@@ -1,0 +1,54 @@
+# AI Research Workflow Skill
+
+A Codex/OMX skill that turns vague AI/ML research ideas into artifact-gated research workflows: intake, literature review, falsifiable hypothesis spec, experiment design, implementation, experiment runs, result analysis, reproducibility review, and paper drafting.
+
+## Why
+
+AI research agents are most useful when they do not jump from an idea directly to code. This skill forces separation between:
+
+- `RESEARCH.md`: scientific intent, hypotheses, contribution, success/falsification criteria, non-goals, and claim boundaries.
+- `EXPERIMENT.md`: datasets, baselines, metrics, ablations, seeds, commands, logging, statistical tests, and failure policy.
+
+The result is a workflow where evidence controls claims.
+
+## Install
+
+Clone the repo and copy the skill folder into your Codex skills directory:
+
+```bash
+git clone https://github.com/MciG-ggg/ai-research-workflow.git
+mkdir -p ~/.codex/skills
+cp -R ai-research-workflow/skills/ai-research-workflow ~/.codex/skills/
+```
+
+Then invoke it explicitly:
+
+```text
+$ai-research-workflow turn this paper idea into a research plan and experiment workflow
+```
+
+## What it creates
+
+For a new project, the skill can initialize:
+
+```text
+.omx/ai-research/<slug>/
+  RESEARCH.md
+  LITERATURE.md
+  EXPERIMENT.md
+  RUNS.md
+  RESULTS.md
+  REPRODUCIBILITY.md
+  PAPER_DRAFT.md
+```
+
+## Local validation
+
+```bash
+python3 ~/.codex/skills/.system/skill-creator/scripts/quick_validate.py skills/ai-research-workflow
+python3 skills/ai-research-workflow/scripts/init_research_artifacts.py demo --root /tmp/ai-research-workflow-test --title "Demo Research"
+```
+
+## License
+
+MIT

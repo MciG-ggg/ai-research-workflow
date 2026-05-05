@@ -1,0 +1,4 @@
+interface:
+  display_name: "AI Research Workflow"
+  short_description: "Turn AI research ideas into validated artifacts"
+  default_prompt: "Use $ai-research-workflow to turn this AI research idea into a validated research plan and experiment workflow."

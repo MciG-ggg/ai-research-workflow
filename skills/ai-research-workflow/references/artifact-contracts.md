@@ -1,0 +1,68 @@
+# AI Research Artifact Contracts
+
+Use these contracts to keep scientific goals separate from execution details.
+
+## Required artifacts
+
+| Artifact | Purpose | Created by phase |
+| --- | --- | --- |
+| `RESEARCH.md` | Scientific intent, hypothesis, contribution, success/falsification criteria, non-goals, claim boundaries | intake / question spec |
+| `LITERATURE.md` | Source-backed related work, baselines, datasets, benchmark constraints, evidence gaps | literature review |
+| `EXPERIMENT.md` | Runnable experimental protocol and validation plan | experiment design |
+| `RUNS.md` | Commands, environment, data versions, seeds, logs, result paths, failures | experiment execution |
+| `RESULTS.md` | Tables, analysis, uncertainty, ablations, threats to validity | analysis |
+| `REPRODUCIBILITY.md` | Reproducibility checklist and blockers | reproducibility review |
+| `PAPER_DRAFT.md` | Claim-traceable paper/report draft | paper/report drafting |
+
+## `RESEARCH.md` minimum sections
+
+- Title
+- Research question
+- Hypothesis
+- Contribution type
+- Motivation and expected novelty
+- Success criteria
+- Falsification criteria
+- In scope
+- Out of scope / non-goals
+- Claim boundaries / forbidden claims
+- Decision boundaries
+- Open questions
+
+## `LITERATURE.md` minimum sections
+
+- Search date
+- Query strategy
+- Inclusion / exclusion criteria
+- Source table: title, venue/date, link, relevance, key evidence
+- Related-work matrix
+- Baseline candidates
+- Dataset and benchmark notes
+- Gaps and risks
+
+## `EXPERIMENT.md` minimum sections
+
+- Experiment objective
+- Datasets and splits
+- Baselines
+- Method variants
+- Training or inference configuration
+- Metrics
+- Statistical testing plan
+- Ablations
+- Seeds
+- Hardware and runtime budget
+- Logging and artifact paths
+- Reproduction commands
+- Failure policy
+
+## `RESULTS.md` minimum sections
+
+- Result artifact paths
+- Summary tables
+- Hypothesis verdicts: supported, contradicted, inconclusive
+- Uncertainty / variance
+- Ablations
+- Error analysis
+- Threats to validity
+- Evidence-to-claim mapping
