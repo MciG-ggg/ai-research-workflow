@@ -11,6 +11,21 @@ AI research agents are most useful when they do not jump from an idea directly t
 
 The result is a workflow where evidence controls claims.
 
+## Dependency: oh-my-codex
+
+This skill is designed for Codex sessions running with [oh-my-codex (OMX)](https://github.com/Yeachan-Heo/oh-my-codex), the multi-agent orchestration layer that provides workflow skills such as `$deep-interview --autoresearch`, `$autoresearch`, `$ralplan`, `$ralph`, and `$autopilot`.
+
+- GitHub: <https://github.com/Yeachan-Heo/oh-my-codex>
+- Documentation/homepage: <https://yeachan-heo.github.io/oh-my-codex>
+
+Install and initialize OMX before using the OMX handoff paths in this skill:
+
+```bash
+npm install -g oh-my-codex
+omx setup
+omx doctor
+```
+
 ## Install
 
 Clone the repo and copy the skill folder into your Codex skills directory:
