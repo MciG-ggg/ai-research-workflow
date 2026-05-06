@@ -59,7 +59,7 @@ For a new project, the skill can initialize:
 
 ## Experiment run standards
 
-This skill also standardizes how experiments are executed and recorded:
+By default, this skill standardizes how experiments are executed and recorded. Users should not need to request this separately:
 
 - create a dedicated run directory under `.omx/ai-research/<slug>/runs/<run-id>/`
 - capture complete stdout/stderr in `logs/combined.log`
@@ -67,7 +67,7 @@ This skill also standardizes how experiments are executed and recorded:
 - generate figures under `figures/` with a `figures_manifest.json`
 - print the absolute log path in the final report
 
-Use the helper script to scaffold a run:
+The agent should use the helper script to scaffold a run unless the project already has an equivalent runner:
 
 ```bash
 python3 skills/ai-research-workflow/scripts/prepare_experiment_run.py <slug> --command "python train.py ..."

@@ -26,6 +26,15 @@ python3 <skill_dir>/scripts/init_research_artifacts.py <slug> --root .omx/ai-res
 
 Read `references/artifact-contracts.md` when authoring or auditing artifact contents. Read `references/experiment-runtime-standards.md` before designing, implementing, running, or auditing experiments. Read `references/research-quality-gates.md` before approving a handoff, result, or paper claim.
 
+
+## Default experiment execution contract
+
+When this skill runs, designs, implements, or audits experiments, structured runtime evidence is mandatory by default. Do not wait for the user to ask for logs, metrics, progress, or visualizations.
+
+For every experiment run, use `scripts/prepare_experiment_run.py` to create the run directory and wrapper unless an existing project-native runner already provides the same contract. Equivalent runners must still produce: `run_manifest.json`, `run.sh` or equivalent command record, `logs/combined.log`, `data/metrics.jsonl`, `data/summary.json`, `figures/`, and `figures/figures_manifest.json`.
+
+Only skip this contract when no experiment is actually executed, or when the user explicitly opts out. If skipped, record the reason in `RUNS.md` or the final response.
+
 ## Workflow
 
 ### 1. Research intake
@@ -79,7 +88,7 @@ Only implement after `RESEARCH.md` and `EXPERIMENT.md` are coherent. Keep code c
 
 ### 6. Run experiments
 
-Produce `RUNS.md`. Record commands, environment, commit hash if available, data versions, seed values, result file paths, complete log file absolute paths, metrics file absolute paths, figure paths, exit status, and failures. Prefer `scripts/prepare_experiment_run.py` to create `.omx/ai-research/<slug>/runs/<run-id>/` with `run.sh`, `logs/combined.log`, `data/metrics.jsonl`, `data/summary.json`, and `figures/`. Never fabricate results. If experiments cannot run locally, state the blocker and leave exact runnable commands plus expected output locations.
+Produce `RUNS.md`. Record commands, environment, commit hash if available, data versions, seed values, result file paths, complete log file absolute paths, metrics file absolute paths, figure paths, exit status, and failures. By default, run experiments through `scripts/prepare_experiment_run.py` so each run creates `.omx/ai-research/<slug>/runs/<run-id>/` with `run.sh`, `logs/combined.log`, `data/metrics.jsonl`, `data/summary.json`, and `figures/`. Never fabricate results. If experiments cannot run locally, state the blocker and leave exact runnable commands plus expected output locations.
 
 ### 7. Analyze results
 

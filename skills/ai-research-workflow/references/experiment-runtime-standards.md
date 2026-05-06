@@ -1,10 +1,10 @@
 # Experiment Runtime Standards
 
-Use these standards whenever an AI agent designs, implements, runs, or audits experiments.
+These standards are mandatory by default whenever an AI agent designs, implements, runs, or audits experiments. Do not treat logs, structured metrics, progress reporting, or visualizations as optional niceties. They are the evidence layer for reproducible research. Skip only when no experiment is executed or the user explicitly opts out; record the reason when skipped.
 
 ## Run directory contract
 
-Every experiment run must write to one run directory:
+Every experiment run must write to one run directory by default:
 
 ```text
 .omx/ai-research/<slug>/runs/<UTC_TIMESTAMP>-<run-name>/
@@ -39,7 +39,7 @@ set -o pipefail
 bash run.sh 2>&1 | tee -a /absolute/path/to/logs/combined.log
 ```
 
-Prefer the bundled `prepare_experiment_run.py` script to generate a safer `run.sh` wrapper.
+Use the bundled `prepare_experiment_run.py` script to generate a safer `run.sh` wrapper unless an existing project-native runner already satisfies this same contract.
 
 ## Progress bar rules
 
