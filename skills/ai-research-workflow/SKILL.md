@@ -11,6 +11,8 @@ Turn an AI/ML research idea into artifact-gated research work. Do not jump from 
 
 This is a framework skill, not a project-specific experiment runner. It defines artifacts, quality gates, orchestration expectations, and script-recording conventions. Generate or adapt project-local scripts inside the research workspace only when the current project needs them.
 
+Bundled scripts under this skill's own `scripts/` directory are maintenance-only tools for validating or evolving the skill framework itself. Do not use them as user experiment runners, metrics collectors, plotting scripts, or research-doc publishers.
+
 This skill may hand off to OMX workflows when available:
 - Use `$deep-interview --autoresearch` when the research mission, evaluator, non-goals, or launch criteria are unclear.
 - Use `$autoresearch` when a clarified mission needs a persistent validator-gated research loop.
@@ -36,7 +38,7 @@ Minimum framework layout:
   runs/
 ```
 
-Read `references/artifact-contracts.md` when authoring or auditing artifact contents. Read `references/project-local-script-registry.md` before creating or relying on project-local scripts. Read `references/experiment-runtime-standards.md` before designing, implementing, running, or auditing experiments. Read `references/research-quality-gates.md` before approving a handoff, result, or paper claim.
+Read `references/artifact-contracts.md` when authoring or auditing artifact contents. Read `references/project-local-script-registry.md` before creating or relying on project-local scripts. Read `references/experiment-runtime-standards.md` before designing, implementing, running, or auditing experiments. Read `references/research-quality-gates.md` before approving a handoff, result, or paper claim. Run maintenance-only scripts only when updating or validating this skill, not while executing a user's research workflow.
 
 ## Default experiment evidence contract
 

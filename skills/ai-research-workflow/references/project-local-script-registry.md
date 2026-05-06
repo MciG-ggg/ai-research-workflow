@@ -2,6 +2,8 @@
 
 This skill is framework-first. Do not assume bundled Python scripts fit the user's project. Instead, record the scripts that the current project actually needs inside the research workspace.
 
+Distinguish project scripts from skill maintenance scripts. Scripts shipped in this skill's own `scripts/` directory are for validating or maintaining the framework itself; do not register or invoke them as user research scripts.
+
 ## Location
 
 For each research workspace, maintain project-local scripts and script metadata here:

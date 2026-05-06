@@ -62,6 +62,17 @@ For each research project, the skill asks the agent to create or maintain a proj
 
 The skill intentionally does **not** ship universal experiment runner scripts. Different research projects use different training stacks, config systems, clusters, notebooks, plotting tools, and logging conventions. Instead, it defines where project-local scripts should live and how they should be named and documented.
 
+## Maintenance-only bundled scripts
+
+The skill may include bundled scripts under `skills/ai-research-workflow/scripts/`, but those scripts are maintenance-only tools for validating and evolving this framework. They are not for running user experiments, collecting user metrics, plotting user results, or publishing user research docs.
+
+User research scripts belong in the target project workspace:
+
+```text
+.omx/ai-research/<slug>/scripts/
+.omx/ai-research/<slug>/SCRIPT_REGISTRY.md
+```
+
 ## Experiment run standards
 
 By default, this skill standardizes how experiments are executed, monitored, recorded, and published. Users should not need to request this separately:
@@ -96,6 +107,7 @@ publish_docs_<experiment>.sh
 
 ```bash
 python3 ~/.codex/skills/.system/skill-creator/scripts/quick_validate.py skills/ai-research-workflow
+python3 skills/ai-research-workflow/scripts/validate_framework_contract.py skills/ai-research-workflow
 ```
 
 ## License
