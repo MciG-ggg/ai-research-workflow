@@ -24,7 +24,7 @@ Prefer the bundled initializer for a new workspace:
 python3 <skill_dir>/scripts/init_research_artifacts.py <slug> --root .omx/ai-research --title "<short title>"
 ```
 
-Read `references/artifact-contracts.md` when authoring or auditing artifact contents. Read `references/research-quality-gates.md` before approving a handoff, result, or paper claim.
+Read `references/artifact-contracts.md` when authoring or auditing artifact contents. Read `references/experiment-runtime-standards.md` before designing, implementing, running, or auditing experiments. Read `references/research-quality-gates.md` before approving a handoff, result, or paper claim.
 
 ## Workflow
 
@@ -71,19 +71,23 @@ Produce `EXPERIMENT.md` before writing or changing experiment code. Include:
 - logging and artifact paths
 - exact reproduction commands
 - failure-handling policy
+- required run directory, complete log capture, metrics files, progress reporting, and visualization outputs
 
 ### 5. Implement experiment
 
-Only implement after `RESEARCH.md` and `EXPERIMENT.md` are coherent. Keep code changes minimal and traceable to the experiment spec. Prefer existing project patterns. Add config files, logging, deterministic seeds, and result-output paths needed for reproducibility.
+Only implement after `RESEARCH.md` and `EXPERIMENT.md` are coherent. Keep code changes minimal and traceable to the experiment spec. Prefer existing project patterns. Add config files, deterministic seeds, structured metric writers, progress reporting, visualization generation, and result-output paths needed for reproducibility. Long-running experiment code must expose progress without corrupting structured outputs.
 
 ### 6. Run experiments
 
-Produce `RUNS.md`. Record commands, environment, commit hash if available, data versions, seed values, result file paths, and failures. Never fabricate results. If experiments cannot run locally, state the blocker and leave exact runnable commands plus expected output locations.
+Produce `RUNS.md`. Record commands, environment, commit hash if available, data versions, seed values, result file paths, complete log file absolute paths, metrics file absolute paths, figure paths, exit status, and failures. Prefer `scripts/prepare_experiment_run.py` to create `.omx/ai-research/<slug>/runs/<run-id>/` with `run.sh`, `logs/combined.log`, `data/metrics.jsonl`, `data/summary.json`, and `figures/`. Never fabricate results. If experiments cannot run locally, state the blocker and leave exact runnable commands plus expected output locations.
 
 ### 7. Analyze results
 
 Produce `RESULTS.md`. Separate evidence from interpretation:
 - raw result locations
+- complete experiment log path
+- metrics and summary data paths
+- visualization paths and captions
 - summary tables
 - uncertainty, variance, or confidence intervals when applicable
 - ablation interpretation
@@ -93,7 +97,7 @@ Produce `RESULTS.md`. Separate evidence from interpretation:
 
 ### 8. Reproducibility review
 
-Produce `REPRODUCIBILITY.md` using the quality gates reference. Check whether a fresh agent could reproduce the result from artifacts alone. Missing seeds, data versions, commands, or result paths are blockers.
+Produce `REPRODUCIBILITY.md` using the quality gates reference. Check whether a fresh agent could reproduce the result from artifacts alone. Missing seeds, data versions, commands, complete log paths, metrics files, visualization outputs for numeric/comparative results, or result paths are blockers.
 
 ### 9. Paper draft or report
 
@@ -106,4 +110,4 @@ Stop only when one of these is true:
 - A validator script or `$autoresearch` completion artifact passes.
 - A real blocker prevents progress; report the missing data, compute, credentials, or decision.
 
-Final responses must list changed/created artifacts, validation evidence, unsupported claims removed or downgraded, and remaining risks.
+Final responses must list changed/created artifacts, validation evidence, complete log file absolute paths for every experiment run, metrics/summary/figure paths, unsupported claims removed or downgraded, and remaining risks.

@@ -9,7 +9,7 @@ Use these contracts to keep scientific goals separate from execution details.
 | `RESEARCH.md` | Scientific intent, hypothesis, contribution, success/falsification criteria, non-goals, claim boundaries | intake / question spec |
 | `LITERATURE.md` | Source-backed related work, baselines, datasets, benchmark constraints, evidence gaps | literature review |
 | `EXPERIMENT.md` | Runnable experimental protocol and validation plan | experiment design |
-| `RUNS.md` | Commands, environment, data versions, seeds, logs, result paths, failures | experiment execution |
+| `RUNS.md` | Commands, environment, data versions, seeds, complete log paths, metrics paths, figure paths, result paths, failures | experiment execution |
 | `RESULTS.md` | Tables, analysis, uncertainty, ablations, threats to validity | analysis |
 | `REPRODUCIBILITY.md` | Reproducibility checklist and blockers | reproducibility review |
 | `PAPER_DRAFT.md` | Claim-traceable paper/report draft | paper/report drafting |
@@ -55,6 +55,25 @@ Use these contracts to keep scientific goals separate from execution details.
 - Logging and artifact paths
 - Reproduction commands
 - Failure policy
+- Run directory contract
+- Complete log capture plan
+- Metrics output schema
+- Progress reporting plan
+- Visualization output plan
+
+## `RUNS.md` minimum sections
+
+- Run directory absolute path
+- Run manifest path
+- Complete log file absolute path
+- Command and wrapper script path
+- Environment and git commit
+- Data versions
+- Seeds
+- Metrics file paths
+- Summary file path
+- Figure output paths
+- Exit status and failures
 
 ## `RESULTS.md` minimum sections
 
@@ -66,3 +85,4 @@ Use these contracts to keep scientific goals separate from execution details.
 - Error analysis
 - Threats to validity
 - Evidence-to-claim mapping
+- Visualization manifest path and figure captions

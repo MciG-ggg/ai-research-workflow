@@ -57,6 +57,22 @@ For a new project, the skill can initialize:
   PAPER_DRAFT.md
 ```
 
+## Experiment run standards
+
+This skill also standardizes how experiments are executed and recorded:
+
+- create a dedicated run directory under `.omx/ai-research/<slug>/runs/<run-id>/`
+- capture complete stdout/stderr in `logs/combined.log`
+- write structured metrics to `data/metrics.jsonl` and `data/summary.json`
+- generate figures under `figures/` with a `figures_manifest.json`
+- print the absolute log path in the final report
+
+Use the helper script to scaffold a run:
+
+```bash
+python3 skills/ai-research-workflow/scripts/prepare_experiment_run.py <slug> --command "python train.py ..."
+```
+
 ## Local validation
 
 ```bash
