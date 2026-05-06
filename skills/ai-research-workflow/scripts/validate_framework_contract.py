@@ -27,6 +27,8 @@ REQUIRED_FILES = [
     "references/experiment-runtime-standards.md",
     "references/project-local-script-registry.md",
     "references/research-quality-gates.md",
+    "references/worktree-development.md",
+    "scripts/check_worktree_registry.py",
 ]
 
 REQUIRED_PHRASES = {
@@ -35,6 +37,8 @@ REQUIRED_PHRASES = {
         "not a project-specific experiment runner",
         "maintenance-only",
         "project-local scripts",
+        "separate git worktree",
+        ".omx/worktrees/REGISTRY.md",
         ".omx/ai-research/<slug>/SCRIPT_REGISTRY.md",
         ".omx/ai-research/<slug>/scripts/",
     ],
@@ -43,6 +47,7 @@ REQUIRED_PHRASES = {
         "does **not** ship universal experiment runner scripts",
         "maintenance-only",
         "not for running user experiments",
+        ".omx/worktrees/REGISTRY.md",
     ],
     "references/artifact-contracts.md": [
         "SCRIPT_REGISTRY.md",
@@ -62,6 +67,13 @@ REQUIRED_PHRASES = {
     "references/research-quality-gates.md": [
         "SCRIPT_REGISTRY.md",
         "project-local wrapper scripts",
+    ],
+    "references/worktree-development.md": [
+        "Worktree-based Framework Development",
+        ".omx/worktrees/REGISTRY.md",
+        "non-overlapping write scopes",
+        "git rerere",
+        "Lore-format commit",
     ],
 }
 

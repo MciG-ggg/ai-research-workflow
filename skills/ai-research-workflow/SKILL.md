@@ -38,7 +38,11 @@ Minimum framework layout:
   runs/
 ```
 
-Read `references/artifact-contracts.md` when authoring or auditing artifact contents. Read `references/project-local-script-registry.md` before creating or relying on project-local scripts. Read `references/experiment-runtime-standards.md` before designing, implementing, running, or auditing experiments. Read `references/research-quality-gates.md` before approving a handoff, result, or paper claim. Run maintenance-only scripts only when updating or validating this skill, not while executing a user's research workflow.
+Read `references/artifact-contracts.md` when authoring or auditing artifact contents. Read `references/project-local-script-registry.md` before creating or relying on project-local scripts. Read `references/experiment-runtime-standards.md` before designing, implementing, running, or auditing experiments. Read `references/research-quality-gates.md` before approving a handoff, result, or paper claim. Read `references/worktree-development.md` when updating this skill framework itself. Run maintenance-only scripts only when updating or validating this skill, not while executing a user's research workflow.
+
+## Framework maintenance rule
+
+When changing different aspects of this skill, isolate each aspect in a separate git worktree. Prefer `<repo>/.omx/worktrees/<scope>/`; if that path is not writable, use a writable fallback and record the absolute path. Maintain `.omx/worktrees/REGISTRY.md` with each worktree's path, branch, scope, owned files/areas, and status. Merge worktrees back serially after validation, then clean them up. Keep write scopes narrow so parallel worktrees avoid editing the same files or lines.
 
 ## Default experiment evidence contract
 

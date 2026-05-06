@@ -73,6 +73,34 @@ User research scripts belong in the target project workspace:
 .omx/ai-research/<slug>/SCRIPT_REGISTRY.md
 ```
 
+## Framework development with worktrees
+
+When changing different aspects of this skill, use isolated git worktrees to reduce merge conflicts:
+
+```text
+.omx/worktrees/<scope>/
+.omx/worktrees/REGISTRY.md
+```
+
+Record each worktree's path, branch, purpose, owned files/areas, and status in `REGISTRY.md`. If `.omx/worktrees/` is not writable, use a writable fallback such as `~/omx-worktrees/<repo-name>/<scope>` and record the absolute path.
+
+Conflict policy:
+
+- split work by non-overlapping file/area ownership
+- avoid concurrent edits to `SKILL.md` unless one worktree is the integrator
+- rebase each worktree on `main` before final validation
+- merge worktrees back serially, validating after each merge
+- enable `git rerere` when repeated conflict patterns are expected
+- rewrite or squash worker auto-checkpoint commits into Lore-format commits before merge-back
+
+Maintenance helpers:
+
+```bash
+python3 skills/ai-research-workflow/scripts/check_worktree_registry.py .
+```
+
+See `skills/ai-research-workflow/references/worktree-development.md`.
+
 ## Experiment run standards
 
 By default, this skill standardizes how experiments are executed, monitored, recorded, and published. Users should not need to request this separately:
@@ -108,6 +136,7 @@ publish_docs_<experiment>.sh
 ```bash
 python3 ~/.codex/skills/.system/skill-creator/scripts/quick_validate.py skills/ai-research-workflow
 python3 skills/ai-research-workflow/scripts/validate_framework_contract.py skills/ai-research-workflow
+python3 skills/ai-research-workflow/scripts/check_worktree_registry.py .
 ```
 
 ## License
