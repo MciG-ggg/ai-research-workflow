@@ -59,18 +59,34 @@ For a new project, the skill can initialize:
 
 ## Experiment run standards
 
-By default, this skill standardizes how experiments are executed and recorded. Users should not need to request this separately:
+By default, this skill standardizes how experiments are executed, monitored, recorded, and published. Users should not need to request this separately:
 
+- launch actual experiment runs in detached tmux via a helper script
 - create a dedicated run directory under `.omx/ai-research/<slug>/runs/<run-id>/`
 - capture complete stdout/stderr in `logs/combined.log`
 - write structured metrics to `data/metrics.jsonl` and `data/summary.json`
 - generate figures under `figures/` with a `figures_manifest.json`
-- print the absolute log path in the final report
+- print the tmux session/status path and absolute log path in the final report
+- publish settled results and conclusions into project-root `docs/ai-research/<slug>/` with MkDocs config
 
-The agent should use the helper script to scaffold a run unless the project already has an equivalent runner:
+The agent should use the tmux helper script for real experiment runs unless the project already has an equivalent runner:
+
+```bash
+python3 skills/ai-research-workflow/scripts/launch_experiment_tmux.py <slug> --name baseline --command "python train.py ..."
+```
+
+For short synchronous smoke tests, it can use:
 
 ```bash
 python3 skills/ai-research-workflow/scripts/prepare_experiment_run.py <slug> --command "python train.py ..."
+```
+
+After results are settled, publish docs and create MkDocs config when safe:
+
+```bash
+python3 skills/ai-research-workflow/scripts/publish_research_docs.py <slug>
+python3 -m pip install mkdocs  # if MkDocs is not installed yet
+python3 -m mkdocs serve
 ```
 
 ## Local validation

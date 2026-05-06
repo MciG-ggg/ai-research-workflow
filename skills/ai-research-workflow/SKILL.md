@@ -31,9 +31,19 @@ Read `references/artifact-contracts.md` when authoring or auditing artifact cont
 
 When this skill runs, designs, implements, or audits experiments, structured runtime evidence is mandatory by default. Do not wait for the user to ask for logs, metrics, progress, or visualizations.
 
-For every experiment run, use `scripts/prepare_experiment_run.py` to create the run directory and wrapper unless an existing project-native runner already provides the same contract. Equivalent runners must still produce: `run_manifest.json`, `run.sh` or equivalent command record, `logs/combined.log`, `data/metrics.jsonl`, `data/summary.json`, `figures/`, and `figures/figures_manifest.json`.
+For every experiment run, use `scripts/launch_experiment_tmux.py` by default so the run is prepared, launched in a detached tmux session, and monitored from durable artifacts. Use `scripts/prepare_experiment_run.py` only when tmux is unavailable, the run is intentionally short/synchronous, or a project-native runner already provides the same contract. Equivalent runners must still produce: `run_manifest.json`, `run.sh` or equivalent command record, `logs/combined.log`, `data/metrics.jsonl`, `data/summary.json`, `figures/`, and `figures/figures_manifest.json`.
 
 Only skip this contract when no experiment is actually executed, or when the user explicitly opts out. If skipped, record the reason in `RUNS.md` or the final response.
+
+## Default experiment orchestration contract
+
+Run experiments in detached tmux by default. The experiment runner agent must return the tmux session name, run directory, complete log path, metrics path, summary path, and figures path to the leader immediately after launch. The leader must poll the durable status/summary/log files until completion before claiming results.
+
+For multiple independent variants, seeds, datasets, or ablations, use OMX `$team` or native subagents when parallel execution materially reduces wall-clock time and resource contention is acceptable. Each parallel lane must own a distinct run directory and must not overwrite another lane's metrics, logs, figures, or summaries. Aggregate only after all required lanes finish or fail with preserved logs.
+
+## Default docs publishing contract
+
+When results, settled data, or research conclusions are finalized, publish them under the project root `docs/` directory by default and configure MkDocs when safe. Use `scripts/publish_research_docs.py <slug>` to copy research artifacts into `docs/ai-research/<slug>/` and create `mkdocs.yml` if one does not already exist. If an existing MkDocs config is present, preserve it and report any manual nav update needed.
 
 ## Workflow
 
@@ -88,7 +98,7 @@ Only implement after `RESEARCH.md` and `EXPERIMENT.md` are coherent. Keep code c
 
 ### 6. Run experiments
 
-Produce `RUNS.md`. Record commands, environment, commit hash if available, data versions, seed values, result file paths, complete log file absolute paths, metrics file absolute paths, figure paths, exit status, and failures. By default, run experiments through `scripts/prepare_experiment_run.py` so each run creates `.omx/ai-research/<slug>/runs/<run-id>/` with `run.sh`, `logs/combined.log`, `data/metrics.jsonl`, `data/summary.json`, and `figures/`. Never fabricate results. If experiments cannot run locally, state the blocker and leave exact runnable commands plus expected output locations.
+Produce `RUNS.md`. Record commands, environment, commit hash if available, data versions, seed values, result file paths, tmux session/status paths, complete log file absolute paths, metrics file absolute paths, figure paths, exit status, and failures. By default, run experiments through `scripts/launch_experiment_tmux.py` so each run creates `.omx/ai-research/<slug>/runs/<run-id>/` with `run.sh`, `tmux_status.json`, `logs/combined.log`, `data/metrics.jsonl`, `data/summary.json`, and `figures/`. The leader must periodically inspect `tmux_status.json`, `data/summary.json`, and/or `logs/combined.log` until completion. Never fabricate results. If experiments cannot run locally, state the blocker and leave exact runnable commands plus expected output locations.
 
 ### 7. Analyze results
 
@@ -110,7 +120,7 @@ Produce `REPRODUCIBILITY.md` using the quality gates reference. Check whether a 
 
 ### 9. Paper draft or report
 
-Produce `PAPER_DRAFT.md` only after results and reproducibility review exist. Every scientific claim must point to a result, citation, or explicit assumption. Downgrade unsupported claims to hypotheses or future work.
+Produce `PAPER_DRAFT.md` only after results and reproducibility review exist. Every scientific claim must point to a result, citation, or explicit assumption. Downgrade unsupported claims to hypotheses or future work. After settled conclusions exist, publish the current artifacts to `docs/ai-research/<slug>/` via `scripts/publish_research_docs.py` so they can be browsed with MkDocs.
 
 ## Completion rules
 
@@ -119,4 +129,4 @@ Stop only when one of these is true:
 - A validator script or `$autoresearch` completion artifact passes.
 - A real blocker prevents progress; report the missing data, compute, credentials, or decision.
 
-Final responses must list changed/created artifacts, validation evidence, complete log file absolute paths for every experiment run, metrics/summary/figure paths, unsupported claims removed or downgraded, and remaining risks.
+Final responses must list changed/created artifacts, validation evidence, tmux session/status paths for launched experiments, complete log file absolute paths for every experiment run, metrics/summary/figure paths, docs/MkDocs paths when conclusions were published, unsupported claims removed or downgraded, and remaining risks.

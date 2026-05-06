@@ -9,7 +9,7 @@ Use these contracts to keep scientific goals separate from execution details.
 | `RESEARCH.md` | Scientific intent, hypothesis, contribution, success/falsification criteria, non-goals, claim boundaries | intake / question spec |
 | `LITERATURE.md` | Source-backed related work, baselines, datasets, benchmark constraints, evidence gaps | literature review |
 | `EXPERIMENT.md` | Runnable experimental protocol and validation plan | experiment design |
-| `RUNS.md` | Commands, environment, data versions, seeds, complete log paths, metrics paths, figure paths, result paths, failures | experiment execution |
+| `RUNS.md` | Commands, environment, tmux session/status, data versions, seeds, complete log paths, metrics paths, figure paths, result paths, failures | experiment execution |
 | `RESULTS.md` | Tables, analysis, uncertainty, ablations, threats to validity | analysis |
 | `REPRODUCIBILITY.md` | Reproducibility checklist and blockers | reproducibility review |
 | `PAPER_DRAFT.md` | Claim-traceable paper/report draft | paper/report drafting |
@@ -56,6 +56,7 @@ Use these contracts to keep scientific goals separate from execution details.
 - Reproduction commands
 - Failure policy
 - Run directory contract
+- Detached tmux launch and monitoring plan
 - Complete log capture plan
 - Metrics output schema
 - Progress reporting plan
@@ -65,6 +66,7 @@ Use these contracts to keep scientific goals separate from execution details.
 
 - Run directory absolute path
 - Run manifest path
+- Tmux session name and `tmux_status.json` path when used
 - Complete log file absolute path
 - Command and wrapper script path
 - Environment and git commit
@@ -86,3 +88,19 @@ Use these contracts to keep scientific goals separate from execution details.
 - Threats to validity
 - Evidence-to-claim mapping
 - Visualization manifest path and figure captions
+
+
+## Published docs minimum sections
+
+When findings are settled, publish browser-readable copies under `docs/ai-research/<slug>/`:
+
+- `index.md`: summary and links to all artifact pages
+- `research.md`
+- `literature.md`
+- `experiment.md`
+- `runs.md`
+- `results.md`
+- `reproducibility.md`
+- `paper-draft.md` when available
+
+Project root should contain `mkdocs.yml` when safe to create. If a project already has MkDocs configuration, preserve it and report any nav update needed.

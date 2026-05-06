@@ -4,12 +4,13 @@ These standards are mandatory by default whenever an AI agent designs, implement
 
 ## Run directory contract
 
-Every experiment run must write to one run directory by default:
+Every experiment run must be launched in detached tmux by default and write to one run directory:
 
 ```text
 .omx/ai-research/<slug>/runs/<UTC_TIMESTAMP>-<run-name>/
   run_manifest.json
   run.sh
+  tmux_status.json              # present for tmux-launched runs
   logs/
     combined.log
   data/
@@ -23,6 +24,22 @@ Every experiment run must write to one run directory by default:
 ```
 
 `run_manifest.json` must include absolute paths for `run_dir`, `log_file`, `metrics_jsonl`, `summary_json`, and `figures_dir` so a human can open outputs without guessing.
+
+
+## Tmux orchestration rules
+
+- Use `scripts/launch_experiment_tmux.py` by default for actual experiment execution.
+- The runner/subagent returns immediately with `tmux_session`, `tmux_status`, `run_dir`, `log_file`, `metrics_jsonl`, `summary_json`, and `figures_dir`.
+- The leader monitors periodically with `tmux capture-pane`, `tmux_status.json`, `data/summary.json`, and `logs/combined.log`.
+- Completion is determined by durable files, not by optimistic status messages.
+- Long-running panes may remain open briefly after completion for inspection; logs and summaries remain the source of truth.
+- For parallel lanes, use distinct run directories and session names; aggregate only after all required runs are terminal.
+
+Default launch pattern:
+
+```bash
+python3 <skill_dir>/scripts/launch_experiment_tmux.py <slug> --name <run-name> --command "python train.py ..."
+```
 
 ## Logging rules
 
@@ -39,7 +56,7 @@ set -o pipefail
 bash run.sh 2>&1 | tee -a /absolute/path/to/logs/combined.log
 ```
 
-Use the bundled `prepare_experiment_run.py` script to generate a safer `run.sh` wrapper unless an existing project-native runner already satisfies this same contract.
+Use the bundled `launch_experiment_tmux.py` script for default detached execution. Use `prepare_experiment_run.py` only for short synchronous smoke runs, tmux-unavailable environments, or project-native runners that satisfy this same contract.
 
 ## Progress bar rules
 
@@ -121,6 +138,7 @@ If visualization is not appropriate, record why in `RESULTS.md`.
 
 After running an experiment, the agent must report:
 
+- tmux session name and status file when tmux was used
 - run directory absolute path
 - complete log file absolute path
 - metrics file absolute path

@@ -25,7 +25,7 @@ Pass only if:
 - Baselines are comparable under fair settings.
 - Metrics match the research question.
 - Seeds, data splits, and commands are specified.
-- Complete log capture, metrics files, progress reporting, and visualization outputs are specified.
+- Detached tmux execution/monitoring, complete log capture, metrics files, progress reporting, and visualization outputs are specified.
 - Ablations test the core mechanism rather than cosmetic variants.
 - Failure policy distinguishes environment failures from hypothesis failures.
 
@@ -34,7 +34,7 @@ Pass only if:
 Pass only if:
 - No result is invented or inferred without an artifact path.
 - Tables trace back to raw outputs.
-- Complete log file paths, metrics paths, summary paths, and figure paths are recorded.
+- Tmux session/status paths, complete log file paths, metrics paths, summary paths, and figure paths are recorded.
 - Visualizations exist for numeric/comparative results or a reason is documented.
 - Variance or uncertainty is reported when multiple runs are expected.
 - Negative and inconclusive results are preserved.
@@ -43,7 +43,12 @@ Pass only if:
 ## Reproducibility gate
 
 Pass only if:
-- A fresh agent can find data, configs, commands, seeds, complete logs, metrics, figures, and outputs.
+- A fresh agent can find data, configs, commands, seeds, tmux/run status, complete logs, metrics, figures, and outputs.
 - Environment requirements are explicit.
 - Known non-determinism is disclosed.
 - Missing compute, credentials, or data access is reported as a blocker.
+
+
+## Documentation publishing gate
+
+Pass only if settled conclusions and data are mirrored into project-root `docs/ai-research/<slug>/` or a documented reason explains why publication is deferred. `mkdocs.yml` should exist or an existing MkDocs config should be preserved with a reported nav update requirement.
