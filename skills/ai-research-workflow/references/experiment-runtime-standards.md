@@ -2,63 +2,63 @@
 
 These standards are mandatory by default whenever an AI agent designs, implements, runs, or audits experiments. Do not treat logs, structured metrics, progress reporting, or visualizations as optional niceties. They are the evidence layer for reproducible research. Skip only when no experiment is executed or the user explicitly opts out; record the reason when skipped.
 
+This document defines contracts, not universal scripts. Use project-native tooling first and create thin project-local wrappers only when needed. Record those wrappers in `SCRIPT_REGISTRY.md`.
+
 ## Run directory contract
 
-Every experiment run must be launched in detached tmux by default and write to one run directory:
+Every experiment run must write to one distinct run directory:
 
 ```text
 .omx/ai-research/<slug>/runs/<UTC_TIMESTAMP>-<run-name>/
   run_manifest.json
-  run.sh
-  tmux_status.json              # present for tmux-launched runs
+  run_command.sh               # or equivalent command record
+  tmux_status.json             # when tmux is used
   logs/
     combined.log
   data/
     metrics.jsonl
-    metrics.csv                 # optional but recommended for tabular metrics
-    predictions.jsonl           # optional task outputs
-    summary.json                # final machine-readable summary
+    metrics.csv                # optional but recommended for tabular metrics
+    predictions.jsonl          # optional task outputs
+    summary.json               # final machine-readable summary
   figures/
-    *.png|*.svg|*.pdf           # generated plots
-    figures_manifest.json       # what each figure shows and source data path
+    *.png|*.svg|*.pdf          # generated plots
+    figures_manifest.json      # what each figure shows and source data path
 ```
 
 `run_manifest.json` must include absolute paths for `run_dir`, `log_file`, `metrics_jsonl`, `summary_json`, and `figures_dir` so a human can open outputs without guessing.
 
-
 ## Tmux orchestration rules
 
-- Use `scripts/launch_experiment_tmux.py` by default for actual experiment execution.
+- Launch long experiments in detached tmux by default when tmux is available.
+- Implement the launch as a project-local script or native command recorded in `SCRIPT_REGISTRY.md`; do not assume a pre-bundled runner exists.
 - The runner/subagent returns immediately with `tmux_session`, `tmux_status`, `run_dir`, `log_file`, `metrics_jsonl`, `summary_json`, and `figures_dir`.
 - The leader monitors periodically with `tmux capture-pane`, `tmux_status.json`, `data/summary.json`, and `logs/combined.log`.
 - Completion is determined by durable files, not by optimistic status messages.
-- Long-running panes may remain open briefly after completion for inspection; logs and summaries remain the source of truth.
 - For parallel lanes, use distinct run directories and session names; aggregate only after all required runs are terminal.
 
-Default launch pattern:
+Generic tmux pattern to adapt into a project-local script:
 
 ```bash
-python3 <skill_dir>/scripts/launch_experiment_tmux.py <slug> --name <run-name> --command "python train.py ..."
+tmux new-session -d -s "<session>" \
+  "cd <project-root> && bash <run-command-record> 2>&1 | tee -a <absolute-log-path>"
 ```
 
 ## Logging rules
 
-- Capture full stdout/stderr to `logs/combined.log` with `tee` or an equivalent logger.
+- Capture full stdout/stderr to `logs/combined.log` with `tee` or an equivalent project logger.
 - Final responses must include the absolute `combined.log` path.
 - Do not rely on terminal scrollback as the only record.
 - Keep logs human-readable, but write metrics to structured files instead of scraping logs.
 - If the command fails, keep the log and mark the run status as failed; do not delete partial evidence.
 
-Recommended shell pattern:
+Recommended shell pattern to adapt:
 
 ```bash
 set -o pipefail
-bash run.sh 2>&1 | tee -a /absolute/path/to/logs/combined.log
+<project-command> 2>&1 | tee -a /absolute/path/to/logs/combined.log
 ```
 
-Use the bundled `launch_experiment_tmux.py` script for default detached execution. Use `prepare_experiment_run.py` only for short synchronous smoke runs, tmux-unavailable environments, or project-native runners that satisfy this same contract.
-
-## Progress bar rules
+## Progress rules
 
 - Long-running experiments must expose progress.
 - In interactive terminals, a progress bar may render to stderr.
@@ -66,17 +66,7 @@ Use the bundled `launch_experiment_tmux.py` script for default detached executio
 - Progress updates should include enough data to diagnose stalls: step, total steps when known, epoch, split, current metric, elapsed time, and ETA when available.
 - Do not let progress bars corrupt JSONL/CSV outputs.
 
-Python pattern without adding dependencies:
-
-```python
-import json, sys, time
-
-def progress(step, total=None, **fields):
-    payload = {"event": "progress", "step": step, "total": total, "time": time.time(), **fields}
-    print(json.dumps(payload, ensure_ascii=False), file=sys.stderr, flush=True)
-```
-
-If `tqdm` is already a project dependency, use it for terminal UX, but still write structured metrics/progress records.
+Use the project's native progress tools when available. If no project convention exists, add a small progress event writer in the project's language and record it in `SCRIPT_REGISTRY.md`.
 
 ## Data output rules
 

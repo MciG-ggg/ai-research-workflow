@@ -9,6 +9,7 @@ Use these contracts to keep scientific goals separate from execution details.
 | `RESEARCH.md` | Scientific intent, hypothesis, contribution, success/falsification criteria, non-goals, claim boundaries | intake / question spec |
 | `LITERATURE.md` | Source-backed related work, baselines, datasets, benchmark constraints, evidence gaps | literature review |
 | `EXPERIMENT.md` | Runnable experimental protocol and validation plan | experiment design |
+| `SCRIPT_REGISTRY.md` | Project-local commands/scripts, ownership, inputs, outputs, dependencies, rerun safety, and validation status | implementation / experiment execution |
 | `RUNS.md` | Commands, environment, tmux session/status, data versions, seeds, complete log paths, metrics paths, figure paths, result paths, failures | experiment execution |
 | `RESULTS.md` | Tables, analysis, uncertainty, ablations, threats to validity | analysis |
 | `REPRODUCIBILITY.md` | Reproducibility checklist and blockers | reproducibility review |
@@ -62,13 +63,22 @@ Use these contracts to keep scientific goals separate from execution details.
 - Progress reporting plan
 - Visualization output plan
 
+## `SCRIPT_REGISTRY.md` minimum sections
+
+- Project-native commands that already satisfy the research contract
+- Project-local wrapper scripts under `.omx/ai-research/<slug>/scripts/`
+- Purpose, owner phase, inputs, outputs, dependencies, and environment variables for each command/script
+- Safe-to-rerun/idempotency notes
+- Validation status and last validated command/log path
+- Replacement/deprecation notes when a script becomes stale
+
 ## `RUNS.md` minimum sections
 
 - Run directory absolute path
 - Run manifest path
 - Tmux session name and `tmux_status.json` path when used
 - Complete log file absolute path
-- Command and wrapper script path
+- Command and project-local wrapper script path when used
 - Environment and git commit
 - Data versions
 - Seeds
@@ -103,4 +113,4 @@ When findings are settled, publish browser-readable copies under `docs/ai-resear
 - `reproducibility.md`
 - `paper-draft.md` when available
 
-Project root should contain `mkdocs.yml` when safe to create. If a project already has MkDocs configuration, preserve it and report any nav update needed.
+Project root should contain `mkdocs.yml` when safe to create. If a project already has MkDocs configuration, preserve it and report any nav update needed. Publishing can be done with a project-local `publish_docs_<name>.sh` entry in `SCRIPT_REGISTRY.md`, but the contract is the `docs/` output, not the presence of a bundled publisher.
