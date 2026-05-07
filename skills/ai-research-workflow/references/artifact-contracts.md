@@ -1,6 +1,12 @@
 # AI Research Artifact Contracts
 
-Use these contracts to keep scientific goals separate from execution details.
+Use these contracts to keep scientific goals separate from execution details and to keep `.omx/ai-research` metadata separate from project-root implementation work.
+
+## Control plane vs project-root outputs
+
+`.omx/ai-research/<slug>/` is the research control plane. It stores research intent, plans, run indexes, evidence summaries, and reproducibility notes.
+
+Project-root files are the implementation plane. Method code, baseline reproduction code, configs, tests, dataset adapters, benchmark entrypoints, and durable docs belong in the target repository's normal locations, not under `.omx/ai-research/`.
 
 ## Required artifacts
 
@@ -63,6 +69,7 @@ Use these contracts to keep scientific goals separate from execution details.
 - Metrics output schema
 - Progress reporting plan
 - Visualization output plan
+- Project-root implementation and baseline reproduction paths
 
 ## `SCRIPT_REGISTRY.md` minimum sections
 
@@ -87,6 +94,8 @@ Use these contracts to keep scientific goals separate from execution details.
 - Metrics file paths
 - Summary file path
 - Figure output paths
+- Distilled updates made outside `runs/`
+- Project-root docs/config/code/test updates caused by this run
 - Exit status and failures
 
 ## `RESULTS.md` minimum sections
@@ -100,6 +109,7 @@ Use these contracts to keep scientific goals separate from execution details.
 - Threats to validity
 - Evidence-to-claim mapping
 - Visualization manifest path and figure captions
+- Run distillation notes: what moved from raw run evidence into stable conclusions, docs, configs, or code
 
 
 ## Published docs minimum sections
@@ -116,3 +126,14 @@ When findings are settled, publish browser-readable copies under `docs/ai-resear
 - `paper-draft.md` when available
 
 Project root should contain `mkdocs.yml` when safe to create. If a project already has MkDocs configuration, preserve it and report any nav update needed. Publishing can be done with a project-local `publish_docs_<name>.sh` entry in `SCRIPT_REGISTRY.md`, but the contract is the `docs/` output, not the presence of a bundled publisher.
+
+## Run distillation contract
+
+Each terminal run directory remains raw evidence. After completion, extract durable information outside `runs/`:
+
+- Update `RUNS.md` as the run index and status ledger.
+- Update `RESULTS.md` with tables, figures, interpretation, and hypothesis verdicts when evidence changes.
+- Update `REPRODUCIBILITY.md` with rerun instructions, blockers, environment notes, or nondeterminism.
+- Promote stable conclusions to project-root `docs/`, `reports/`, benchmark cards, README sections, or MkDocs pages.
+- Promote reusable code/config/test changes to the project root, not to `.omx/ai-research/`.
+- Keep raw logs, checkpoints, private data, and large temporary outputs in run/artifact storage; link or summarize them instead of copying them into project docs.

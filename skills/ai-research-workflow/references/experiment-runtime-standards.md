@@ -27,6 +27,17 @@ Every experiment run must write to one distinct run directory:
 
 `run_manifest.json` must include absolute paths for `run_dir`, `log_file`, `metrics_jsonl`, `summary_json`, and `figures_dir` so a human can open outputs without guessing.
 
+## Terminal run distillation rules
+
+The run directory is raw evidence, not the final research memory. After each run becomes terminal:
+
+- Update `.omx/ai-research/<slug>/RUNS.md` with status, command, seed/device/resource, log path, metrics path, summary path, and failure notes.
+- Update `.omx/ai-research/<slug>/RESULTS.md` when the run changes tables, figures, comparisons, hypothesis verdicts, or threats to validity.
+- Update `.omx/ai-research/<slug>/REPRODUCIBILITY.md` when the run reveals environment requirements, nondeterminism, missing data, missing compute, or rerun steps.
+- Promote stable conclusions to project-root `docs/`, `reports/`, benchmark cards, README sections, or MkDocs pages when useful.
+- Promote reusable method, baseline, config, or test changes to project-root files; do not bury them in `.omx/ai-research/`.
+- Keep raw logs, checkpoints, private data, and large temporary outputs in run storage; link or summarize them instead of copying them into project-root docs.
+
 ## Tmux orchestration rules
 
 - Launch long experiments in detached tmux by default when tmux is available.
@@ -163,5 +174,6 @@ After running an experiment, the agent must report:
 - metrics file absolute path
 - summary file absolute path
 - figures directory and key figure paths
+- distilled updates made to `RUNS.md`, `RESULTS.md`, `REPRODUCIBILITY.md`, or project-root docs/code/configs
 - exit status
 - next action if the run failed or remained inconclusive
