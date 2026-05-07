@@ -11,6 +11,13 @@ Pass only if:
 - Non-goals are explicit.
 - Forbidden claims are explicit.
 
+## Workflow gate
+
+Pass only if:
+- The workflow stages that are relevant to the task are explicit: deep interview, planning, implementation, baseline reproduction, experiments, distillation, reproducibility review, and reporting.
+- The chosen OMX handoff path is appropriate for the current ambiguity and risk.
+- Control-plane artifacts in `.omx/ai-research/<slug>/` are clearly separated from project-root code/config/test/docs work.
+
 ## Literature gate
 
 Pass only if:
@@ -31,6 +38,13 @@ Pass only if:
 - Ablations test the core mechanism rather than cosmetic variants.
 - Failure policy distinguishes environment failures from hypothesis failures.
 
+## Implementation gate
+
+Pass only if:
+- The method, baseline, or evaluation implementation lives in the target repository's normal source/config/test layout, not under `.omx/ai-research/`.
+- Project-root code/config/test changes are recorded alongside the research plan when they are part of the task.
+- Baseline reproduction is either completed or explicitly blocked with reasons.
+
 ## Result gate
 
 Pass only if:
@@ -43,6 +57,7 @@ Pass only if:
 - Variance or uncertainty is reported when multiple runs are expected.
 - Negative and inconclusive results are preserved.
 - Claims do not exceed evidence.
+- Distilled updates outside `runs/` are recorded when the run changed stable conclusions or reusable project artifacts.
 
 ## Reproducibility gate
 

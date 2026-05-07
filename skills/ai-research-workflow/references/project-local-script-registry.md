@@ -21,6 +21,8 @@ For each research workspace, maintain project-local scripts and script metadata 
 
 Use `.sh` for shell orchestration and the project's native language for data processing or plotting (`.py`, `.R`, `.jl`, `.ipynb`, etc.). Prefer existing project runners when they already exist; record wrapper commands rather than replacing them.
 
+These scripts are thin orchestration wrappers. Do not put the user's method implementation, baseline implementation, model code, dataset adapter, or production experiment logic here. Those belong in the project root using the repository's normal layout.
+
 ## Naming conventions
 
 - `run_<experiment>.sh`: launch one experiment or one reproducible lane.
@@ -53,6 +55,7 @@ Add one entry per script in `SCRIPT_REGISTRY.md`:
 
 - Create scripts only when the current project needs them.
 - Keep scripts thin: wrap existing project commands, logging, tmux launch, metrics extraction, plotting, or docs sync.
+- Keep method code, baseline code, configs, tests, and durable documentation in project-root locations; record their paths in research artifacts instead of moving them under `.omx/ai-research/`.
 - Do not introduce new dependencies unless the project already uses them or the user explicitly approves.
 - Every script must write outputs into the current research workspace or a project-defined artifact directory recorded in `RUNS.md`.
 - Every script must be referenced from `SCRIPT_REGISTRY.md` before relying on it as part of the workflow.

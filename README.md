@@ -13,7 +13,7 @@ The result is a workflow where evidence controls claims.
 
 ## Dependency: oh-my-codex
 
-This skill is designed for Codex sessions running with [oh-my-codex (OMX)](https://github.com/Yeachan-Heo/oh-my-codex), the multi-agent orchestration layer that provides workflow skills such as `$deep-interview --autoresearch`, `$autoresearch`, `$ralplan`, `$ralph`, `$team`, and `$autopilot`.
+This skill is designed for Codex sessions running with [oh-my-codex (OMX)](https://github.com/Yeachan-Heo/oh-my-codex), the multi-agent orchestration layer that provides workflow skills such as `$deep-interview --autoresearch`, `$ralplan`, `$autoresearch`, `$ralph`, `$team`, and `$autopilot`.
 
 - GitHub: <https://github.com/Yeachan-Heo/oh-my-codex>
 - Documentation/homepage: <https://yeachan-heo.github.io/oh-my-codex>
@@ -41,6 +41,26 @@ Then invoke it explicitly:
 ```text
 $ai-research-workflow turn this paper idea into a research plan and experiment workflow
 ```
+
+## Workflow
+
+This skill is a workflow, not just a logging template.
+
+Default sequence:
+
+```text
+$deep-interview --autoresearch
+  -> literature and research artifacts
+  -> $ralplan for implementation and validation shape
+  -> task worktree in the target repo
+  -> $autoresearch for a validator-gated loop
+  -> implementation / baseline reproduction / experiments
+  -> run distillation into RUNS.md / RESULTS.md / project-root outputs
+  -> reproducibility review
+  -> paper/report drafting
+```
+
+`.omx/ai-research/<slug>/` is the control plane. Actual method implementation, baseline reproduction, configs, tests, and project-native experiment code belong in the target repository root or its existing conventions, not under `.omx/ai-research/`.
 
 ## Update this skill
 
@@ -100,6 +120,8 @@ For each research project, the skill asks the agent to create or maintain a proj
 ```
 
 The skill intentionally does **not** ship universal experiment runner scripts. Different research projects use different training stacks, config systems, clusters, notebooks, plotting tools, and logging conventions. Instead, it defines where project-local scripts should live and how they should be named and documented.
+
+Run directories are raw evidence. After each terminal run, distill stable conclusions back into `RUNS.md`, `RESULTS.md`, `REPRODUCIBILITY.md`, and then into project-root docs, reports, code, configs, or tests when the result is reusable.
 
 ## Maintenance-only bundled scripts
 
@@ -182,6 +204,7 @@ By default, this skill standardizes how experiments are executed, monitored, rec
 - final reports include tmux/status/log/metrics/summary/figure paths
 - settled results and conclusions are mirrored into project-root `docs/ai-research/<slug>/` with MkDocs config when safe
 - multi-seed experiments may run one seed per subagent/team lane, with each lane assigned an explicit idle GPU/device or scheduler slot
+- method implementation and baseline reproduction happen in the target repository root, not inside `.omx/ai-research/`
 
 Project-local scripts should be recorded in:
 

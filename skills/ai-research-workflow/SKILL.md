@@ -1,6 +1,6 @@
 ---
 name: ai-research-workflow
-description: "AI research workflow orchestration for turning vague AI/ML research ideas into validated research artifacts: intake, literature review, falsifiable hypothesis spec, experiment design, implementation, experiment runs, result analysis, reproducibility review, and paper drafting. Use when Codex is asked to develop, evaluate, reproduce, or write up an AI/ML research idea, benchmark, method, ablation, paper plan, experiment pipeline, or research report with clear hypotheses, baselines, metrics, validation, and claim boundaries."
+description: "AI research workflow orchestration for turning vague AI/ML research ideas into validated project work and research artifacts: deep interview, literature review, falsifiable hypothesis spec, ralplan planning, method implementation, baseline reproduction, experiment design, experiment runs, result distillation, reproducibility review, and paper drafting. Use when Codex is asked to develop, implement, evaluate, reproduce, or write up an AI/ML research idea, benchmark, method, baseline, ablation, paper plan, experiment pipeline, or research report with clear hypotheses, baselines, metrics, validation, and claim boundaries."
 ---
 
 # AI Research Workflow
@@ -13,10 +13,21 @@ This is a framework skill, not a project-specific experiment runner. It defines 
 
 Bundled scripts under this skill's own `scripts/` directory are maintenance-only tools for validating or evolving the skill framework itself. Do not use them as user experiment runners, metrics collectors, plotting scripts, or research-doc publishers.
 
-This skill may hand off to OMX workflows when available:
-- Use `$deep-interview --autoresearch` when the research mission, evaluator, non-goals, or launch criteria are unclear.
-- Use `$autoresearch` when a clarified mission needs a persistent validator-gated research loop.
-- Use `$ralplan`/`$ralph`/`$autopilot` only for implementation-heavy phases after research and experiment specs exist.
+This skill is an OMX workflow. By default it orchestrates:
+
+```text
+$deep-interview --autoresearch
+  -> literature and research artifacts
+  -> $ralplan for implementation and validation shape
+  -> task worktree execution in the target repo
+  -> $autoresearch for validator-gated research loop
+  -> implementation / baseline reproduction / experiments
+  -> run distillation and project-root updates
+  -> reproducibility review
+  -> paper/report drafting
+```
+
+Skip completed phases only when existing artifacts pass the relevant gate.
 
 ## Artifact setup
 
@@ -38,7 +49,13 @@ Minimum framework layout:
   runs/
 ```
 
-Read `references/artifact-contracts.md` when authoring or auditing artifact contents. Read `references/project-local-script-registry.md` before creating or relying on project-local scripts. Read `references/experiment-runtime-standards.md` before designing, implementing, running, or auditing experiments. Read `references/research-quality-gates.md` before approving a handoff, result, or paper claim. Read `references/worktree-development.md` when updating this skill framework itself. Run maintenance-only scripts only when updating or validating this skill, not while executing a user's research workflow.
+Read `references/workflow-orchestration.md` before starting or resuming the full research workflow. Read `references/artifact-contracts.md` when authoring or auditing artifact contents. Read `references/project-local-script-registry.md` before creating or relying on project-local scripts. Read `references/experiment-runtime-standards.md` before designing, implementing, running, or auditing experiments. Read `references/research-quality-gates.md` before approving a handoff, result, or paper claim. Read `references/worktree-development.md` when making substantive target-repo changes. Run maintenance-only scripts only when updating or validating this skill, not while executing a user's research workflow.
+
+## Research control plane vs project implementation
+
+`.omx/ai-research/<slug>/` is the research control plane: specs, decisions, run indexes, evidence summaries, and reproducibility notes.
+
+Actual research work belongs in the target project root using existing project conventions. Implement the user's method, reproduce baselines, add configs, tests, datasets adapters, training/evaluation entrypoints, and reports in project-root locations such as `src/`, `models/`, `baselines/`, `configs/`, `experiments/`, `scripts/`, `tests/`, `docs/`, or the repository's established equivalents. Do not put method code, baseline code, or production experiment code under `.omx/ai-research/`; only thin orchestration wrappers and metadata belong there.
 
 ## Task worktree rule
 
@@ -75,6 +92,10 @@ When results, settled data, or research conclusions are finalized, publish them 
 
 ## Workflow
 
+### 0. OMX workflow entry
+
+Start with `$deep-interview --autoresearch` unless the user already provides clear hypotheses, success criteria, non-goals, forbidden claims, and evaluator/validation criteria. Use `$ralplan` before implementation-heavy work. Use `$autoresearch` for the durable validator-gated loop over literature, implementation, experiments, and claims.
+
 ### 1. Research intake
 
 Produce `RESEARCH.md` before implementation. Include:
@@ -102,13 +123,19 @@ Tighten `RESEARCH.md` until each hypothesis is testable. Convert vague goals int
 
 Produce `EXPERIMENT.md` before writing or changing experiment code. Include datasets, splits, baselines, fairness constraints, method variants, configs, metrics, statistical tests, ablations, seeds, runtime budget, logging/artifact paths, reproduction commands, failure policy, run directory contract, progress reporting, and visualization plan.
 
-### 5. Project-local scripts and implementation
+### 5. Project-root implementation and baseline reproduction
+
+After `$ralplan` and before expensive runs, implement or adapt the actual research method, baseline reproduction, configs, tests, and project-native experiment entrypoints in the target repository root. Use the task worktree rule for these edits.
+
+Baseline reproduction is first-class work: preserve exact commands/configs, record blockers, and do not claim improvement over a baseline that was not fairly reproduced or explicitly scoped out.
+
+### 6. Project-local orchestration scripts
 
 Before running experiments, inspect the project for existing runners, notebooks, Make targets, Hydra configs, shell scripts, or CI jobs. Reuse them when possible.
 
 If wrappers are needed, create them under `.omx/ai-research/<slug>/scripts/` and document them in `SCRIPT_REGISTRY.md`. Keep wrappers thin and project-specific: tmux launch, log capture, metrics extraction, plotting, or docs publishing. Do not assume a bundled framework script will fit the project.
 
-### 6. Run experiments
+### 7. Run experiments
 
 Produce `RUNS.md`. Record commands, environment, commit hash if available, data versions, seed values, tmux session/status paths when used, result paths, complete log file absolute paths, metrics file absolute paths, figure paths, exit status, and failures.
 
@@ -120,15 +147,19 @@ Default run behavior:
 
 Never fabricate results. If experiments cannot run locally, state the blocker and leave exact runnable commands plus expected output locations.
 
-### 7. Analyze results
+### 8. Distill completed runs
+
+After each run reaches a terminal state, distill reusable information out of `runs/<run-id>/`. Update `RUNS.md` with status, command, seed/device/resource, log, metrics, summary, and failure notes. Update `RESULTS.md` when the run changes evidence or interpretation. Update `REPRODUCIBILITY.md` with new blockers or rerun instructions. Promote stable conclusions or reusable implementation changes to project-root docs, reports, configs, tests, or code as appropriate. Do not copy raw logs, checkpoints, private data, or large temporary outputs into project-root docs.
+
+### 9. Analyze results
 
 Produce `RESULTS.md`. Separate evidence from interpretation. Include raw result locations, complete experiment log path, metrics and summary data paths, visualization paths/captions, summary tables, uncertainty/variance, ablation interpretation, negative findings, threats to validity, and hypothesis verdicts.
 
-### 8. Reproducibility review
+### 10. Reproducibility review
 
 Produce `REPRODUCIBILITY.md` using the quality gates reference. Check whether a fresh agent could reproduce the result from artifacts alone. Missing seeds, data versions, commands, complete log paths, metrics files, visualization outputs for numeric/comparative results, or result paths are blockers.
 
-### 9. Paper draft or report
+### 11. Paper draft or report
 
 Produce `PAPER_DRAFT.md` only after results and reproducibility review exist. Every scientific claim must point to a result, citation, or explicit assumption. Downgrade unsupported claims to hypotheses or future work. After settled conclusions exist, publish the current artifacts to `docs/ai-research/<slug>/` so they can be browsed with MkDocs.
 
@@ -139,4 +170,4 @@ Stop only when one of these is true:
 - A project validator, test command, or `$autoresearch` completion artifact passes.
 - A real blocker prevents progress; report the missing data, compute, credentials, or decision.
 
-Final responses must list changed/created artifacts, validation evidence, project-local scripts created/updated, tmux session/status paths for launched experiments, complete log file absolute paths for every experiment run, metrics/summary/figure paths, docs/MkDocs paths when conclusions were published, unsupported claims removed or downgraded, and remaining risks.
+Final responses must list changed/created research artifacts, project-root files changed for method/baseline/config/test/docs work, validation evidence, project-local scripts created/updated, tmux session/status paths for launched experiments, complete log file absolute paths for every experiment run, metrics/summary/figure paths, distilled run updates outside `runs/`, docs/MkDocs paths when conclusions were published, unsupported claims removed or downgraded, and remaining risks.
