@@ -65,6 +65,8 @@ Run long experiments in detached tmux by default when tmux is available. The run
 
 For multiple independent variants, seeds, datasets, or ablations, use OMX `$team` or native subagents when parallel execution materially reduces wall-clock time and resource contention is acceptable. Each parallel lane must own a distinct run directory and must not overwrite another lane's metrics, logs, figures, or summaries. Aggregate only after all required lanes finish or fail with preserved logs.
 
+For multi-seed experiments, treat each seed as an independent execution lane when the experiment design allows it. The leader must inspect available accelerators first, assign each seed lane an explicit idle GPU/device or scheduler slot, and record the seed-to-device mapping in `RUNS.md` and the run manifest. Use native subagents or `$team` lanes to launch seeds in parallel only when enough idle cards are available; otherwise run seeds serially or queue them. Prevent resource races by setting project-appropriate device controls such as `CUDA_VISIBLE_DEVICES`, scheduler GPU requests, or the framework's native device flag per lane.
+
 ## Default docs publishing contract
 
 When results, settled data, or research conclusions are finalized, publish them under the project root `docs/` directory by default and configure MkDocs when safe. Prefer project-local docs/publishing scripts recorded in `SCRIPT_REGISTRY.md`; otherwise create the minimal `docs/ai-research/<slug>/` pages and `mkdocs.yml` by following `artifact-contracts.md`. If an existing MkDocs config is present, preserve it and report any manual nav update needed.
@@ -112,6 +114,7 @@ Default run behavior:
 - Long runs: launch in detached tmux through a project-local script or existing native command.
 - Short smoke runs: may run synchronously if they still capture complete logs and structured outputs.
 - Parallel runs: use `$team` or native subagents only for independent lanes with distinct output directories.
+- Multi-seed runs: assign one seed per lane when possible, choose idle GPUs/devices before launch, record `seed`, `device`, `subagent/team lane`, run directory, log path, metrics path, and exit status for every seed.
 
 Never fabricate results. If experiments cannot run locally, state the blocker and leave exact runnable commands plus expected output locations.
 
