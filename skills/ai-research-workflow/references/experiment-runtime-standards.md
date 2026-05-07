@@ -43,6 +43,35 @@ tmux new-session -d -s "<session>" \
   "cd <project-root> && bash <run-command-record> 2>&1 | tee -a <absolute-log-path>"
 ```
 
+## Multi-seed and accelerator lane rules
+
+When an experiment requires multiple seeds and each seed is independent, split seeds across native subagents or OMX `$team` lanes when parallelism is safe.
+
+Leader responsibilities:
+
+- Inspect available GPUs/accelerators or scheduler slots before launch.
+- Assign each seed lane an explicit idle device or scheduler resource.
+- Record a seed-to-device allocation table in `RUNS.md` before or immediately after launch.
+- Cap parallelism at available idle resources; queue or serialize extra seeds.
+- Ensure each lane has a distinct run directory, tmux session name, log file, metrics file, summary file, and figure directory.
+
+Worker/subagent lane responsibilities:
+
+- Use only the assigned seed and device.
+- Set the project-appropriate device control, for example `CUDA_VISIBLE_DEVICES=<id>`, a scheduler GPU request, or the framework's native device flag.
+- Report `seed`, `device`, `run_dir`, `log_file`, `metrics_jsonl`, `summary_json`, `figures_dir`, and exit status to the leader.
+- Never auto-select a GPU in a way that can race with another lane unless the cluster scheduler provides exclusive allocation.
+
+Resource inspection should use project-native or platform-native tools when available, for example `nvidia-smi`, `rocm-smi`, `gpustat`, Slurm/PBS/Kubernetes queue status, or a project-specific launcher. Treat low utilization as a hint, not a lock; prefer scheduler-exclusive allocation on shared machines.
+
+Recommended allocation table:
+
+```markdown
+| Seed | Lane | Device/resource | Run directory | Log path | Status |
+| --- | --- | --- | --- | --- | --- |
+| 1 | subagent-1 | GPU 0 via CUDA_VISIBLE_DEVICES=0 | `/abs/runs/...-seed1` | `/abs/runs/.../logs/combined.log` | running |
+```
+
 ## Logging rules
 
 - Capture full stdout/stderr to `logs/combined.log` with `tee` or an equivalent project logger.

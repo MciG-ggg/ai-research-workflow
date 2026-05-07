@@ -42,6 +42,45 @@ Then invoke it explicitly:
 $ai-research-workflow turn this paper idea into a research plan and experiment workflow
 ```
 
+## Update this skill
+
+If you installed from this repository, update the clone and resync the skill into Codex:
+
+```bash
+cd ai-research-workflow
+git pull --ff-only
+python3 ~/.codex/skills/.system/skill-creator/scripts/quick_validate.py skills/ai-research-workflow
+python3 skills/ai-research-workflow/scripts/validate_framework_contract.py skills/ai-research-workflow
+rsync -a --delete skills/ai-research-workflow/ ~/.codex/skills/ai-research-workflow/
+python3 ~/.codex/skills/.system/skill-creator/scripts/quick_validate.py ~/.codex/skills/ai-research-workflow
+```
+
+If you are maintaining this repository, update the framework through an isolated worktree:
+
+```bash
+git switch main
+git pull --ff-only
+mkdir -p .omx/worktrees
+git worktree add -b omx/<scope> .omx/worktrees/<scope> main
+```
+
+Record the worktree in `.omx/worktrees/REGISTRY.md`, keep the edit scope narrow, validate inside the worktree, then merge back serially:
+
+```bash
+python3 ~/.codex/skills/.system/skill-creator/scripts/quick_validate.py skills/ai-research-workflow
+python3 skills/ai-research-workflow/scripts/validate_framework_contract.py skills/ai-research-workflow
+git commit
+# return to the main worktree, for example:
+cd /path/to/ai-research-workflow
+git merge --no-ff omx/<scope>
+rsync -a --delete skills/ai-research-workflow/ ~/.codex/skills/ai-research-workflow/
+git push origin main
+git worktree remove .omx/worktrees/<scope>
+git branch -d omx/<scope>
+```
+
+Use Lore-format commit messages for final commits and squash or rewrite any worker auto-checkpoint commits before merging.
+
 ## Framework layout
 
 For each research project, the skill asks the agent to create or maintain a project-local research workspace:
@@ -139,6 +178,7 @@ By default, this skill standardizes how experiments are executed, monitored, rec
 - figures are generated for numeric/comparative results when appropriate
 - final reports include tmux/status/log/metrics/summary/figure paths
 - settled results and conclusions are mirrored into project-root `docs/ai-research/<slug>/` with MkDocs config when safe
+- multi-seed experiments may run one seed per subagent/team lane, with each lane assigned an explicit idle GPU/device or scheduler slot
 
 Project-local scripts should be recorded in:
 

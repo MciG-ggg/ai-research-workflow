@@ -41,6 +41,8 @@ REQUIRED_PHRASES = {
         ".omx/worktrees/REGISTRY.md",
         "The skill repository tracks the framework itself",
         "keep `.omx/` ignored",
+        "multi-seed experiments",
+        "idle GPU/device",
         ".omx/ai-research/<slug>/SCRIPT_REGISTRY.md",
         ".omx/ai-research/<slug>/scripts/",
     ],
@@ -54,16 +56,24 @@ REQUIRED_PHRASES = {
         "This repository tracks the skill framework itself",
         "keep `.omx/` ignored",
         "stable research documents and experiment contracts",
+        "Update this skill",
+        "git pull --ff-only",
+        "rsync -a --delete",
+        "one seed per subagent/team lane",
     ],
     "references/artifact-contracts.md": [
         "SCRIPT_REGISTRY.md",
         "Project-local commands/scripts",
         "not the presence of a bundled publisher",
+        "seed-to-device/resource allocation",
     ],
     "references/experiment-runtime-standards.md": [
         "contracts, not universal scripts",
         "project-local wrappers",
         "SCRIPT_REGISTRY.md",
+        "Multi-seed and accelerator lane rules",
+        "CUDA_VISIBLE_DEVICES",
+        "seed-to-device allocation",
     ],
     "references/project-local-script-registry.md": [
         "framework-first",
@@ -73,6 +83,8 @@ REQUIRED_PHRASES = {
     "references/research-quality-gates.md": [
         "SCRIPT_REGISTRY.md",
         "project-local wrapper scripts",
+        "idle GPU/device",
+        "seed-to-device/resource assignments",
     ],
     "references/worktree-development.md": [
         "Worktree-based Framework Development",

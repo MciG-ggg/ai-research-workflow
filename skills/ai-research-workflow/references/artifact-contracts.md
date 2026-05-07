@@ -10,7 +10,7 @@ Use these contracts to keep scientific goals separate from execution details.
 | `LITERATURE.md` | Source-backed related work, baselines, datasets, benchmark constraints, evidence gaps | literature review |
 | `EXPERIMENT.md` | Runnable experimental protocol and validation plan | experiment design |
 | `SCRIPT_REGISTRY.md` | Project-local commands/scripts, ownership, inputs, outputs, dependencies, rerun safety, and validation status | implementation / experiment execution |
-| `RUNS.md` | Commands, environment, tmux session/status, data versions, seeds, complete log paths, metrics paths, figure paths, result paths, failures | experiment execution |
+| `RUNS.md` | Commands, environment, tmux session/status, data versions, seeds, seed-to-device/resource allocation, complete log paths, metrics paths, figure paths, result paths, failures | experiment execution |
 | `RESULTS.md` | Tables, analysis, uncertainty, ablations, threats to validity | analysis |
 | `REPRODUCIBILITY.md` | Reproducibility checklist and blockers | reproducibility review |
 | `PAPER_DRAFT.md` | Claim-traceable paper/report draft | paper/report drafting |
@@ -53,6 +53,7 @@ Use these contracts to keep scientific goals separate from execution details.
 - Ablations
 - Seeds
 - Hardware and runtime budget
+- Multi-seed parallelism and accelerator/resource allocation plan
 - Logging and artifact paths
 - Reproduction commands
 - Failure policy
@@ -82,6 +83,7 @@ Use these contracts to keep scientific goals separate from execution details.
 - Environment and git commit
 - Data versions
 - Seeds
+- Seed-to-device/resource allocation table for parallel runs
 - Metrics file paths
 - Summary file path
 - Figure output paths
