@@ -44,6 +44,13 @@ Read `references/artifact-contracts.md` when authoring or auditing artifact cont
 
 When changing different aspects of this skill, isolate each aspect in a separate git worktree. Prefer `<repo>/.omx/worktrees/<scope>/`; if that path is not writable, use a writable fallback and record the absolute path. Maintain `.omx/worktrees/REGISTRY.md` with each worktree's path, branch, scope, owned files/areas, and status. Merge worktrees back serially after validation, then clean them up. Keep write scopes narrow so parallel worktrees avoid editing the same files or lines.
 
+## Git tracking rule
+
+The skill repository tracks the framework itself:
+- commit `README.md`, `skills/ai-research-workflow/**`, and the maintenance-only scripts that validate this framework
+- keep `.omx/` ignored because it is local runtime state, logs, and temporary worktree data
+- in downstream research projects, selectively version stable research documents and experiment contracts rather than raw run outputs
+
 ## Default experiment evidence contract
 
 When this skill runs, designs, implements, or audits experiments, structured runtime evidence is mandatory by default. Do not wait for the user to ask for logs, metrics, progress, or visualizations.

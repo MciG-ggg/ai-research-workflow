@@ -101,6 +101,32 @@ python3 skills/ai-research-workflow/scripts/check_worktree_registry.py .
 
 See `skills/ai-research-workflow/references/worktree-development.md`.
 
+## Git tracking policy
+
+This repository tracks the skill framework itself:
+
+- track `README.md`, `skills/ai-research-workflow/**`, and the maintenance scripts that validate this framework
+- keep `.omx/` ignored because it records local runtime state, logs, and temporary worktrees
+- in downstream research projects, selectively track only stable research documents and experiment contracts
+
+Good candidates for downstream git history:
+
+- `RESEARCH.md`
+- `LITERATURE.md`
+- `EXPERIMENT.md`
+- `RUNS.md`
+- `RESULTS.md`
+- `REPRODUCIBILITY.md`
+- `PAPER_DRAFT.md`
+- `SCRIPT_REGISTRY.md`
+
+Usually keep local:
+
+- `.omx/**/runs/`
+- `.omx/**/logs/`
+- `.omx/state/`
+- `.omx/worktrees/`
+
 ## Experiment run standards
 
 By default, this skill standardizes how experiments are executed, monitored, recorded, and published. Users should not need to request this separately:
