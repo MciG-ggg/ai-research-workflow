@@ -55,7 +55,7 @@ rsync -a --delete skills/ai-research-workflow/ ~/.codex/skills/ai-research-workf
 python3 ~/.codex/skills/.system/skill-creator/scripts/quick_validate.py ~/.codex/skills/ai-research-workflow
 ```
 
-If you are maintaining this repository, update the framework through an isolated worktree:
+If you are maintaining this repository, this is the special case where the task target is the skill repo itself. Use the same task-worktree rule as normal project work:
 
 ```bash
 git switch main
@@ -112,9 +112,9 @@ User research scripts belong in the target project workspace:
 .omx/ai-research/<slug>/SCRIPT_REGISTRY.md
 ```
 
-## Framework development with worktrees
+## Task worktrees
 
-When changing different aspects of this skill, use isolated git worktrees to reduce merge conflicts:
+When this skill is used to do substantive work in any repository, open an isolated git worktree before editing:
 
 ```text
 .omx/worktrees/<scope>/
@@ -126,7 +126,8 @@ Record each worktree's path, branch, purpose, owned files/areas, and status in `
 Conflict policy:
 
 - split work by non-overlapping file/area ownership
-- avoid concurrent edits to `SKILL.md` unless one worktree is the integrator
+- use one worktree per logical task or lane
+- avoid concurrent edits to shared files unless one worktree is the integrator
 - rebase each worktree on `main` before final validation
 - merge worktrees back serially, validating after each merge
 - enable `git rerere` when repeated conflict patterns are expected
@@ -139,6 +140,8 @@ python3 skills/ai-research-workflow/scripts/check_worktree_registry.py .
 ```
 
 See `skills/ai-research-workflow/references/worktree-development.md`.
+
+This applies to code, docs, experiment setup, refactors, and result packaging. Skip only for read-only analysis or tiny safe edits. If the repository being changed is this skill repo itself, use the same rule as a special case and follow the update instructions above.
 
 ## Git tracking policy
 
