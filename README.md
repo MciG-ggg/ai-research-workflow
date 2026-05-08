@@ -1,5 +1,7 @@
 # AI Research Workflow Skill
 
+[中文文档](README.zh-CN.md)
+
 A Codex/OMX framework skill that turns vague AI/ML research ideas into artifact-gated research workflows: intake, literature review, falsifiable hypothesis spec, experiment design, implementation, experiment runs, result analysis, reproducibility review, and paper drafting.
 
 ## Why
@@ -75,34 +77,7 @@ rsync -a --delete skills/ai-research-workflow/ ~/.codex/skills/ai-research-workf
 python3 ~/.codex/skills/.system/skill-creator/scripts/quick_validate.py ~/.codex/skills/ai-research-workflow
 ```
 
-If you are maintaining this repository, this is the special case where the task target is the skill repo itself. Use the same task-worktree rule as normal project work:
-
-```bash
-git status --short
-# If local changes exist, split them into semantic Lore-format commits first.
-git switch main
-git pull --ff-only
-mkdir -p .omx/worktrees
-git worktree add -b omx/<scope> .omx/worktrees/<scope> HEAD
-```
-
-Record the worktree in `.omx/worktrees/REGISTRY.md`, keep the edit scope narrow, validate inside the worktree, then merge back serially:
-
-```bash
-python3 ~/.codex/skills/.system/skill-creator/scripts/quick_validate.py skills/ai-research-workflow
-python3 skills/ai-research-workflow/scripts/validate_framework_contract.py skills/ai-research-workflow
-git commit
-git push -u origin omx/<scope>
-# return to the main worktree, for example:
-cd /path/to/ai-research-workflow
-git merge --no-ff omx/<scope>
-rsync -a --delete skills/ai-research-workflow/ ~/.codex/skills/ai-research-workflow/
-git push origin main
-git worktree remove .omx/worktrees/<scope>
-git branch -d omx/<scope>
-```
-
-Use Lore-format commit messages for final commits and squash or rewrite any worker auto-checkpoint commits before merging.
+If you are maintaining this repository, validate the skill framework before syncing or publishing changes. The task-worktree policy below describes how the skill should operate inside a target AI research project, not an installation requirement for editing this skill repository.
 
 ## Framework layout
 
@@ -139,7 +114,7 @@ User research scripts belong in the target project workspace:
 
 ## Task worktrees
 
-When this skill is used to do substantive work in any repository, open an isolated git worktree before editing:
+When this skill is used to do substantive AI research work in a target project repository, open an isolated git worktree before editing:
 
 ```text
 .omx/worktrees/<scope>/
@@ -168,13 +143,13 @@ python3 skills/ai-research-workflow/scripts/check_worktree_registry.py .
 
 See `skills/ai-research-workflow/references/worktree-development.md`.
 
-This applies to code, docs, experiment setup, refactors, and result packaging. Skip only for read-only analysis or tiny safe edits. If the repository being changed is this skill repo itself, use the same rule as a special case and follow the update instructions above.
+This applies to target-project code, docs, experiment setup, refactors, and result packaging. Skip only for read-only analysis or tiny safe edits.
 
 ## Git tracking policy
 
 This repository tracks the skill framework itself:
 
-- track `README.md`, `skills/ai-research-workflow/**`, and the maintenance scripts that validate this framework
+- track `README.md`, `README.zh-CN.md`, `skills/ai-research-workflow/**`, and the maintenance scripts that validate this framework
 - keep `.omx/` ignored because it records local runtime state, logs, and temporary worktrees
 - in downstream research projects, selectively track only stable research documents and experiment contracts
 

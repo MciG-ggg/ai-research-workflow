@@ -1,10 +1,10 @@
 # Worktree-based Task Execution
 
-Use this reference when the skill is asked to do substantive work in any repository. The goal is to keep each task isolated, reduce merge conflicts, and make merge-back reviewable. Updating this skill repository itself is only a special case of the same rule.
+Use this reference when the skill is asked to do substantive AI research work in a target project repository. The goal is to keep each research task isolated, reduce merge conflicts, and make merge-back reviewable.
 
 ## When to open a worktree
 
-Open a task worktree before editing for:
+Open a task worktree in the target project repository before editing for:
 
 - code changes
 - documentation changes
@@ -125,13 +125,3 @@ Then mark the registry row `removed` or keep a short completed history entry.
 - Preserve both valid changes when they are additive, then simplify once tests pass.
 - Run validation after conflict resolution before continuing to the next branch.
 - If a worker auto-checkpoint commit appears, rewrite or squash it into a Lore-format commit before merge-back.
-
-## Skill-repo special case
-
-When the target repository is `ai-research-workflow` itself, use the same task worktree lifecycle, then run the skill maintenance validators and resync the installed copy:
-
-```bash
-python3 ~/.codex/skills/.system/skill-creator/scripts/quick_validate.py skills/ai-research-workflow
-python3 skills/ai-research-workflow/scripts/validate_framework_contract.py skills/ai-research-workflow
-rsync -a --delete skills/ai-research-workflow/ ~/.codex/skills/ai-research-workflow/
-```
