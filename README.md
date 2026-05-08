@@ -78,10 +78,12 @@ python3 ~/.codex/skills/.system/skill-creator/scripts/quick_validate.py ~/.codex
 If you are maintaining this repository, this is the special case where the task target is the skill repo itself. Use the same task-worktree rule as normal project work:
 
 ```bash
+git status --short
+# If local changes exist, split them into semantic Lore-format commits first.
 git switch main
 git pull --ff-only
 mkdir -p .omx/worktrees
-git worktree add -b omx/<scope> .omx/worktrees/<scope> main
+git worktree add -b omx/<scope> .omx/worktrees/<scope> HEAD
 ```
 
 Record the worktree in `.omx/worktrees/REGISTRY.md`, keep the edit scope narrow, validate inside the worktree, then merge back serially:
@@ -90,6 +92,7 @@ Record the worktree in `.omx/worktrees/REGISTRY.md`, keep the edit scope narrow,
 python3 ~/.codex/skills/.system/skill-creator/scripts/quick_validate.py skills/ai-research-workflow
 python3 skills/ai-research-workflow/scripts/validate_framework_contract.py skills/ai-research-workflow
 git commit
+git push -u origin omx/<scope>
 # return to the main worktree, for example:
 cd /path/to/ai-research-workflow
 git merge --no-ff omx/<scope>
@@ -144,6 +147,8 @@ When this skill is used to do substantive work in any repository, open an isolat
 ```
 
 Record each worktree's path, branch, purpose, owned files/areas, and status in `REGISTRY.md`. If `.omx/worktrees/` is not writable, use a writable fallback such as `~/omx-worktrees/<repo-name>/<scope>` and record the absolute path.
+
+Before opening a worktree, inspect local git status. If the main worktree has modifications, split them by intent into semantic Lore-format commits first, then create the task worktree from the latest commit. After validation, push the task branch or merged main branch to the remote.
 
 Conflict policy:
 

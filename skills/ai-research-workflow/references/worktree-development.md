@@ -58,6 +58,28 @@ git config rerere.enabled true
 
 ## Standard lifecycle
 
+### Preflight local git state
+
+Before opening a new worktree, inspect the main worktree and protect any existing local work:
+
+```bash
+# from the main worktree of the target repo
+git status --short
+git diff --stat
+git diff --cached --stat
+```
+
+If there are modifications, split them into semantic commits before creating the task worktree. Do not mix unrelated edits just because they are already present. Use `git diff`, `git diff --cached`, and path-level staging to group changes by intent, then commit each group with a Lore-format message:
+
+```bash
+git add <paths-for-one-semantic-change>
+git commit
+```
+
+If a change is incomplete but must be preserved before worktree creation, make the commit message say that explicitly with `Confidence: low` or a `Not-tested:` trailer. Do not stash and forget local work unless the user explicitly asked for a temporary stash workflow.
+
+After the main worktree is clean, update the primary branch and create the task worktree from the latest commit:
+
 ```bash
 # from the main worktree of the target repo
 git status --short
@@ -65,7 +87,7 @@ git fetch origin
 git switch main
 git pull --ff-only
 mkdir -p .omx/worktrees
-git worktree add -b omx/<scope> .omx/worktrees/<scope> main
+git worktree add -b omx/<scope> .omx/worktrees/<scope> HEAD
 ```
 
 Inside the isolated worktree:
@@ -75,6 +97,7 @@ Inside the isolated worktree:
 git status --short
 # run project-appropriate tests or skill validators
 git commit
+git push -u origin omx/<scope>
 ```
 
 Merge back serially from the main worktree:
