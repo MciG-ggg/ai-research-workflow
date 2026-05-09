@@ -101,6 +101,8 @@ python3 ~/.codex/skills/.system/skill-creator/scripts/quick_validate.py ~/.codex
 
 运行目录是原始证据。每次运行终止后，把稳定结论蒸馏回 `RUNS.md`、`RESULTS.md`、`REPRODUCIBILITY.md`，并在结果可复用时同步到项目根目录的 docs、报告、代码、配置或测试。
 
+当用户说“当前实验做完了”“这个实验结束了”或要求收尾时，agent 应进入 experiment completion handoff：先整理 `runs/` 和 `scripts/`，更新 `RUNS.md` 和 `SCRIPT_REGISTRY.md`，再把有价值或用户明确要求保留的内容写入 `RESULTS.md`、`REPRODUCIBILITY.md` 或项目根目录文档，最后报告写入的路径。
+
 ## bundled scripts 只用于维护
 
 `skills/ai-research-workflow/scripts/` 下的脚本只用于维护和验证这个 framework。它们不能用作用户研究项目的实验 runner、指标收集器、绘图脚本或研究文档发布器。

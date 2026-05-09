@@ -60,3 +60,15 @@ Add one entry per script in `SCRIPT_REGISTRY.md`:
 - Every script must write outputs into the current research workspace or a project-defined artifact directory recorded in `RUNS.md`.
 - Every script must be referenced from `SCRIPT_REGISTRY.md` before relying on it as part of the workflow.
 - If a script is unsuitable for a project, document the equivalent native command instead of forcing the framework's preferred shape.
+
+## Completion handoff updates
+
+When the user says the current experiment is done, inspect `.omx/ai-research/<slug>/scripts/` and the native commands recorded by the run. Update `SCRIPT_REGISTRY.md` before final response:
+
+- add missing entries for scripts or native commands that produced the completed run
+- mark scripts as `validated` when the completed run proves they worked, including the command/log path
+- mark scripts as `deprecated` when the experiment replaced or invalidated them
+- record user-requested reusable commands, monitors, metrics collectors, plotting scripts, or docs publishers
+- record known cleanup TODOs only when they are actionable and tied to a path
+
+Do not leave useful script knowledge only in chat. If the script directory or registry is missing, create the minimal registry entry needed to preserve what happened, or report the missing path and exact recovery command.

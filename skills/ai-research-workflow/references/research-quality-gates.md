@@ -58,6 +58,7 @@ Pass only if:
 - Negative and inconclusive results are preserved.
 - Claims do not exceed evidence.
 - Distilled updates outside `runs/` are recorded when the run changed stable conclusions or reusable project artifacts.
+- User-requested findings, reusable commands, cleanup decisions, and next-step TODOs from experiment completion handoff are persisted to `RUNS.md`, `SCRIPT_REGISTRY.md`, `RESULTS.md`, `REPRODUCIBILITY.md`, or project-root docs as appropriate.
 
 ## Reproducibility gate
 
@@ -71,3 +72,13 @@ Pass only if:
 ## Documentation publishing gate
 
 Pass only if settled conclusions and data are mirrored into project-root `docs/ai-research/<slug>/` or a documented reason explains why publication is deferred. `mkdocs.yml` should exist or an existing MkDocs config should be preserved with a reported nav update requirement.
+
+## Experiment completion handoff gate
+
+Pass only if, when the user says the current experiment is done:
+- available run directories, manifests, logs, metrics, summaries, and figures were inspected
+- `RUNS.md` records terminal status, evidence paths, failures, and distilled updates outside `runs/`
+- `SCRIPT_REGISTRY.md` records scripts or native commands used, changed, validated, deprecated, or requested by the user
+- `RESULTS.md` and `REPRODUCIBILITY.md` were updated when the evidence changed conclusions or rerun requirements
+- valuable or user-requested content was written to stable artifacts instead of remaining only in chat
+- missing evidence or skipped writes are reported with exact paths and recovery commands

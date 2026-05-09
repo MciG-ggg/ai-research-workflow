@@ -79,6 +79,7 @@ Project-root files are the implementation plane. Method code, baseline reproduct
 - Safe-to-rerun/idempotency notes
 - Validation status and last validated command/log path
 - Replacement/deprecation notes when a script becomes stale
+- Completion-handoff notes for scripts or native commands that were used, changed, validated, deprecated, or explicitly requested by the user during the finished experiment
 
 ## `RUNS.md` minimum sections
 
@@ -96,6 +97,7 @@ Project-root files are the implementation plane. Method code, baseline reproduct
 - Figure output paths
 - Distilled updates made outside `runs/`
 - Project-root docs/config/code/test updates caused by this run
+- User-requested outputs or decisions persisted during experiment completion handoff
 - Exit status and failures
 
 ## `RESULTS.md` minimum sections
@@ -132,8 +134,11 @@ Project root should contain `mkdocs.yml` when safe to create. If a project alrea
 Each terminal run directory remains raw evidence. After completion, extract durable information outside `runs/`:
 
 - Update `RUNS.md` as the run index and status ledger.
+- Update `SCRIPT_REGISTRY.md` with scripts or native commands that were used, changed, validated, deprecated, or requested by the user.
 - Update `RESULTS.md` with tables, figures, interpretation, and hypothesis verdicts when evidence changes.
 - Update `REPRODUCIBILITY.md` with rerun instructions, blockers, environment notes, or nondeterminism.
 - Promote stable conclusions to project-root `docs/`, `reports/`, benchmark cards, README sections, or MkDocs pages.
 - Promote reusable code/config/test changes to the project root, not to `.omx/ai-research/`.
 - Keep raw logs, checkpoints, private data, and large temporary outputs in run/artifact storage; link or summarize them instead of copying them into project docs.
+
+When the user says the current experiment is done, treat that message as an experiment completion handoff trigger. Inspect available run directories and project-local scripts, then persist valuable or user-requested content into the stable artifacts above before giving the final answer. If a requested artifact cannot be written because evidence is missing, record the missing path and exact recovery step.

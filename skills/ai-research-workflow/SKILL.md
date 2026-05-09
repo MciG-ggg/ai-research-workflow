@@ -90,6 +90,20 @@ For multi-seed experiments, treat each seed as an independent execution lane whe
 
 When results, settled data, or research conclusions are finalized, publish them under the project root `docs/` directory by default and configure MkDocs when safe. Prefer project-local docs/publishing scripts recorded in `SCRIPT_REGISTRY.md`; otherwise create the minimal `docs/ai-research/<slug>/` pages and `mkdocs.yml` by following `artifact-contracts.md`. If an existing MkDocs config is present, preserve it and report any manual nav update needed.
 
+## Experiment completion handoff
+
+When the user says the current experiment is done, finished, ready to wrap up, or otherwise asks to close out the current run, switch into experiment completion handoff before answering. Do not treat the user's message as a request for a chat-only summary.
+
+Completion handoff requires:
+- inspect the current `.omx/ai-research/<slug>/runs/` directories, run manifests, logs, metrics, summaries, and figures that exist locally
+- inspect `.omx/ai-research/<slug>/scripts/` and update `SCRIPT_REGISTRY.md` for scripts or native commands that were used, changed, validated, deprecated, or requested by the user
+- update `RUNS.md` with terminal statuses, command records, log paths, metrics paths, summary paths, figure paths, failures, and distilled updates made outside `runs/`
+- update `RESULTS.md` when the completed experiment changes tables, comparisons, interpretations, hypothesis verdicts, or user-requested takeaways
+- update `REPRODUCIBILITY.md` with rerun commands, environment notes, missing artifacts, nondeterminism, blockers, or cleanup decisions
+- persist user-requested outputs, notable findings, reusable commands, decisions, and next-step TODOs into the appropriate research artifact or project-root docs instead of leaving them only in the final response
+
+Only skip artifact updates when the relevant files or run outputs cannot be found. If skipped, record the missing paths and the next exact recovery command in the final response.
+
 ## Workflow
 
 ### 0. OMX workflow entry
@@ -150,6 +164,8 @@ Never fabricate results. If experiments cannot run locally, state the blocker an
 ### 8. Distill completed runs
 
 After each run reaches a terminal state, distill reusable information out of `runs/<run-id>/`. Update `RUNS.md` with status, command, seed/device/resource, log, metrics, summary, and failure notes. Update `RESULTS.md` when the run changes evidence or interpretation. Update `REPRODUCIBILITY.md` with new blockers or rerun instructions. Promote stable conclusions or reusable implementation changes to project-root docs, reports, configs, tests, or code as appropriate. Do not copy raw logs, checkpoints, private data, or large temporary outputs into project-root docs.
+
+If the user explicitly says the current experiment is done, treat that as a terminal-run distillation trigger. First organize runs and scripts, then persist valuable or user-requested content into `RUNS.md`, `SCRIPT_REGISTRY.md`, `RESULTS.md`, `REPRODUCIBILITY.md`, and project-root docs when appropriate. The final response should summarize what was written and cite the file paths.
 
 ### 9. Analyze results
 

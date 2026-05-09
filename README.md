@@ -101,6 +101,8 @@ The skill intentionally does **not** ship universal experiment runner scripts. D
 
 Run directories are raw evidence. After each terminal run, distill stable conclusions back into `RUNS.md`, `RESULTS.md`, `REPRODUCIBILITY.md`, and then into project-root docs, reports, code, configs, or tests when the result is reusable.
 
+When the user says the current experiment is done, the agent should treat that as an experiment completion handoff: inspect `runs/` and `scripts/`, update `RUNS.md` and `SCRIPT_REGISTRY.md`, persist valuable or user-requested content into `RESULTS.md`, `REPRODUCIBILITY.md`, or project-root docs, then report the paths written.
+
 ## Maintenance-only bundled scripts
 
 The skill may include bundled scripts under `skills/ai-research-workflow/scripts/`, but those scripts are maintenance-only tools for validating and evolving this framework. They are not for running user experiments, collecting user metrics, plotting user results, or publishing user research docs.

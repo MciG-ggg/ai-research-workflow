@@ -47,12 +47,15 @@ Do not implement the user's method, model, baseline, dataset adapter, or product
 A completed run directory is raw evidence. After each terminal run, distill reusable knowledge out of `runs/<run-id>/`:
 
 1. Update `.omx/ai-research/<slug>/RUNS.md` with command, seed/device/resource, status, log path, metrics path, summary path, and failure notes.
-2. Update `.omx/ai-research/<slug>/RESULTS.md` with tables, figures, hypothesis verdicts, and interpretation when the run changes the scientific picture.
-3. Update `.omx/ai-research/<slug>/REPRODUCIBILITY.md` with new blockers, environment notes, nondeterminism, or rerun instructions.
-4. Promote stable conclusions to project-root `docs/`, `reports/`, benchmark cards, config docs, or README sections when useful.
-5. Promote reusable implementation changes to project-root code/config/tests, not to `.omx/ai-research/`.
+2. Update `.omx/ai-research/<slug>/SCRIPT_REGISTRY.md` with scripts or native commands that were used, changed, validated, deprecated, or requested by the user.
+3. Update `.omx/ai-research/<slug>/RESULTS.md` with tables, figures, hypothesis verdicts, and interpretation when the run changes the scientific picture.
+4. Update `.omx/ai-research/<slug>/REPRODUCIBILITY.md` with new blockers, environment notes, nondeterminism, or rerun instructions.
+5. Promote stable conclusions to project-root `docs/`, `reports/`, benchmark cards, config docs, or README sections when useful.
+6. Promote reusable implementation changes to project-root code/config/tests, not to `.omx/ai-research/`.
 
 Do not copy raw logs, large outputs, checkpoints, private data, or temporary run files into project-root docs. Link to them or summarize them.
+
+If the user says the current experiment is done, use this as an experiment completion handoff signal: inspect runs and scripts, persist valuable or user-requested content into stable artifacts, then report the paths written.
 
 ## Baseline and method work
 

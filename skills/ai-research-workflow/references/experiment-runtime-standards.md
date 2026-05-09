@@ -32,11 +32,14 @@ Every experiment run must write to one distinct run directory:
 The run directory is raw evidence, not the final research memory. After each run becomes terminal:
 
 - Update `.omx/ai-research/<slug>/RUNS.md` with status, command, seed/device/resource, log path, metrics path, summary path, and failure notes.
+- Update `.omx/ai-research/<slug>/SCRIPT_REGISTRY.md` with scripts or native commands that were used, changed, validated, deprecated, or requested by the user.
 - Update `.omx/ai-research/<slug>/RESULTS.md` when the run changes tables, figures, comparisons, hypothesis verdicts, or threats to validity.
 - Update `.omx/ai-research/<slug>/REPRODUCIBILITY.md` when the run reveals environment requirements, nondeterminism, missing data, missing compute, or rerun steps.
 - Promote stable conclusions to project-root `docs/`, `reports/`, benchmark cards, README sections, or MkDocs pages when useful.
 - Promote reusable method, baseline, config, or test changes to project-root files; do not bury them in `.omx/ai-research/`.
 - Keep raw logs, checkpoints, private data, and large temporary outputs in run storage; link or summarize them instead of copying them into project-root docs.
+
+When the user says the current experiment is done, treat that as a terminal run distillation trigger. Inspect the run directory and scripts first, then persist valuable or user-requested content into stable artifacts before responding.
 
 ## Tmux orchestration rules
 
@@ -175,5 +178,7 @@ After running an experiment, the agent must report:
 - summary file absolute path
 - figures directory and key figure paths
 - distilled updates made to `RUNS.md`, `RESULTS.md`, `REPRODUCIBILITY.md`, or project-root docs/code/configs
+- updates made to `SCRIPT_REGISTRY.md` for completed-run scripts or native commands
+- user-requested content that was persisted, with destination paths
 - exit status
 - next action if the run failed or remained inconclusive
