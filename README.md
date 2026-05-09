@@ -107,12 +107,13 @@ New workstream creation is forced through `$deep-interview --autoresearch -> $ra
 
 Artifact templates live under `skills/ai-research-workflow/assets/templates/`. They are starting points for portfolio, workstream, run, result, reproducibility, paper, and optional feedback files. Replace `TODO` placeholders before treating any artifact as complete.
 
-## Optional feedback memory
+## Optional feedback memory and Q&A capture
 
-Research Feedback Memory and Researcher Growth Review are disabled by default. Enable them only when a project wants durable learning notes in addition to normal research artifacts:
+Research Feedback Memory, Question Capture, and Researcher Growth Review are disabled by default. Enable them only when a project wants durable learning notes, Q&A capture, or growth review in addition to normal research artifacts:
 
 ```text
 $ai-research-workflow --feedback-memory ...
+$ai-research-workflow --qa-capture ...
 $ai-research-workflow --growth-review ...
 $ai-research-workflow --no-feedback ...
 ```
@@ -121,10 +122,11 @@ Project defaults can be stored in `.omx/ai-research/CONFIG.md`:
 
 ```yaml
 feedback_memory: off | lite | full
+qa_capture: off | research | all
 growth_review: off | milestone | always
 ```
 
-When enabled, the skill may add root feedback files such as `LEARNINGS.md`, `ISSUES.md`, `DECISIONS.md`, and `SKILL_GROWTH.md`, plus workstream files such as `DESIGN.md`, `NOTES.md`, and `REVIEW.md`. These files store distilled issues, knowledge, architecture/design decisions, verification gaps, and capability reflections; raw logs and run outputs stay under `runs/`.
+When enabled, the skill may add root feedback files such as `QUESTIONS.md`, `LEARNINGS.md`, `ISSUES.md`, `DECISIONS.md`, and `SKILL_GROWTH.md`, plus workstream files such as `QUESTIONS.md`, `DESIGN.md`, `NOTES.md`, and `REVIEW.md`. `QUESTIONS.md` records user questions and answer summaries when `--qa-capture` or `qa_capture` is enabled. These files store distilled issues, knowledge, architecture/design decisions, verification gaps, Q&A, and capability reflections; raw logs and run outputs stay under `runs/`.
 
 The skill intentionally does **not** ship universal experiment runner scripts. Different research projects use different training stacks, config systems, clusters, notebooks, plotting tools, and logging conventions. Instead, it defines where project-local scripts should live and how they should be named and documented.
 

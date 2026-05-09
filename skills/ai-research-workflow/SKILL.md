@@ -1,6 +1,6 @@
 ---
 name: ai-research-workflow
-description: "AI research workflow orchestration for turning vague AI/ML research ideas into validated project work and research artifacts: deep interview, literature review, falsifiable hypothesis spec, ralplan planning, method implementation, baseline reproduction, experiment design, experiment runs, result distillation, reproducibility review, optional research feedback memory, optional researcher growth review, and paper drafting. Use when Codex is asked to develop, implement, evaluate, reproduce, or write up an AI/ML research idea, benchmark, method, baseline, ablation, paper plan, experiment pipeline, or research report with clear hypotheses, baselines, metrics, validation, and claim boundaries."
+description: "AI research workflow orchestration for turning vague AI/ML research ideas into validated project work and research artifacts: deep interview, literature review, falsifiable hypothesis spec, ralplan planning, method implementation, baseline reproduction, experiment design, experiment runs, result distillation, reproducibility review, optional research feedback memory, optional question capture, optional researcher growth review, and paper drafting. Use when Codex is asked to develop, implement, evaluate, reproduce, answer questions about, or write up an AI/ML research idea, benchmark, method, baseline, ablation, paper plan, experiment pipeline, or research report with clear hypotheses, baselines, metrics, validation, and claim boundaries."
 ---
 
 # AI Research Workflow
@@ -33,6 +33,7 @@ Skip completed phases only when existing artifacts pass the relevant gate.
 - Read `references/workflow-orchestration.md` before starting or resuming the full workflow.
 - Read `references/artifact-contracts.md` when authoring or auditing artifacts; prefer templates in `assets/templates/` when creating new artifacts.
 - Read `references/research-quality-gates.md` before approving handoff, result, reproducibility, feedback, or paper claims.
+- Read `references/question-capture.md` when the user asks a research/workflow question and Q&A capture is enabled.
 - Read `references/experiment-runtime-standards.md` before designing, implementing, running, or auditing experiments.
 - Read `references/project-local-script-registry.md` before creating or relying on project-local scripts.
 - Read `references/worktree-development.md` before substantive target-repo edits.
@@ -57,6 +58,7 @@ Minimum portfolio layout:
 .omx/ai-research/
   RESEARCH.md
   INDEX.md
+  QUESTIONS.md      # optional when qa_capture is enabled
 ```
 
 Minimum workstream layout:
@@ -71,6 +73,7 @@ Minimum workstream layout:
   REPRODUCIBILITY.md
   PAPER_DRAFT.md
   SCRIPT_REGISTRY.md
+  QUESTIONS.md      # optional when qa_capture is enabled
   scripts/
   runs/
 ```
@@ -98,23 +101,27 @@ If any gate evidence is missing, stop at the gate, create or complete the missin
 
 ## Optional feedback and growth modes
 
-Research Feedback Memory and Researcher Growth Review are disabled by default. Do not create or update feedback artifacts unless the current invocation or project config enables them.
+Research Feedback Memory, Question Capture, and Researcher Growth Review are disabled by default. Do not create or update feedback artifacts unless the current invocation or project config enables them.
 
 Invocation flags:
 - `--feedback-memory`: enable Research Feedback Memory for this invocation.
+- `--qa-capture`: enable Q&A capture for this invocation.
 - `--growth-review`: enable Researcher Growth Review for this invocation.
-- `--no-feedback`: force both optional modes off for this invocation.
+- `--no-feedback`: force feedback memory, Q&A capture, and growth review off for this invocation.
 
 Optional project config lives at `.omx/ai-research/CONFIG.md`:
 
 ```yaml
 feedback_memory: off | lite | full
+qa_capture: off | research | all
 growth_review: off | milestone | always
 ```
 
-Resolution precedence: `--no-feedback`, explicit enable flags, `.omx/ai-research/CONFIG.md`, then default off. Use `assets/templates/CONFIG.md`, `LEARNINGS.md`, `ISSUES.md`, `DECISIONS.md`, `SKILL_GROWTH.md`, `DESIGN.md`, `NOTES.md`, and `REVIEW.md` only when the resolved mode enables them.
+Resolution precedence: `--no-feedback`, explicit enable flags, `.omx/ai-research/CONFIG.md`, then default off. Use `assets/templates/CONFIG.md`, `QUESTIONS.md`, `LEARNINGS.md`, `ISSUES.md`, `DECISIONS.md`, `SKILL_GROWTH.md`, `DESIGN.md`, `NOTES.md`, and `REVIEW.md` only when the resolved mode enables them.
 
 Feedback memory records distilled knowledge, not raw logs. Keep raw run outputs under `runs/` and link or summarize them.
+
+When Q&A capture is enabled and the user asks a research, design, architecture, experiment, interpretation, or workflow question rather than issuing a command, answer first, then append the question and answer summary to `.omx/ai-research/QUESTIONS.md` or `.omx/ai-research/<slug>/QUESTIONS.md`. Route durable concepts, decisions, issues, design notes, or growth lessons to the appropriate feedback artifacts.
 
 ## Research control plane vs project implementation
 
@@ -162,7 +169,7 @@ Only skip artifact updates when relevant files or run outputs cannot be found. I
 
 ## Workflow phases
 
-0. OMX workflow entry: read or create `.omx/ai-research/RESEARCH.md` and `.omx/ai-research/INDEX.md`; decide whether to reuse a workstream or enter the new-workstream gate; resolve optional feedback modes.
+0. OMX workflow entry: read or create `.omx/ai-research/RESEARCH.md` and `.omx/ai-research/INDEX.md`; decide whether to reuse a workstream or enter the new-workstream gate; resolve optional feedback and Q&A capture modes.
 1. Research intake: produce portfolio and workstream `RESEARCH.md` with research question, falsifiable hypothesis, success/falsification criteria, non-goals, claim boundaries, and decision boundaries.
 2. Literature review: produce `LITERATURE.md` with source-backed evidence from primary sources when facts are current or niche.
 3. Research question spec: tighten hypotheses until each is testable.
@@ -170,7 +177,7 @@ Only skip artifact updates when relevant files or run outputs cannot be found. I
 5. Project-root implementation and baseline reproduction: implement method, baseline, configs, tests, and entrypoints in the target repository root after `$ralplan`.
 6. Project-local orchestration scripts: reuse native project runners first; add thin wrappers only when needed and record them in `SCRIPT_REGISTRY.md`.
 7. Run experiments: produce `RUNS.md`, never fabricate results, and record complete log, metrics, summary, figures, command, environment, commit, seeds, and failures.
-8. Distill completed runs: update `RUNS.md`, `SCRIPT_REGISTRY.md`, `RESULTS.md`, `REPRODUCIBILITY.md`, project-root docs, and optional feedback artifacts when enabled.
+8. Distill completed runs: update `RUNS.md`, `SCRIPT_REGISTRY.md`, `RESULTS.md`, `REPRODUCIBILITY.md`, project-root docs, and optional feedback/Q&A artifacts when enabled.
 9. Analyze results: produce `RESULTS.md`; separate evidence from interpretation and keep claims within evidence.
 10. Reproducibility review: produce `REPRODUCIBILITY.md`; missing seeds, data versions, commands, complete log paths, metrics, figures, or result paths are blockers.
 11. Paper draft or report: produce `PAPER_DRAFT.md` only after results and reproducibility review exist.
@@ -179,4 +186,4 @@ Only skip artifact updates when relevant files or run outputs cannot be found. I
 
 Stop only when the requested artifact set passes the relevant quality gates, a project validator/test command or `$autoresearch` completion artifact passes, or a real blocker prevents progress.
 
-Final responses must list changed/created research artifacts, project-root method/baseline/config/test/docs files, validation evidence, project-local scripts, tmux/status/log/metrics/summary/figure paths, distilled run updates outside `runs/`, docs/MkDocs paths, unsupported claims removed or downgraded, optional feedback artifacts when enabled, and remaining risks.
+Final responses must list changed/created research artifacts, project-root method/baseline/config/test/docs files, validation evidence, project-local scripts, tmux/status/log/metrics/summary/figure paths, distilled run updates outside `runs/`, docs/MkDocs paths, unsupported claims removed or downgraded, optional feedback/Q&A artifacts when enabled, and remaining risks.

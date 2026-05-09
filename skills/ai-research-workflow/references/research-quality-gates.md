@@ -13,6 +13,7 @@ Use these gates before moving to the next phase or approving a final answer.
 - [Result gate](#result-gate)
 - [Reproducibility gate](#reproducibility-gate)
 - [Optional feedback memory gate](#optional-feedback-memory-gate)
+- [Optional question capture gate](#optional-question-capture-gate)
 - [Optional growth review gate](#optional-growth-review-gate)
 - [Documentation publishing gate](#documentation-publishing-gate)
 - [Experiment completion handoff gate](#experiment-completion-handoff-gate)
@@ -92,6 +93,7 @@ Pass only if:
 - User-requested findings, reusable commands, cleanup decisions, and next-step TODOs from experiment completion handoff are persisted to `RUNS.md`, `SCRIPT_REGISTRY.md`, `RESULTS.md`, `REPRODUCIBILITY.md`, or project-root docs as appropriate.
 - Portfolio `RESEARCH.md` and `INDEX.md` are updated when a result changes the overall synthesis, workstream status, or next priority.
 - Optional Research Feedback Memory artifacts are updated when the mode is enabled; when disabled, their absence is not a failure.
+- Optional Question Capture artifacts are updated when the mode is enabled and the user asked question-like prompts; when disabled, their absence is not a failure.
 
 ## Reproducibility gate
 
@@ -113,6 +115,18 @@ Pass only if enabled feedback artifacts contain concise, reusable entries:
 - Workstream `DESIGN.md` records non-obvious method, architecture, pipeline, or evaluation design rationale when `feedback_memory: full`.
 
 Fail only on enabled modes when valuable durable knowledge was discovered but left only in chat.
+
+## Optional question capture gate
+
+This gate is active only when `--qa-capture` is present or `.omx/ai-research/CONFIG.md` sets `qa_capture: research` or `qa_capture: all`. When Question Capture is disabled by default or by `--no-feedback`, skip this gate.
+
+Pass only if enabled Q&A artifacts contain concise, durable entries:
+- Root `QUESTIONS.md` records cross-workstream or portfolio-level user questions and answer summaries.
+- Workstream `QUESTIONS.md` records workstream-specific questions and answer summaries.
+- Each captured entry includes scope, question, answer summary, evidence/links, routed updates, and follow-up.
+- Durable concepts, decisions, issues, design notes, or growth lessons are routed to the appropriate feedback artifacts when applicable.
+
+Do not fail when no question-like prompt occurred. Fail only when a durable answered question occurred under enabled capture and was left only in chat.
 
 ## Optional growth review gate
 

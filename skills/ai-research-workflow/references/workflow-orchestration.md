@@ -41,14 +41,15 @@ If the user provides mature artifacts, resume at the earliest failing gate inste
 
 ## Optional feedback mode resolution
 
-Research Feedback Memory and Researcher Growth Review are disabled by default. At workflow entry, resolve these modes from the user invocation and project config before creating optional files:
+Research Feedback Memory, Question Capture, and Researcher Growth Review are disabled by default. At workflow entry, resolve these modes from the user invocation and project config before creating optional files.
+Question Capture is disabled by default and follows the same resolution step.
 
-1. `--no-feedback` forces both modes off for the current invocation.
-2. `--feedback-memory` or `--growth-review` enables that mode for the current invocation.
-3. `.omx/ai-research/CONFIG.md` can set `feedback_memory: off | lite | full` and `growth_review: off | milestone | always`.
-4. Missing config leaves both modes off.
+1. `--no-feedback` forces feedback memory, Q&A capture, and growth review off for the current invocation.
+2. `--feedback-memory`, `--qa-capture`, or `--growth-review` enables that mode for the current invocation.
+3. `.omx/ai-research/CONFIG.md` can set `feedback_memory: off | lite | full`, `qa_capture: off | research | all`, and `growth_review: off | milestone | always`.
+4. Missing config leaves all optional modes off.
 
-When Research Feedback Memory is enabled, write distilled issues, learnings, decisions, design notes, architecture tradeoffs, reusable commands, and failed assumptions to the optional feedback artifacts defined in `artifact-contracts.md`. When Researcher Growth Review is enabled, write capability-focused reflections to `SKILL_GROWTH.md` and workstream `REVIEW.md`.
+When Research Feedback Memory is enabled, write distilled issues, learnings, decisions, design notes, architecture tradeoffs, reusable commands, and failed assumptions to the optional feedback artifacts defined in `artifact-contracts.md`. When Question Capture is enabled, answer question-like prompts first and then write the Q&A ledger entry described in `question-capture.md`. When Researcher Growth Review is enabled, write capability-focused reflections to `SKILL_GROWTH.md` and workstream `REVIEW.md`.
 
 Feedback writes happen at natural workflow boundaries: intake, experiment design, implementation handoff, experiment completion handoff, reproducibility review, and paper/report drafting. Do not interrupt default workflows with reflection questions unless growth review is enabled and one concise answer would materially improve the review.
 

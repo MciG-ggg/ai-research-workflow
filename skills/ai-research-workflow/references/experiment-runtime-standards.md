@@ -195,6 +195,6 @@ After running an experiment, the agent must report:
 - distilled updates made to `RUNS.md`, `RESULTS.md`, `REPRODUCIBILITY.md`, or project-root docs/code/configs
 - updates made to `SCRIPT_REGISTRY.md` for completed-run scripts or native commands
 - user-requested content that was persisted, with destination paths
-- optional Research Feedback Memory or Researcher Growth Review artifact paths when those modes were enabled
+- optional Research Feedback Memory, Question Capture, or Researcher Growth Review artifact paths when those modes were enabled
 - exit status
 - next action if the run failed or remained inconclusive

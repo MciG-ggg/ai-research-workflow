@@ -27,9 +27,11 @@ WORKSTREAM_FILES = [
 ]
 
 FEEDBACK_ROOT_FILES = ["LEARNINGS.md", "ISSUES.md", "DECISIONS.md"]
+QA_ROOT_FILES = ["QUESTIONS.md"]
 GROWTH_ROOT_FILES = ["SKILL_GROWTH.md"]
 
 VALID_FEEDBACK_MEMORY = {"off", "lite", "full"}
+VALID_QA_CAPTURE = {"off", "research", "all"}
 VALID_GROWTH_REVIEW = {"off", "milestone", "always"}
 
 
@@ -48,21 +50,24 @@ def add_missing_file(findings: list[Finding], path: Path, label: str) -> None:
         findings.append(Finding("error", f"missing {label}: {path}"))
 
 
-def parse_config(ai_root: Path, findings: list[Finding]) -> tuple[str, str]:
+def parse_config(ai_root: Path, findings: list[Finding]) -> tuple[str, str, str]:
     config_path = ai_root / "CONFIG.md"
     feedback_memory = "off"
+    qa_capture = "off"
     growth_review = "off"
     if not config_path.is_file():
-        return feedback_memory, growth_review
+        return feedback_memory, qa_capture, growth_review
 
     text = read_text(config_path)
     for line in text.splitlines():
-        match = re.match(r"^\s*(feedback_memory|growth_review)\s*:\s*([A-Za-z_-]+)\s*$", line)
+        match = re.match(r"^\s*(feedback_memory|qa_capture|growth_review)\s*:\s*([A-Za-z_-]+)\s*$", line)
         if not match:
             continue
         key, value = match.group(1), match.group(2).lower()
         if key == "feedback_memory":
             feedback_memory = value
+        elif key == "qa_capture":
+            qa_capture = value
         elif key == "growth_review":
             growth_review = value
 
@@ -73,6 +78,13 @@ def parse_config(ai_root: Path, findings: list[Finding]) -> tuple[str, str]:
                 f"{config_path} has invalid feedback_memory={feedback_memory!r}; expected off, lite, or full",
             )
         )
+    if qa_capture not in VALID_QA_CAPTURE:
+        findings.append(
+            Finding(
+                "error",
+                f"{config_path} has invalid qa_capture={qa_capture!r}; expected off, research, or all",
+            )
+        )
     if growth_review not in VALID_GROWTH_REVIEW:
         findings.append(
             Finding(
@@ -80,7 +92,7 @@ def parse_config(ai_root: Path, findings: list[Finding]) -> tuple[str, str]:
                 f"{config_path} has invalid growth_review={growth_review!r}; expected off, milestone, or always",
             )
         )
-    return feedback_memory, growth_review
+    return feedback_memory, qa_capture, growth_review
 
 
 def find_workstreams(ai_root: Path) -> list[Path]:
@@ -159,6 +171,7 @@ def validate_feedback_modes(
     ai_root: Path,
     workstreams: list[Path],
     feedback_memory: str,
+    qa_capture: str,
     growth_review: str,
     findings: list[Finding],
 ) -> None:
@@ -174,6 +187,16 @@ def validate_feedback_modes(
                     f"full-feedback workstream {workstream.name}/DESIGN.md",
                 )
 
+    if qa_capture in {"research", "all"}:
+        for name in QA_ROOT_FILES:
+            add_missing_file(findings, ai_root / name, f"question-capture root {name}")
+        for workstream in workstreams:
+            add_missing_file(
+                findings,
+                workstream / "QUESTIONS.md",
+                f"question-capture workstream {workstream.name}/QUESTIONS.md",
+            )
+
     if growth_review in {"milestone", "always"}:
         for name in GROWTH_ROOT_FILES:
             add_missing_file(findings, ai_root / name, f"growth root {name}")
@@ -187,7 +210,7 @@ def validate(project_root: Path, require_workstream: bool) -> list[Finding]:
     if not ai_root.is_dir():
         return [Finding("error", f"missing ai-research root: {ai_root}")]
 
-    feedback_memory, growth_review = parse_config(ai_root, findings)
+    feedback_memory, qa_capture, growth_review = parse_config(ai_root, findings)
     index_text = validate_portfolio(ai_root, findings)
 
     workstreams = find_workstreams(ai_root)
@@ -197,7 +220,7 @@ def validate(project_root: Path, require_workstream: bool) -> list[Finding]:
     for workstream in workstreams:
         validate_workstream(workstream, index_text, findings)
 
-    validate_feedback_modes(ai_root, workstreams, feedback_memory, growth_review, findings)
+    validate_feedback_modes(ai_root, workstreams, feedback_memory, qa_capture, growth_review, findings)
     return findings
 
 

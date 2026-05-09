@@ -6,6 +6,7 @@ Use these contracts to keep scientific goals separate from execution details and
 
 - [Control plane vs project-root outputs](#control-plane-vs-project-root-outputs)
 - [Optional feedback memory artifacts](#optional-feedback-memory-artifacts)
+- [Optional question capture artifacts](#optional-question-capture-artifacts)
 - [Portfolio artifacts](#portfolio-artifacts)
 - [Required artifacts](#required-artifacts)
 - [Workstream `RESEARCH.md` minimum sections](#workstream-researchmd-minimum-sections)
@@ -29,11 +30,12 @@ Portfolio control plane:
   INDEX.md
 ```
 
-Optional feedback memory and growth review artifacts, created only when enabled:
+Optional feedback memory, question capture, and growth review artifacts, created only when enabled:
 
 ```text
 .omx/ai-research/
   CONFIG.md
+  QUESTIONS.md
   LEARNINGS.md
   ISSUES.md
   DECISIONS.md
@@ -41,6 +43,7 @@ Optional feedback memory and growth review artifacts, created only when enabled:
 .omx/ai-research/<slug>/
   DESIGN.md
   NOTES.md
+  QUESTIONS.md
   REVIEW.md
 ```
 
@@ -56,18 +59,20 @@ Use the Markdown templates in `assets/templates/` when creating new artifacts. T
 
 ## Optional feedback memory artifacts
 
-Research Feedback Memory and Researcher Growth Review are opt-in. They are disabled by default and must not create extra files unless enabled by invocation flags or `.omx/ai-research/CONFIG.md`.
+Research Feedback Memory, Question Capture, and Researcher Growth Review are opt-in. They are disabled by default and must not create extra files unless enabled by invocation flags or `.omx/ai-research/CONFIG.md`.
 
 Supported invocation flags:
 
 - `--feedback-memory`: enable Research Feedback Memory for the current invocation.
+- `--qa-capture`: enable Q&A capture for the current invocation.
 - `--growth-review`: enable Researcher Growth Review for the current invocation.
-- `--no-feedback`: force both optional modes off for the current invocation.
+- `--no-feedback`: force feedback memory, Q&A capture, and growth review off for the current invocation.
 
 Optional `.omx/ai-research/CONFIG.md` fields:
 
 ```yaml
 feedback_memory: off | lite | full
+qa_capture: off | research | all
 growth_review: off | milestone | always
 ```
 
@@ -124,6 +129,27 @@ Workstream `REVIEW.md` minimum sections when Researcher Growth Review is enabled
 - Next capability practice item
 
 Keep feedback files concise and distilled. Raw logs, checkpoints, private data, and large run outputs stay in `runs/` or external artifact storage.
+
+## Optional question capture artifacts
+
+Question Capture is opt-in. It records user questions and answer summaries when the user asks a research, design, architecture, experiment, interpretation, or workflow question rather than issuing a command. See `references/question-capture.md`.
+
+`QUESTIONS.md` can exist at the portfolio root or inside a workstream:
+
+```text
+.omx/ai-research/QUESTIONS.md
+.omx/ai-research/<slug>/QUESTIONS.md
+```
+
+Use `assets/templates/QUESTIONS.md` when creating either file.
+
+`QUESTIONS.md` minimum sections:
+
+- Q&A ledger with date, scope, user question, answer summary, evidence/links, routed updates, and follow-up
+- Links to artifacts, code paths, citations, commands, or an explicit `chat-only reasoning` marker
+- Routed update notes when the answer also changed `LEARNINGS.md`, `ISSUES.md`, `DECISIONS.md`, `DESIGN.md`, `NOTES.md`, `SKILL_GROWTH.md`, or `REVIEW.md`
+
+Do not persist secrets, credentials, private data, transient status checks, command-only prompts, or unanswered questions.
 
 ## Portfolio artifacts
 

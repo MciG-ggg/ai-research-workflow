@@ -107,12 +107,13 @@ python3 ~/.codex/skills/.system/skill-creator/scripts/quick_validate.py ~/.codex
 
 Artifact 模板放在 `skills/ai-research-workflow/assets/templates/`。它们用于创建 portfolio、workstream、run、result、reproducibility、paper 和可选 feedback 文件。把 `TODO` 占位符替换成真实项目证据后，才能把 artifact 当作完成。
 
-## 可选反馈记忆
+## 可选反馈记忆和 Q&A 捕获
 
-Research Feedback Memory 和 Researcher Growth Review 默认关闭。只有当项目需要把长期学习反馈也沉淀下来时再启用：
+Research Feedback Memory、Question Capture 和 Researcher Growth Review 默认关闭。只有当项目需要把长期学习反馈、Q&A 或能力复盘沉淀下来时再启用：
 
 ```text
 $ai-research-workflow --feedback-memory ...
+$ai-research-workflow --qa-capture ...
 $ai-research-workflow --growth-review ...
 $ai-research-workflow --no-feedback ...
 ```
@@ -121,10 +122,11 @@ $ai-research-workflow --no-feedback ...
 
 ```yaml
 feedback_memory: off | lite | full
+qa_capture: off | research | all
 growth_review: off | milestone | always
 ```
 
-启用后，skill 可以增加根目录反馈文件，例如 `LEARNINGS.md`、`ISSUES.md`、`DECISIONS.md`、`SKILL_GROWTH.md`，以及 workstream 内的 `DESIGN.md`、`NOTES.md`、`REVIEW.md`。这些文件只记录蒸馏后的问题、知识、架构/设计决策、验证缺口和能力复盘；原始日志和运行输出仍然放在 `runs/`。
+启用后，skill 可以增加根目录反馈文件，例如 `QUESTIONS.md`、`LEARNINGS.md`、`ISSUES.md`、`DECISIONS.md`、`SKILL_GROWTH.md`，以及 workstream 内的 `QUESTIONS.md`、`DESIGN.md`、`NOTES.md`、`REVIEW.md`。当 `--qa-capture` 或 `qa_capture` 启用时，`QUESTIONS.md` 记录用户疑问和回答摘要。这些文件只记录蒸馏后的问题、知识、架构/设计决策、验证缺口、Q&A 和能力复盘；原始日志和运行输出仍然放在 `runs/`。
 
 这个 skill 不内置通用实验 runner。不同研究项目会使用不同训练栈、配置系统、集群、notebook、绘图工具和日志约定。因此它只规定项目本地脚本应该放在哪里、如何命名、如何登记。
 
