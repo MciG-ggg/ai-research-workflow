@@ -2,7 +2,7 @@
 
 [中文文档](README.zh-CN.md)
 
-A Codex/OMX framework skill that turns vague AI/ML research ideas into artifact-gated research workflows: intake, literature review, falsifiable hypothesis spec, experiment design, implementation, experiment runs, result analysis, reproducibility review, and paper drafting.
+A Codex/OMX framework skill that turns vague AI/ML research ideas into artifact-gated research workflows: optional idea scouting/generation, intake, literature review, falsifiable hypothesis spec, experiment design, implementation, experiment runs, result analysis, reproducibility review, and paper drafting.
 
 ## Why
 
@@ -51,7 +51,8 @@ This skill is a workflow, not just a logging template.
 Default sequence:
 
 ```text
-$deep-interview --autoresearch
+optional IDEA_SCOUTING.md when no clear research question exists
+  -> $deep-interview --autoresearch
   -> portfolio RESEARCH.md / INDEX.md check
   -> literature and research artifacts
   -> $ralplan for implementation and validation shape
@@ -67,15 +68,19 @@ $deep-interview --autoresearch
 
 ## Update this skill
 
-If you installed from this repository, update the clone and resync the skill into Codex:
+If you installed from this repository, use the safe updater:
 
 ```bash
 cd ai-research-workflow
-git pull --ff-only
-python3 ~/.codex/skills/.system/skill-creator/scripts/quick_validate.py skills/ai-research-workflow
-python3 skills/ai-research-workflow/scripts/validate_framework_contract.py skills/ai-research-workflow
-rsync -a --delete skills/ai-research-workflow/ ~/.codex/skills/ai-research-workflow/
-python3 ~/.codex/skills/.system/skill-creator/scripts/quick_validate.py ~/.codex/skills/ai-research-workflow
+./skills/ai-research-workflow/scripts/update_installed_skill.sh
+```
+
+The updater runs `git pull --ff-only`, source validation, staged `rsync -a --delete`, and installed-copy validation. For local development, skip pulling with `--no-pull`.
+
+Developer symlink mode is available when you want repo edits to be picked up immediately:
+
+```bash
+./skills/ai-research-workflow/scripts/update_installed_skill.sh --symlink --no-pull
 ```
 
 If you are maintaining this repository, validate the skill framework before syncing or publishing changes. The task-worktree policy below describes how the skill should operate inside a target AI research project, not an installation requirement for editing this skill repository.
@@ -86,6 +91,7 @@ For each research project, the skill asks the agent to create or maintain a proj
 
 ```text
 .omx/ai-research/
+  IDEA_SCOUTING.md # optional before a clear research question exists
   RESEARCH.md
   INDEX.md
 .omx/ai-research/<slug>/
@@ -101,7 +107,9 @@ For each research project, the skill asks the agent to create or maintain a proj
   runs/
 ```
 
-The root `RESEARCH.md` captures the overall research program: central question, north-star hypotheses, claim boundaries, current synthesis, active workstreams, and next priorities. The root `INDEX.md` maps each slug to its subquestion, status, artifact links, latest evidence, and next action. Before creating a new slug, the agent should inspect these files and existing workstreams, then reuse an existing workstream unless the new task has a distinct research question or validation boundary.
+The optional root `IDEA_SCOUTING.md` captures idea generation, lightweight evidence, novelty risk, feasibility budget, and user-goal fit before a formal research question exists. The root `RESEARCH.md` captures the overall research program: central question, north-star hypotheses, claim boundaries, current synthesis, active workstreams, and next priorities. The root `INDEX.md` maps each slug to its subquestion, status, artifact links, latest evidence, and next action. Before creating a new slug, the agent should inspect these files and existing workstreams, then reuse an existing workstream unless the new task has a distinct research question or validation boundary.
+
+Idea scouting is optional. Use it when a user asks to generate candidate ideas, evaluate whether an existing idea is worth doing, or converge a vague area into candidate research questions. A candidate may be recommended for intake only when it has a falsifiable hypothesis, evaluation metric/baseline, lightweight evidence, novelty risk, feasibility budget, and user-goal fit. The agent must ask before creating a workstream.
 
 New workstream creation is forced through `$deep-interview --autoresearch -> $ralplan -> $autoresearch`. The agent should not create a new slug, implement code, or launch experiments until `INDEX.md` records the deep-interview handoff, ralplan PRD/test spec, and autoresearch state/completion artifact paths.
 
@@ -121,10 +129,16 @@ $ai-research-workflow --no-feedback ...
 Project defaults can be stored in `.omx/ai-research/CONFIG.md`:
 
 ```yaml
+workflow_preset: conservative | guided | autonomous
+idea_scouting: auto | off | on
+completion_handoff: auto | off
+worktree_closeout: off | report-before-merge
 feedback_memory: off | lite | full
 qa_capture: off | research | all
 growth_review: off | milestone | always
 ```
+
+Use `workflow_preset: guided` to reduce manual workflow naming: broad idea prompts enter scouting, "done/wrap up" prompts enter completion handoff, and worktree closeout produces a report-before-merge plan. Use `conservative` for explicit-only behavior or `autonomous` for more proactive artifact maintenance; per-feature overrides win over the preset.
 
 When enabled, the skill may add root feedback files such as `QUESTIONS.md`, `LEARNINGS.md`, `ISSUES.md`, `DECISIONS.md`, and `SKILL_GROWTH.md`, plus workstream files such as `QUESTIONS.md`, `DESIGN.md`, `NOTES.md`, and `REVIEW.md`. `QUESTIONS.md` records user questions and answer summaries when `--qa-capture` or `qa_capture` is enabled. These files store distilled issues, knowledge, architecture/design decisions, verification gaps, Q&A, and capability reflections; raw logs and run outputs stay under `runs/`.
 
@@ -132,7 +146,7 @@ The skill intentionally does **not** ship universal experiment runner scripts. D
 
 Run directories are raw evidence. After each terminal run, distill stable conclusions back into `RUNS.md`, `RESULTS.md`, `REPRODUCIBILITY.md`, and then into project-root docs, reports, code, configs, or tests when the result is reusable.
 
-When the user says the current experiment is done, the agent should treat that as an experiment completion handoff: inspect `runs/` and `scripts/`, update `RUNS.md` and `SCRIPT_REGISTRY.md`, persist valuable or user-requested content into `RESULTS.md`, `REPRODUCIBILITY.md`, or project-root docs, then report the paths written.
+When the user says the current experiment is done, the agent should treat that as an experiment completion handoff: inspect `runs/` and `scripts/`, update `RUNS.md` and `SCRIPT_REGISTRY.md`, persist valuable or user-requested content into `RESULTS.md`, `REPRODUCIBILITY.md`, or project-root docs, then report the paths written. If the workstream used a task worktree, the agent must also produce a report-before-merge closeout plan covering validation, semantic commits, merge/push target, worktree removal, branch deletion, and `.omx/worktrees/REGISTRY.md`; it waits for user confirmation before merging or deleting anything.
 
 ## Maintenance-only bundled scripts
 
@@ -156,7 +170,7 @@ When this skill is used to do substantive AI research work in a target project r
 
 Record each worktree's path, branch, purpose, owned files/areas, and status in `REGISTRY.md`. If `.omx/worktrees/` is not writable, use a writable fallback such as `~/omx-worktrees/<repo-name>/<scope>` and record the absolute path.
 
-Before opening a worktree, inspect local git status. If the main worktree has modifications, split them by intent into semantic Lore-format commits first, then create the task worktree from the latest commit. After validation, push the task branch or merged main branch to the remote.
+Before opening a worktree, inspect local git status. If the main worktree has modifications, split them by intent into semantic Lore-format commits first, then create the task worktree from the latest commit. After validation and any required report-before-merge confirmation, push the task branch or merged main branch to the remote.
 
 Conflict policy:
 

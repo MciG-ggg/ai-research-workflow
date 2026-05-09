@@ -14,6 +14,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 PORTFOLIO_FILES = ["RESEARCH.md", "INDEX.md"]
+IDEA_SCOUTING_FILES = ["IDEA_SCOUTING.md"]
 
 WORKSTREAM_FILES = [
     "RESEARCH.md",
@@ -31,6 +32,10 @@ QA_ROOT_FILES = ["QUESTIONS.md"]
 GROWTH_ROOT_FILES = ["SKILL_GROWTH.md"]
 
 VALID_FEEDBACK_MEMORY = {"off", "lite", "full"}
+VALID_WORKFLOW_PRESET = {"conservative", "guided", "autonomous"}
+VALID_IDEA_SCOUTING = {"auto", "off", "on"}
+VALID_COMPLETION_HANDOFF = {"auto", "off"}
+VALID_WORKTREE_CLOSEOUT = {"off", "report-before-merge"}
 VALID_QA_CAPTURE = {"off", "research", "all"}
 VALID_GROWTH_REVIEW = {"off", "milestone", "always"}
 
@@ -50,27 +55,78 @@ def add_missing_file(findings: list[Finding], path: Path, label: str) -> None:
         findings.append(Finding("error", f"missing {label}: {path}"))
 
 
-def parse_config(ai_root: Path, findings: list[Finding]) -> tuple[str, str, str]:
+def parse_config(ai_root: Path, findings: list[Finding]) -> tuple[str, str, str, str, str, str, str]:
     config_path = ai_root / "CONFIG.md"
+    workflow_preset = "guided"
+    idea_scouting = "auto"
+    completion_handoff = "auto"
+    worktree_closeout = "report-before-merge"
     feedback_memory = "off"
     qa_capture = "off"
     growth_review = "off"
     if not config_path.is_file():
-        return feedback_memory, qa_capture, growth_review
+        return (
+            workflow_preset,
+            idea_scouting,
+            completion_handoff,
+            worktree_closeout,
+            feedback_memory,
+            qa_capture,
+            growth_review,
+        )
 
     text = read_text(config_path)
     for line in text.splitlines():
-        match = re.match(r"^\s*(feedback_memory|qa_capture|growth_review)\s*:\s*([A-Za-z_-]+)\s*$", line)
+        match = re.match(
+            r"^\s*(workflow_preset|idea_scouting|completion_handoff|worktree_closeout|feedback_memory|qa_capture|growth_review)\s*:\s*([A-Za-z_-]+)\s*$",
+            line,
+        )
         if not match:
             continue
         key, value = match.group(1), match.group(2).lower()
-        if key == "feedback_memory":
+        if key == "workflow_preset":
+            workflow_preset = value
+        elif key == "idea_scouting":
+            idea_scouting = value
+        elif key == "completion_handoff":
+            completion_handoff = value
+        elif key == "worktree_closeout":
+            worktree_closeout = value
+        elif key == "feedback_memory":
             feedback_memory = value
         elif key == "qa_capture":
             qa_capture = value
         elif key == "growth_review":
             growth_review = value
 
+    if workflow_preset not in VALID_WORKFLOW_PRESET:
+        findings.append(
+            Finding(
+                "error",
+                f"{config_path} has invalid workflow_preset={workflow_preset!r}; expected conservative, guided, or autonomous",
+            )
+        )
+    if idea_scouting not in VALID_IDEA_SCOUTING:
+        findings.append(
+            Finding(
+                "error",
+                f"{config_path} has invalid idea_scouting={idea_scouting!r}; expected auto, off, or on",
+            )
+        )
+    if completion_handoff not in VALID_COMPLETION_HANDOFF:
+        findings.append(
+            Finding(
+                "error",
+                f"{config_path} has invalid completion_handoff={completion_handoff!r}; expected auto or off",
+            )
+        )
+    if worktree_closeout not in VALID_WORKTREE_CLOSEOUT:
+        findings.append(
+            Finding(
+                "error",
+                f"{config_path} has invalid worktree_closeout={worktree_closeout!r}; expected off or report-before-merge",
+            )
+        )
     if feedback_memory not in VALID_FEEDBACK_MEMORY:
         findings.append(
             Finding(
@@ -92,7 +148,15 @@ def parse_config(ai_root: Path, findings: list[Finding]) -> tuple[str, str, str]
                 f"{config_path} has invalid growth_review={growth_review!r}; expected off, milestone, or always",
             )
         )
-    return feedback_memory, qa_capture, growth_review
+    return (
+        workflow_preset,
+        idea_scouting,
+        completion_handoff,
+        worktree_closeout,
+        feedback_memory,
+        qa_capture,
+        growth_review,
+    )
 
 
 def find_workstreams(ai_root: Path) -> list[Path]:
@@ -167,14 +231,19 @@ def validate_workstream(path: Path, index_text: str, findings: list[Finding]) ->
                 )
 
 
-def validate_feedback_modes(
+def validate_optional_modes(
     ai_root: Path,
     workstreams: list[Path],
+    idea_scouting: str,
     feedback_memory: str,
     qa_capture: str,
     growth_review: str,
     findings: list[Finding],
 ) -> None:
+    if idea_scouting == "on":
+        for name in IDEA_SCOUTING_FILES:
+            add_missing_file(findings, ai_root / name, f"idea-scouting root {name}")
+
     if feedback_memory in {"lite", "full"}:
         for name in FEEDBACK_ROOT_FILES:
             add_missing_file(findings, ai_root / name, f"feedback root {name}")
@@ -210,7 +279,15 @@ def validate(project_root: Path, require_workstream: bool) -> list[Finding]:
     if not ai_root.is_dir():
         return [Finding("error", f"missing ai-research root: {ai_root}")]
 
-    feedback_memory, qa_capture, growth_review = parse_config(ai_root, findings)
+    (
+        _workflow_preset,
+        idea_scouting,
+        _completion_handoff,
+        _worktree_closeout,
+        feedback_memory,
+        qa_capture,
+        growth_review,
+    ) = parse_config(ai_root, findings)
     index_text = validate_portfolio(ai_root, findings)
 
     workstreams = find_workstreams(ai_root)
@@ -220,7 +297,7 @@ def validate(project_root: Path, require_workstream: bool) -> list[Finding]:
     for workstream in workstreams:
         validate_workstream(workstream, index_text, findings)
 
-    validate_feedback_modes(ai_root, workstreams, feedback_memory, qa_capture, growth_review, findings)
+    validate_optional_modes(ai_root, workstreams, idea_scouting, feedback_memory, qa_capture, growth_review, findings)
     return findings
 
 

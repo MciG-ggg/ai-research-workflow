@@ -2,7 +2,7 @@
 
 [English README](README.md)
 
-这是一个面向 Codex/OMX 的 AI 科研工作流 skill，用来把模糊的 AI/ML 研究想法推进成有 artifact gate 的研究流程：研究 intake、文献综述、可证伪假设、实验设计、方法实现、实验运行、结果分析、可复现性审查和论文/报告草稿。
+这是一个面向 Codex/OMX 的 AI 科研工作流 skill，用来把模糊的 AI/ML 研究想法推进成有 artifact gate 的研究流程：可选 idea scouting/idea generation、研究 intake、文献综述、可证伪假设、实验设计、方法实现、实验运行、结果分析、可复现性审查和论文/报告草稿。
 
 ## 为什么需要它
 
@@ -51,7 +51,8 @@ $ai-research-workflow turn this paper idea into a research plan and experiment w
 默认序列：
 
 ```text
-$deep-interview --autoresearch
+没有明确研究问题时先写可选 IDEA_SCOUTING.md
+  -> $deep-interview --autoresearch
   -> 检查总览 RESEARCH.md / INDEX.md
   -> 文献和研究 artifacts
   -> $ralplan 规划实现和验证形状
@@ -67,15 +68,19 @@ $deep-interview --autoresearch
 
 ## 更新这个 skill
 
-如果你从本仓库安装，更新 clone 并同步到 Codex：
+如果你从本仓库安装，推荐用安全更新脚本：
 
 ```bash
 cd ai-research-workflow
-git pull --ff-only
-python3 ~/.codex/skills/.system/skill-creator/scripts/quick_validate.py skills/ai-research-workflow
-python3 skills/ai-research-workflow/scripts/validate_framework_contract.py skills/ai-research-workflow
-rsync -a --delete skills/ai-research-workflow/ ~/.codex/skills/ai-research-workflow/
-python3 ~/.codex/skills/.system/skill-creator/scripts/quick_validate.py ~/.codex/skills/ai-research-workflow
+./skills/ai-research-workflow/scripts/update_installed_skill.sh
+```
+
+这个脚本会执行 `git pull --ff-only`、源码校验、staged `rsync -a --delete`、安装版校验。维护本地未提交改动时可以加 `--no-pull`。
+
+如果你在开发这个 skill，希望 repo 里的修改立刻生效，可以使用 symlink 模式：
+
+```bash
+./skills/ai-research-workflow/scripts/update_installed_skill.sh --symlink --no-pull
 ```
 
 如果你维护的是这个 skill 仓库本身，发布或同步前先跑框架校验。下面的 task worktree 策略描述的是 skill 在目标 AI 科研项目仓库中的行为，不是编辑这个 skill 仓库的安装要求。
@@ -86,6 +91,7 @@ python3 ~/.codex/skills/.system/skill-creator/scripts/quick_validate.py ~/.codex
 
 ```text
 .omx/ai-research/
+  IDEA_SCOUTING.md # 没有明确研究问题时可选
   RESEARCH.md
   INDEX.md
 .omx/ai-research/<slug>/
@@ -101,7 +107,9 @@ python3 ~/.codex/skills/.system/skill-creator/scripts/quick_validate.py ~/.codex
   runs/
 ```
 
-根目录 `RESEARCH.md` 记录整体研究目标、中心问题、north-star hypotheses、claim 边界、当前综合判断、活跃 workstreams 和下一步优先级。根目录 `INDEX.md` 记录每个 slug 的子问题、状态、artifact 链接、最新证据和下一步。创建新 slug 前，agent 应先检查这两个文件和已有 workstream；只有当新任务确实有独立研究问题或验证边界时才创建新 slug。
+可选根目录 `IDEA_SCOUTING.md` 用来在正式研究问题还不清楚时记录候选 idea、轻量证据、novelty risk、可行性预算和用户目标匹配度。根目录 `RESEARCH.md` 记录整体研究目标、中心问题、north-star hypotheses、claim 边界、当前综合判断、活跃 workstreams 和下一步优先级。根目录 `INDEX.md` 记录每个 slug 的子问题、状态、artifact 链接、最新证据和下一步。创建新 slug 前，agent 应先检查这些文件和已有 workstream；只有当新任务确实有独立研究问题或验证边界时才创建新 slug。
+
+Idea scouting 是可选阶段。用户要求生成候选 idea、判断已有 idea 值不值得做，或把宽泛方向收敛成研究问题时才启用。候选 idea 只有在具备可证伪假设、可评估指标/baseline、轻量证据、novelty risk、可行性预算和用户目标匹配度后，才能被推荐进入 intake。创建 workstream 前仍必须先问用户。
 
 新建 workstream/小方向必须强制经过 `$deep-interview --autoresearch -> $ralplan -> $autoresearch`。在 `INDEX.md` 记录 deep-interview handoff、ralplan PRD/test spec、autoresearch state/completion artifact 路径之前，agent 不应创建新 slug、写实现或启动实验。
 
@@ -121,10 +129,16 @@ $ai-research-workflow --no-feedback ...
 项目默认值可以写在 `.omx/ai-research/CONFIG.md`：
 
 ```yaml
+workflow_preset: conservative | guided | autonomous
+idea_scouting: auto | off | on
+completion_handoff: auto | off
+worktree_closeout: off | report-before-merge
 feedback_memory: off | lite | full
 qa_capture: off | research | all
 growth_review: off | milestone | always
 ```
+
+使用 `workflow_preset: guided` 可以减少手动指定 workflow：宽泛 idea 会进入 scouting，“做完了/整理落盘”会进入 completion handoff，worktree closeout 会生成 report-before-merge plan。`conservative` 表示尽量只执行显式请求，`autonomous` 表示更主动维护 artifact 和下一步计划；单项 override 优先于 preset。
 
 启用后，skill 可以增加根目录反馈文件，例如 `QUESTIONS.md`、`LEARNINGS.md`、`ISSUES.md`、`DECISIONS.md`、`SKILL_GROWTH.md`，以及 workstream 内的 `QUESTIONS.md`、`DESIGN.md`、`NOTES.md`、`REVIEW.md`。当 `--qa-capture` 或 `qa_capture` 启用时，`QUESTIONS.md` 记录用户疑问和回答摘要。这些文件只记录蒸馏后的问题、知识、架构/设计决策、验证缺口、Q&A 和能力复盘；原始日志和运行输出仍然放在 `runs/`。
 
@@ -132,7 +146,7 @@ growth_review: off | milestone | always
 
 运行目录是原始证据。每次运行终止后，把稳定结论蒸馏回 `RUNS.md`、`RESULTS.md`、`REPRODUCIBILITY.md`，并在结果可复用时同步到项目根目录的 docs、报告、代码、配置或测试。
 
-当用户说“当前实验做完了”“这个实验结束了”或要求收尾时，agent 应进入 experiment completion handoff：先整理 `runs/` 和 `scripts/`，更新 `RUNS.md` 和 `SCRIPT_REGISTRY.md`，再把有价值或用户明确要求保留的内容写入 `RESULTS.md`、`REPRODUCIBILITY.md` 或项目根目录文档，最后报告写入的路径。
+当用户说“当前实验做完了”“这个实验结束了”或要求收尾时，agent 应进入 experiment completion handoff：先整理 `runs/` 和 `scripts/`，更新 `RUNS.md` 和 `SCRIPT_REGISTRY.md`，再把有价值或用户明确要求保留的内容写入 `RESULTS.md`、`REPRODUCIBILITY.md` 或项目根目录文档，最后报告写入的路径。如果这个 workstream 使用了 task worktree，agent 还必须给出 report-before-merge closeout plan，包含验证、语义 commit、merge/push 目标、worktree 删除、branch 删除和 `.omx/worktrees/REGISTRY.md` 更新；合并或删除前必须等待用户确认。
 
 ## bundled scripts 只用于维护
 
@@ -156,7 +170,7 @@ growth_review: off | milestone | always
 
 在 `REGISTRY.md` 记录每个 worktree 的路径、分支、用途、负责的文件/区域和状态。如果 `.omx/worktrees/` 不可写，使用 `~/omx-worktrees/<repo-name>/<scope>` 这类可写 fallback，并记录绝对路径。
 
-开 worktree 之前，先检查本地 git 状态。如果主 worktree 有修改，先按语义拆分成 Lore-format commit，再基于最新 commit 创建 task worktree。验证通过后，把 task 分支或合并后的 main 分支推送到远端。
+开 worktree 之前，先检查本地 git 状态。如果主 worktree 有修改，先按语义拆分成 Lore-format commit，再基于最新 commit 创建 task worktree。验证通过并完成必要的 report-before-merge 确认后，把 task 分支或合并后的 main 分支推送到远端。
 
 冲突策略：
 

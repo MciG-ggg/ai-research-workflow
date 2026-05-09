@@ -5,6 +5,7 @@ This skill is a workflow, not only an experiment logging template. It coordinate
 ## Contents
 
 - [Default OMX sequence](#default-omx-sequence)
+- [Optional idea scouting](#optional-idea-scouting)
 - [Optional feedback mode resolution](#optional-feedback-mode-resolution)
 - [Portfolio and workstream control plane](#portfolio-and-workstream-control-plane)
 - [New workstream mandatory workflow gate](#new-workstream-mandatory-workflow-gate)
@@ -17,7 +18,8 @@ This skill is a workflow, not only an experiment logging template. It coordinate
 Use this default sequence unless existing artifacts prove that a phase is already complete:
 
 ```text
-$deep-interview --autoresearch
+optional idea scouting when no clear research question exists
+  -> $deep-interview --autoresearch
   -> portfolio RESEARCH.md / INDEX.md check
   -> literature / research artifact drafting
   -> $ralplan for implementation and validation plan
@@ -31,6 +33,7 @@ $deep-interview --autoresearch
 
 Phase rules:
 
+- Use Idea Scouting before formal intake when the user asks to generate ideas, evaluate whether an idea is worth doing, or only provides a broad area without a falsifiable research question.
 - Use `$deep-interview --autoresearch` when the research mission, hypothesis, evaluator, non-goals, claim boundaries, or launch criteria are unclear.
 - Use `$ralplan` before implementation-heavy work to produce a plan, tradeoffs, file ownership, and validation shape.
 - Use `$autoresearch` when the work needs a persistent professor/critic or validator-gated loop over literature, implementation, experiments, and claims.
@@ -39,6 +42,22 @@ Phase rules:
 
 If the user provides mature artifacts, resume at the earliest failing gate instead of repeating completed phases.
 
+## Optional idea scouting
+
+Idea Scouting is optional. It is not a mandatory first stage when the user already has a concrete research question, hypothesis, metric, and baseline.
+
+Activation:
+
+1. Run when the user asks for research idea generation, idea triage, broad-direction scouting, or whether an idea is worth pursuing.
+2. Run when the current invocation includes `--idea-scouting`.
+3. Run when `.omx/ai-research/CONFIG.md` sets `idea_scouting: on`.
+4. Run when `workflow_preset` is `guided` or `autonomous`, `idea_scouting: auto`, and the prompt is broad/vague.
+5. Skip when a formal workstream can already pass the intake gate.
+
+Write `.omx/ai-research/IDEA_SCOUTING.md` using `assets/templates/IDEA_SCOUTING.md`. The scouting pass may search sources, generate candidates, rank/filter them, and mark weak ideas as parked or rejected.
+
+Promotion gate: recommend a candidate for formal intake only when it has a falsifiable hypothesis, evaluation metric/baseline, lightweight evidence, novelty-risk note, feasibility budget, and user-goal fit. Ask the user before creating `.omx/ai-research/<slug>/`; on confirmation, enter the new-workstream mandatory workflow gate.
+
 ## Optional feedback mode resolution
 
 Research Feedback Memory, Question Capture, and Researcher Growth Review are disabled by default. At workflow entry, resolve these modes from the user invocation and project config before creating optional files.
@@ -46,8 +65,15 @@ Question Capture is disabled by default and follows the same resolution step.
 
 1. `--no-feedback` forces feedback memory, Q&A capture, and growth review off for the current invocation.
 2. `--feedback-memory`, `--qa-capture`, or `--growth-review` enables that mode for the current invocation.
-3. `.omx/ai-research/CONFIG.md` can set `feedback_memory: off | lite | full`, `qa_capture: off | research | all`, and `growth_review: off | milestone | always`.
-4. Missing config leaves all optional modes off.
+3. `.omx/ai-research/CONFIG.md` can set `workflow_preset: conservative | guided | autonomous`, `idea_scouting: auto | off | on`, `completion_handoff: auto | off`, `worktree_closeout: off | report-before-merge`, `feedback_memory: off | lite | full`, `qa_capture: off | research | all`, and `growth_review: off | milestone | always`.
+4. Missing config uses the `guided` workflow preset for routing, while feedback memory, Q&A capture, and growth review remain off.
+
+Preset rules:
+
+- `conservative`: run only explicitly requested phases.
+- `guided`: infer common phases from user language while preserving confirmation boundaries.
+- `autonomous`: proactively maintain relevant artifacts and next-step plans, but still ask before final-topic selection, workstream creation, merge, push, worktree removal, or branch deletion.
+- Overrides win over the preset.
 
 When Research Feedback Memory is enabled, write distilled issues, learnings, decisions, design notes, architecture tradeoffs, reusable commands, and failed assumptions to the optional feedback artifacts defined in `artifact-contracts.md`. When Question Capture is enabled, answer question-like prompts first and then write the Q&A ledger entry described in `question-capture.md`. When Researcher Growth Review is enabled, write capability-focused reflections to `SKILL_GROWTH.md` and workstream `REVIEW.md`.
 
@@ -118,6 +144,8 @@ A completed run directory is raw evidence. After each terminal run, distill reus
 Do not copy raw logs, large outputs, checkpoints, private data, or temporary run files into project-root docs. Link to them or summarize them.
 
 If the user says the current experiment is done, use this as an experiment completion handoff signal: inspect runs and scripts, persist valuable or user-requested content into stable artifacts, then report the paths written.
+
+If the workstream used a task worktree, completion handoff also includes a report-before-merge closeout plan: validation still needed, semantic commit status, base branch, merge/rebase command, push target, worktree removal, branch deletion, and `.omx/worktrees/REGISTRY.md` update. Do not merge, push, remove the worktree, or delete the branch until the user confirms the plan.
 
 When distillation changes the global picture, update `.omx/ai-research/RESEARCH.md` and `.omx/ai-research/INDEX.md` in the same pass so the portfolio layer remains the user's overall map of the work.
 

@@ -5,6 +5,7 @@ Use these contracts to keep scientific goals separate from execution details and
 ## Contents
 
 - [Control plane vs project-root outputs](#control-plane-vs-project-root-outputs)
+- [Idea scouting artifact](#idea-scouting-artifact)
 - [Optional feedback memory artifacts](#optional-feedback-memory-artifacts)
 - [Optional question capture artifacts](#optional-question-capture-artifacts)
 - [Portfolio artifacts](#portfolio-artifacts)
@@ -26,6 +27,7 @@ Portfolio control plane:
 
 ```text
 .omx/ai-research/
+  IDEA_SCOUTING.md # optional before a clear research question exists
   RESEARCH.md
   INDEX.md
 ```
@@ -57,6 +59,22 @@ Project-root files are the implementation plane. Method code, baseline reproduct
 
 Use the Markdown templates in `assets/templates/` when creating new artifacts. They are scaffolds, not evidence; replace TODO placeholders before treating an artifact as complete.
 
+## Idea scouting artifact
+
+`IDEA_SCOUTING.md` is optional and belongs at the portfolio root. It is used only before a clear research question exists, when the user asks for idea generation, idea triage, broad-direction scouting, `.omx/ai-research/CONFIG.md` sets `idea_scouting: on`, or `idea_scouting: auto` applies under a guided/autonomous preset.
+
+Use `assets/templates/IDEA_SCOUTING.md` when creating it.
+
+`IDEA_SCOUTING.md` minimum sections:
+
+- Scouting objective: user goal, broad area, and whether the pass is generating candidates, evaluating an existing idea, or converging a vague direction.
+- Candidate idea table: candidate idea, falsifiable hypothesis, evaluation metric/baseline, lightweight evidence, novelty risk, feasibility budget, user-goal fit, and status.
+- Promotion gate: all six required fields before an idea can be recommended for formal research intake.
+- Parked or rejected ideas with evidence and revisit triggers.
+- Recommended next step and a reminder to ask the user before creating a workstream.
+
+Idea promotion gate: an idea may enter formal research intake only when it has a falsifiable hypothesis, evaluation metric or baseline, lightweight evidence, novelty-risk note, feasibility budget, and user-goal fit. Scouting does not guarantee absolute novelty and does not replace full `LITERATURE.md`.
+
 ## Optional feedback memory artifacts
 
 Research Feedback Memory, Question Capture, and Researcher Growth Review are opt-in. They are disabled by default and must not create extra files unless enabled by invocation flags or `.omx/ai-research/CONFIG.md`.
@@ -71,6 +89,10 @@ Supported invocation flags:
 Optional `.omx/ai-research/CONFIG.md` fields:
 
 ```yaml
+workflow_preset: conservative | guided | autonomous
+idea_scouting: auto | off | on
+completion_handoff: auto | off
+worktree_closeout: off | report-before-merge
 feedback_memory: off | lite | full
 qa_capture: off | research | all
 growth_review: off | milestone | always
@@ -186,6 +208,7 @@ New workstream mandatory workflow gate:
 
 | Artifact | Purpose | Created by phase |
 | --- | --- | --- |
+| `IDEA_SCOUTING.md` | Optional candidate idea generation, triage, lightweight evidence, promotion gate, and rejected-idea ledger | idea scouting |
 | `RESEARCH.md` | Scientific intent, hypothesis, contribution, success/falsification criteria, non-goals, claim boundaries | intake / question spec |
 | `LITERATURE.md` | Source-backed related work, baselines, datasets, benchmark constraints, evidence gaps | literature review |
 | `EXPERIMENT.md` | Runnable experimental protocol and validation plan | experiment design |
@@ -275,6 +298,7 @@ New workstream mandatory workflow gate:
 - Distilled updates made outside `runs/`
 - Project-root docs/config/code/test updates caused by this run
 - User-requested outputs or decisions persisted during experiment completion handoff
+- Worktree closeout plan with validation, merge-back, push, cleanup, and user-confirmation status when a task worktree was used
 - Exit status and failures
 
 ## `RESULTS.md` minimum sections
@@ -321,3 +345,5 @@ Each terminal run directory remains raw evidence. After completion, extract dura
 When the user says the current experiment is done, treat that message as an experiment completion handoff trigger. Inspect available run directories and project-local scripts, then persist valuable or user-requested content into the stable artifacts above before giving the final answer. If a requested artifact cannot be written because evidence is missing, record the missing path and exact recovery step.
 
 If a completed run changes the larger research picture, update portfolio `RESEARCH.md` with the new synthesis and portfolio `INDEX.md` with the workstream status, latest evidence, and next priority.
+
+If the workstream used a task worktree, the completion handoff must also write a report-before-merge closeout plan. Include current branch/worktree path, base branch, validation evidence still needed, semantic Lore-format commit status, merge/rebase command plan, push target, worktree removal command, branch deletion command, and `.omx/worktrees/REGISTRY.md` update. Do not execute merge, push, worktree removal, or branch deletion until the user confirms.

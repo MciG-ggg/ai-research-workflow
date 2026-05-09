@@ -5,6 +5,7 @@ Use these gates before moving to the next phase or approving a final answer.
 ## Contents
 
 - [Intake gate](#intake-gate)
+- [Idea scouting gate](#idea-scouting-gate)
 - [Workflow gate](#workflow-gate)
 - [New workstream gate](#new-workstream-gate)
 - [Literature gate](#literature-gate)
@@ -30,10 +31,22 @@ Pass only if:
 - Non-goals are explicit.
 - Forbidden claims are explicit.
 
+## Idea scouting gate
+
+This gate is active only when the user asks for idea generation, idea triage, broad-direction scouting, `.omx/ai-research/CONFIG.md` sets `idea_scouting: on`, or `idea_scouting: auto` applies under a guided/autonomous preset. Skip it for already-clear research questions.
+
+Pass only if:
+- `.omx/ai-research/IDEA_SCOUTING.md` exists and records the scouting objective.
+- Candidate ideas include falsifiable hypothesis, evaluation metric/baseline, lightweight evidence, novelty risk, feasibility budget, and user-goal fit.
+- Weak ideas are parked or rejected with evidence and revisit triggers instead of silently discarded.
+- The recommended candidate passes all six promotion gate fields before formal intake is suggested.
+- The final topic is not chosen for the user; creating a new workstream still requires user confirmation.
+- Scouting is not treated as full literature review and does not replace `LITERATURE.md`.
+
 ## Workflow gate
 
 Pass only if:
-- The workflow stages that are relevant to the task are explicit: deep interview, planning, implementation, baseline reproduction, experiments, distillation, reproducibility review, and reporting.
+- The workflow stages that are relevant to the task are explicit: optional idea scouting, deep interview, planning, implementation, baseline reproduction, experiments, distillation, reproducibility review, and reporting.
 - The chosen OMX handoff path is appropriate for the current ambiguity and risk.
 - Portfolio artifacts in `.omx/ai-research/` describe the overall research program, while workstream artifacts in `.omx/ai-research/<slug>/` describe one concrete direction.
 - Control-plane artifacts are clearly separated from project-root code/config/test/docs work.
@@ -91,6 +104,7 @@ Pass only if:
 - Claims do not exceed evidence.
 - Distilled updates outside `runs/` are recorded when the run changed stable conclusions or reusable project artifacts.
 - User-requested findings, reusable commands, cleanup decisions, and next-step TODOs from experiment completion handoff are persisted to `RUNS.md`, `SCRIPT_REGISTRY.md`, `RESULTS.md`, `REPRODUCIBILITY.md`, or project-root docs as appropriate.
+- When a task worktree was used, the completion handoff includes a report-before-merge closeout plan covering validation, semantic commit status, merge/rebase target, push target, worktree removal, branch deletion, and `.omx/worktrees/REGISTRY.md` update.
 - Portfolio `RESEARCH.md` and `INDEX.md` are updated when a result changes the overall synthesis, workstream status, or next priority.
 - Optional Research Feedback Memory artifacts are updated when the mode is enabled; when disabled, their absence is not a failure.
 - Optional Question Capture artifacts are updated when the mode is enabled and the user asked question-like prompts; when disabled, their absence is not a failure.
@@ -151,4 +165,5 @@ Pass only if, when the user says the current experiment is done:
 - `SCRIPT_REGISTRY.md` records scripts or native commands used, changed, validated, deprecated, or requested by the user
 - `RESULTS.md` and `REPRODUCIBILITY.md` were updated when the evidence changed conclusions or rerun requirements
 - valuable or user-requested content was written to stable artifacts instead of remaining only in chat
+- if a task worktree was used, a report-before-merge closeout plan was written and the agent did not merge, push, remove the worktree, or delete the branch before user confirmation
 - missing evidence or skipped writes are reported with exact paths and recovery commands

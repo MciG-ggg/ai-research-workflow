@@ -1,6 +1,6 @@
 ---
 name: ai-research-workflow
-description: "AI research workflow orchestration for turning vague AI/ML research ideas into validated project work and research artifacts: deep interview, literature review, falsifiable hypothesis spec, ralplan planning, method implementation, baseline reproduction, experiment design, experiment runs, result distillation, reproducibility review, optional research feedback memory, optional question capture, optional researcher growth review, and paper drafting. Use when Codex is asked to develop, implement, evaluate, reproduce, answer questions about, or write up an AI/ML research idea, benchmark, method, baseline, ablation, paper plan, experiment pipeline, or research report with clear hypotheses, baselines, metrics, validation, and claim boundaries."
+description: "AI research workflow orchestration for turning vague AI/ML research ideas into validated project work and research artifacts: optional idea scouting/generation, deep interview, literature review, falsifiable hypothesis spec, ralplan planning, method implementation, baseline reproduction, experiment design, experiment runs, result distillation, reproducibility review, optional research feedback memory, optional question capture, optional researcher growth review, and paper drafting. Use when Codex is asked to generate, scout, develop, implement, evaluate, reproduce, answer questions about, or write up an AI/ML research idea, benchmark, method, baseline, ablation, paper plan, experiment pipeline, or research report with clear hypotheses, baselines, metrics, validation, and claim boundaries."
 ---
 
 # AI Research Workflow
@@ -14,7 +14,8 @@ Bundled scripts in this skill are maintenance-only. Do not use them as user expe
 This skill is an OMX workflow. By default it orchestrates:
 
 ```text
-$deep-interview --autoresearch
+optional idea scouting when no clear research question exists
+  -> $deep-interview --autoresearch
   -> portfolio RESEARCH.md / INDEX.md check
   -> literature and research artifacts
   -> $ralplan for implementation and validation shape
@@ -33,6 +34,7 @@ Skip completed phases only when existing artifacts pass the relevant gate.
 - Read `references/workflow-orchestration.md` before starting or resuming the full workflow.
 - Read `references/artifact-contracts.md` when authoring or auditing artifacts; prefer templates in `assets/templates/` when creating new artifacts.
 - Read `references/research-quality-gates.md` before approving handoff, result, reproducibility, feedback, or paper claims.
+- Read `references/idea-scouting.md` when the user asks for research idea generation, idea triage, or broad-direction scouting.
 - Read `references/question-capture.md` when the user asks a research/workflow question and Q&A capture is enabled.
 - Read `references/experiment-runtime-standards.md` before designing, implementing, running, or auditing experiments.
 - Read `references/project-local-script-registry.md` before creating or relying on project-local scripts.
@@ -56,6 +58,7 @@ Minimum portfolio layout:
 
 ```text
 .omx/ai-research/
+  IDEA_SCOUTING.md # optional when idea_scouting is enabled or the question is not yet clear
   RESEARCH.md
   INDEX.md
   QUESTIONS.md      # optional when qa_capture is enabled
@@ -79,6 +82,32 @@ Minimum workstream layout:
 ```
 
 Use `assets/templates/portfolio-RESEARCH.md`, `portfolio-INDEX.md`, `workstream-RESEARCH.md`, and the artifact-specific templates as the starting point when creating these files. Templates define shape only; replace TODO placeholders with project evidence before treating an artifact as complete.
+
+## Workflow presets and overrides
+
+Project config can reduce how often the user must name the workflow explicitly. Use `.omx/ai-research/CONFIG.md` from `assets/templates/CONFIG.md`:
+
+```yaml
+workflow_preset: conservative | guided | autonomous
+idea_scouting: auto | off | on
+completion_handoff: auto | off
+worktree_closeout: off | report-before-merge
+```
+
+Preset meaning:
+- `conservative`: run only explicitly requested phases.
+- `guided`: infer common phases from user language; this is the recommended default.
+- `autonomous`: proactively maintain relevant artifacts and next-step plans while still asking before final-topic selection, workstream creation, merge, push, worktree removal, or branch deletion.
+
+Overrides win over the preset. `idea_scouting: auto` lets broad/vague idea prompts enter scouting; `completion_handoff: auto` treats "done", "wrap up", or "整理落盘" as completion handoff; `worktree_closeout: report-before-merge` prepares but does not execute merge/delete cleanup.
+
+## Optional idea scouting
+
+Idea Scouting is optional and is not the default path for already-clear research questions. Use it when the user asks for idea generation, asks whether an idea is worth doing, gives only a broad area, or explicitly passes `--idea-scouting`.
+
+Write `.omx/ai-research/IDEA_SCOUTING.md` from `assets/templates/IDEA_SCOUTING.md`. The agent may choose search sources, generate candidate ideas, rank/filter candidates, and write the scouting artifact. It must not choose the final topic, guarantee absolute novelty, replace full `LITERATURE.md`, implement code, run experiments, or create a new workstream without user confirmation.
+
+An idea may be recommended for formal research intake only when the promotion gate has all six fields: falsifiable hypothesis, evaluation metric/baseline, lightweight evidence, novelty risk, feasibility budget, and user-goal fit. If the user confirms promotion, enter the new-workstream gate.
 
 ## New workstream gate
 
@@ -112,6 +141,10 @@ Invocation flags:
 Optional project config lives at `.omx/ai-research/CONFIG.md`:
 
 ```yaml
+workflow_preset: conservative | guided | autonomous
+idea_scouting: auto | off | on
+completion_handoff: auto | off
+worktree_closeout: off | report-before-merge
 feedback_memory: off | lite | full
 qa_capture: off | research | all
 growth_review: off | milestone | always
@@ -131,7 +164,7 @@ Actual research work belongs in the target project root using existing project c
 
 ## Task worktree rule
 
-When this skill is used to make substantive AI research changes in a target project repository, inspect the local git status before opening any new worktree. If the main worktree has local modifications, preserve them first by splitting them into semantic commits with Lore-format commit messages; do not mix unrelated changes into one checkpoint. After the main worktree is clean, fetch/pull the primary branch, create the task worktree from the latest commit, and push the completed branch or merged main branch to the remote after validation.
+When this skill is used to make substantive AI research changes in a target project repository, inspect the local git status before opening any new worktree. If the main worktree has local modifications, preserve them first by splitting them into semantic commits with Lore-format commit messages; do not mix unrelated changes into one checkpoint. After the main worktree is clean, fetch/pull the primary branch, create the task worktree from the latest commit, and push the completed branch or merged main branch to the remote after validation and any required report-before-merge confirmation.
 
 Prefer `<repo>/.omx/worktrees/<scope>/`; if that path is not writable, use a writable fallback and record the absolute path. Maintain `.omx/worktrees/REGISTRY.md` in the target repository with each worktree's path, branch, scope, owned files/areas, and status. Use one worktree per logical task or lane, merge worktrees back serially after validation, then clean them up.
 
@@ -164,12 +197,13 @@ Completion handoff requires:
 - update `RUNS.md`, `RESULTS.md`, and `REPRODUCIBILITY.md` when evidence changes status, conclusions, rerun requirements, or failures
 - persist user-requested outputs, notable findings, reusable commands, decisions, and next-step TODOs into stable artifacts or project-root docs
 - update portfolio `RESEARCH.md` and `INDEX.md` when the overall synthesis, workstream status, or next priority changes
+- if the workstream used a task worktree, prepare a report-before-merge closeout plan covering validation, semantic Lore-format commit status, merge/rebase target, push target, worktree removal, branch deletion, and `.omx/worktrees/REGISTRY.md` update; do not merge, push, delete the worktree, or delete the branch until the user confirms
 
 Only skip artifact updates when relevant files or run outputs cannot be found. If skipped, record the missing paths and the next exact recovery command in the final response.
 
 ## Workflow phases
 
-0. OMX workflow entry: read or create `.omx/ai-research/RESEARCH.md` and `.omx/ai-research/INDEX.md`; decide whether to reuse a workstream or enter the new-workstream gate; resolve optional feedback and Q&A capture modes.
+0. OMX workflow entry: read or create `.omx/ai-research/RESEARCH.md` and `.omx/ai-research/INDEX.md`; run optional idea scouting when there is no clear research question; decide whether to reuse a workstream or enter the new-workstream gate; resolve optional feedback and Q&A capture modes.
 1. Research intake: produce portfolio and workstream `RESEARCH.md` with research question, falsifiable hypothesis, success/falsification criteria, non-goals, claim boundaries, and decision boundaries.
 2. Literature review: produce `LITERATURE.md` with source-backed evidence from primary sources when facts are current or niche.
 3. Research question spec: tighten hypotheses until each is testable.

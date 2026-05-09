@@ -30,6 +30,16 @@
 
 - TODO
 
+## Worktree Closeout Plan
+
+- Worktree path / branch: TODO
+- Base branch: TODO
+- Validation before merge: TODO
+- Merge-back plan: TODO
+- Push plan: TODO
+- Cleanup plan: TODO
+- User confirmation required before merge/delete: TODO
+
 ## Failures and Recovery
 
 - TODO

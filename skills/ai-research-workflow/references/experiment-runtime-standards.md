@@ -49,12 +49,13 @@ The run directory is raw evidence, not the final research memory. After each run
 - Update `.omx/ai-research/<slug>/REPRODUCIBILITY.md` when the run reveals environment requirements, nondeterminism, missing data, missing compute, or rerun steps.
 - Promote stable conclusions to project-root `docs/`, `reports/`, benchmark cards, README sections, or MkDocs pages when useful.
 - Promote reusable method, baseline, config, or test changes to project-root files; do not bury them in `.omx/ai-research/`.
+- When a task worktree was used, write a report-before-merge closeout plan before merge-back or cleanup.
 - Update portfolio `.omx/ai-research/RESEARCH.md` and `.omx/ai-research/INDEX.md` when the run changes the overall synthesis, workstream status, or next priority.
 - If Research Feedback Memory is enabled, update `LEARNINGS.md`, `ISSUES.md`, `DECISIONS.md`, and workstream `NOTES.md`/`DESIGN.md` with distilled run lessons, failed assumptions, decisions, reusable commands, and design rationale.
 - If Researcher Growth Review is enabled, update `SKILL_GROWTH.md` and workstream `REVIEW.md` with capability lessons tied to the completed run and evidence quality.
 - Keep raw logs, checkpoints, private data, and large temporary outputs in run storage; link or summarize them instead of copying them into project-root docs.
 
-When the user says the current experiment is done, treat that as a terminal run distillation trigger. Inspect the run directory and scripts first, then persist valuable or user-requested content into stable artifacts before responding.
+When the user says the current experiment is done, treat that as a terminal run distillation trigger. Inspect the run directory and scripts first, then persist valuable or user-requested content into stable artifacts before responding. If the workstream used a task worktree, report a merge/cleanup plan and wait for user confirmation before merging, pushing, removing the worktree, or deleting the branch.
 
 ## Tmux orchestration rules
 
@@ -195,6 +196,7 @@ After running an experiment, the agent must report:
 - distilled updates made to `RUNS.md`, `RESULTS.md`, `REPRODUCIBILITY.md`, or project-root docs/code/configs
 - updates made to `SCRIPT_REGISTRY.md` for completed-run scripts or native commands
 - user-requested content that was persisted, with destination paths
+- worktree closeout plan and confirmation status when a task worktree was used
 - optional Research Feedback Memory, Question Capture, or Researcher Growth Review artifact paths when those modes were enabled
 - exit status
 - next action if the run failed or remained inconclusive

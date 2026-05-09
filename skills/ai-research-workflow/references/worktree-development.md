@@ -8,6 +8,7 @@ Use this reference when the skill is asked to do substantive AI research work in
 - [Worktree location and registry](#worktree-location-and-registry)
 - [Conflict-minimizing task design](#conflict-minimizing-task-design)
 - [Standard lifecycle](#standard-lifecycle)
+- [Completion handoff closeout](#completion-handoff-closeout)
 - [Conflict resolution rules](#conflict-resolution-rules)
 
 ## When to open a worktree
@@ -98,6 +99,8 @@ mkdir -p .omx/worktrees
 git worktree add -b omx/<scope> .omx/worktrees/<scope> HEAD
 ```
 
+If `worktree_closeout: report-before-merge` is active, treat the push, merge, and cleanup commands below as the closeout plan until the user confirms them.
+
 Inside the isolated worktree:
 
 ```bash
@@ -125,6 +128,32 @@ git branch -d omx/<scope>
 ```
 
 Then mark the registry row `removed` or keep a short completed history entry.
+
+## Completion handoff closeout
+
+When the user says a workstream or experiment is done, do not stop after run/script distillation if the work happened in a task worktree.
+
+Default behavior is report-before-merge:
+
+1. Inspect the task worktree status, branch, base branch, commits, and validation evidence.
+2. Ensure useful run/script/result/reproducibility artifacts were already distilled.
+3. Write a closeout plan in `RUNS.md`, `REPRODUCIBILITY.md`, project-root docs, or `.omx/worktrees/REGISTRY.md` as appropriate.
+4. Report the exact merge-back, push, worktree removal, branch deletion, and registry-update plan.
+5. Wait for user confirmation before running merge, push, `git worktree remove`, or branch deletion commands.
+
+The closeout plan must include:
+
+- worktree path and branch
+- base branch / merge target
+- semantic Lore-format commit status
+- validation already run and validation still required
+- merge or rebase command plan
+- push target
+- cleanup commands for worktree and branch
+- `.omx/worktrees/REGISTRY.md` status update
+- blockers such as conflicts, dirty worktree, missing validation, or unpushed commits
+
+If the user explicitly confirms the closeout plan, merge back serially, validate after merge, push, remove the worktree, delete the branch when safe, and mark the registry row `removed`.
 
 ## Conflict resolution rules
 
