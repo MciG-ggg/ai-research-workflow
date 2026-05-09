@@ -6,6 +6,7 @@ This skill is a workflow, not only an experiment logging template. It coordinate
 
 - [Default OMX sequence](#default-omx-sequence)
 - [Deterministic routing helpers](#deterministic-routing-helpers)
+- [Subcommand routing surface](#subcommand-routing-surface)
 - [Optional idea scouting](#optional-idea-scouting)
 - [Optional feedback mode resolution](#optional-feedback-mode-resolution)
 - [Portfolio and workstream control plane](#portfolio-and-workstream-control-plane)
@@ -52,12 +53,38 @@ python3 scripts/resolve_workflow.py <project-root> --prompt "<user prompt>"
 python3 scripts/init_research_workspace.py <project-root> --preset guided
 python3 scripts/init_workstream.py <project-root> <slug> --title "..." --question "..." --deep-interview <path> --ralplan-prd <path> --ralplan-test-spec <path> --autoresearch-result <path>
 python3 scripts/update_workstream_state.py <project-root> <slug> --phase running --next-action "monitor run"
+python3 scripts/summarize_research_state.py <project-root>
+python3 scripts/score_research_artifacts.py <project-root>
+python3 scripts/capture_question.py <project-root> --question "..." --answer-summary "..."
+python3 scripts/prepare_workstream_closeout.py <project-root> <slug> --write
+python3 scripts/preserve_negative_result.py <project-root> <slug> --finding "..." --evidence <path> --interpretation "..." --claim-update "..."
+python3 scripts/generate_report_outline.py <project-root> <slug> --kind paper-outline --write
 python3 scripts/validate_research_workspace.py <project-root> --phase idea-scouting
 python3 scripts/validate_research_workspace.py <project-root> --phase new-workstream --workstream <slug>
 python3 scripts/validate_research_workspace.py <project-root> --phase completion-handoff --workstream <slug>
 ```
 
-`resolve_workflow.py` emits JSON decisions for idea scouting, completion handoff, new-workstream gating, report-before-merge closeout, and ask-required boundaries. `init_research_workspace.py` initializes the portfolio control plane only. `init_workstream.py` scaffolds a workstream only after user confirmation and explicit deep-interview, ralplan, and autoresearch gate evidence. `update_workstream_state.py` updates `STATE.json` without touching research code or running experiments.
+`resolve_workflow.py` emits JSON decisions for idea scouting, completion handoff, new-workstream gating, report-before-merge closeout, question capture, negative-result preservation, and ask-required boundaries. Its structured routing output includes `phase`, `workflow_action`, `requires_user_confirmation`, `next_artifacts`, and `guardrail_scripts`. `init_research_workspace.py` initializes the portfolio control plane only. `init_workstream.py` scaffolds a workstream only after user confirmation and explicit deep-interview, ralplan, and autoresearch gate evidence. `update_workstream_state.py` updates `STATE.json` without touching research code or running experiments.
+
+`summarize_research_state.py` and `score_research_artifacts.py` are read-only review helpers. `capture_question.py`, `prepare_workstream_closeout.py`, `preserve_negative_result.py`, and `generate_report_outline.py` write only research control-plane artifacts.
+
+## Subcommand routing surface
+
+The skill supports these explicit lanes. Use them when the user wants less manual workflow steering:
+
+| Subcommand | Phase | Primary artifacts |
+| --- | --- | --- |
+| `scout` | idea-scouting | `IDEA_SCOUTING.md` |
+| `new-workstream` | new-workstream gate | `INDEX.md`, `<slug>/STATE.json`, `<slug>/RESEARCH.md` |
+| `handoff` | completion-handoff | `RUNS.md`, `SCRIPT_REGISTRY.md`, `RESULTS.md`, `CLAIMS.md`, `REPRODUCIBILITY.md` |
+| `qa` | question-capture | `QUESTIONS.md` |
+| `summarize` | portfolio-summary | portfolio/workstream status summary |
+| `score` / `review` | research-review | artifact quality score and claim-risk review |
+| `closeout` | report-before-merge | `CLOSEOUT.md`, worktree closeout plan |
+| `negative-result` | result-analysis | negative/inconclusive result preservation in `RESULTS.md` and `CLAIMS.md` |
+| `draft` | paper-draft | paper outline, workshop report, internal report, blog summary, or rebuttal notes |
+
+Subcommands do not bypass confirmation boundaries. Workstream creation, final topic promotion, merge, push, worktree removal, branch deletion, and stronger claims after negative/inconclusive evidence still require explicit user confirmation.
 
 ## Optional idea scouting
 
@@ -167,6 +194,10 @@ If the user says the current experiment is done, use this as an experiment compl
 If the workstream used a task worktree, completion handoff also includes a report-before-merge closeout plan: validation still needed, semantic commit status, base branch, merge/rebase command, push target, worktree removal, branch deletion, and `.omx/worktrees/REGISTRY.md` update. Do not merge, push, remove the worktree, or delete the branch until the user confirms the plan.
 
 When distillation changes the global picture, update `.omx/ai-research/RESEARCH.md` and `.omx/ai-research/INDEX.md` in the same pass so the portfolio layer remains the user's overall map of the work.
+
+Negative or inconclusive runs are first-class evidence. Preserve them in `RESULTS.md` and `CLAIMS.md` before changing the story, and downgrade or retire unsupported claims instead of deleting failed evidence.
+
+At handoff, run a research review pass: summarize portfolio state, score artifact quality, and generate report outlines only after evidence-to-claim mapping is stable.
 
 ## Baseline and method work
 

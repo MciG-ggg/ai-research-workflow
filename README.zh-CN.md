@@ -66,6 +66,24 @@ $ai-research-workflow turn this paper idea into a research plan and experiment w
 
 `.omx/ai-research/RESEARCH.md` 和 `.omx/ai-research/INDEX.md` 是整个研究工作的 portfolio control plane。每个 `.omx/ai-research/<slug>/` 是一个具体方向的 workstream。真实的方法实现、baseline 复现、配置、测试和项目原生实验代码，应该放在目标项目仓库根目录或该仓库已有约定的位置，而不是放到 `.omx/ai-research/` 下面。
 
+## 命令入口
+
+当你希望路由更确定时，可以使用 subcommand，而不是只靠自然语言：
+
+```text
+$ai-research-workflow scout
+$ai-research-workflow new-workstream
+$ai-research-workflow handoff
+$ai-research-workflow qa
+$ai-research-workflow summarize
+$ai-research-workflow score
+$ai-research-workflow closeout
+$ai-research-workflow negative-result
+$ai-research-workflow draft
+```
+
+`resolve_workflow.py` 也识别这些命令，并输出结构化字段：`phase`、`workflow_action`、`requires_user_confirmation`、`next_artifacts` 和 `guardrail_scripts`。
+
 ## 更新这个 skill
 
 如果你从本仓库安装，推荐用安全更新脚本：
@@ -106,6 +124,8 @@ cd ai-research-workflow
   REPRODUCIBILITY.md
   PAPER_DRAFT.md
   SCRIPT_REGISTRY.md
+  CLOSEOUT.md       # 可选 completion/report-before-merge plan
+  PAPER_OUTLINE.md  # 可选报告/论文 outline
   scripts/
   runs/
 ```
@@ -147,11 +167,21 @@ growth_review: off | milestone | always
 
 启用后，skill 可以增加根目录反馈文件，例如 `QUESTIONS.md`、`LEARNINGS.md`、`ISSUES.md`、`DECISIONS.md`、`SKILL_GROWTH.md`，以及 workstream 内的 `QUESTIONS.md`、`DESIGN.md`、`NOTES.md`、`REVIEW.md`。当 `--qa-capture` 或 `qa_capture` 启用时，`QUESTIONS.md` 记录用户疑问和回答摘要。这些文件只记录蒸馏后的问题、知识、架构/设计决策、验证缺口、Q&A 和能力复盘；原始日志和运行输出仍然放在 `runs/`。
 
+如果需要确定性 Q&A 记录，可以在回答之后调用 `capture_question.py`。它只应该在 `qa_capture` 解析为 `research` 或 `all` 时由 agent 或 OMX hook 调用。
+
 这个 skill 不内置通用实验 runner。不同研究项目会使用不同训练栈、配置系统、集群、notebook、绘图工具和日志约定。因此它只规定项目本地脚本应该放在哪里、如何命名、如何登记。
 
 运行目录是原始证据。每次运行终止后，把稳定结论蒸馏回 `RUNS.md`、`RESULTS.md`、`REPRODUCIBILITY.md`，并在结果可复用时同步到项目根目录的 docs、报告、代码、配置或测试。
 
 当用户说“当前实验做完了”“这个实验结束了”或要求收尾时，agent 应进入 experiment completion handoff：先整理 `runs/` 和 `scripts/`，更新 `RUNS.md` 和 `SCRIPT_REGISTRY.md`，再把有价值或用户明确要求保留的内容写入 `RESULTS.md`、`REPRODUCIBILITY.md` 或项目根目录文档，最后报告写入的路径。如果这个 workstream 使用了 task worktree，agent 还必须给出 report-before-merge closeout plan，包含验证、语义 commit、merge/push 目标、worktree 删除、branch 删除和 `.omx/worktrees/REGISTRY.md` 更新；合并或删除前必须等待用户确认。
+
+新增的研究 review 辅助工具：
+
+- `summarize_research_state.py`：汇总整体 portfolio/workstream 状态、blocker、缺失 artifact、run/script inventory 和下一步。
+- `score_research_artifacts.py`：给 artifact 做启发式质量评分；低分表示需要先检查再加强 claim。
+- `prepare_workstream_closeout.py`：写入 workstream 级 `CLOSEOUT.md`，只生成计划，不 merge/delete。
+- `preserve_negative_result.py`：把负结果/无显著/失败结果写入 `RESULTS.md`，并把 claim 降级写入 `CLAIMS.md`。
+- `generate_report_outline.py`：从稳定 artifact 生成 paper outline、workshop report、internal report、blog summary 或 rebuttal notes。
 
 ## bundled scripts 只用于维护
 
@@ -164,6 +194,12 @@ python3 skills/ai-research-workflow/scripts/init_research_workspace.py <project-
 python3 skills/ai-research-workflow/scripts/init_workstream.py <project-root> <slug> --title "..." --question "..." --deep-interview <path> --ralplan-prd <path> --ralplan-test-spec <path> --autoresearch-result <path>
 python3 skills/ai-research-workflow/scripts/update_workstream_state.py <project-root> <slug> --phase running --next-action "monitor run"
 python3 skills/ai-research-workflow/scripts/resolve_workflow.py <project-root> --prompt "这个实验做完了，整理落盘"
+python3 skills/ai-research-workflow/scripts/summarize_research_state.py <project-root>
+python3 skills/ai-research-workflow/scripts/score_research_artifacts.py <project-root>
+python3 skills/ai-research-workflow/scripts/capture_question.py <project-root> --question "..." --answer-summary "..."
+python3 skills/ai-research-workflow/scripts/prepare_workstream_closeout.py <project-root> <slug> --write
+python3 skills/ai-research-workflow/scripts/preserve_negative_result.py <project-root> <slug> --finding "..." --evidence <path> --interpretation "..." --claim-update "..."
+python3 skills/ai-research-workflow/scripts/generate_report_outline.py <project-root> <slug> --kind paper-outline --write
 python3 skills/ai-research-workflow/scripts/validate_research_workspace.py <project-root> --phase completion-handoff
 python3 skills/ai-research-workflow/scripts/prepare_worktree_closeout.py <task-worktree> --base main
 python3 skills/ai-research-workflow/scripts/check_regression_fixtures.py

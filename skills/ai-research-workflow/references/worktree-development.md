@@ -170,3 +170,12 @@ If the user explicitly confirms the closeout plan, merge back serially, validate
 - Preserve both valid changes when they are additive, then simplify once tests pass.
 - Run validation after conflict resolution before continuing to the next branch.
 - If a worker auto-checkpoint commit appears, rewrite or squash it into a Lore-format commit before merge-back.
+
+## Workstream closeout plan
+
+Worktree closeout and workstream closeout are related but distinct:
+
+- `scripts/prepare_workstream_closeout.py <project-root> <slug> --write` writes `.omx/ai-research/<slug>/CLOSEOUT.md` with completion-handoff artifacts, validation evidence, run/script inventory, blockers, and confirmation boundaries.
+- `scripts/prepare_worktree_closeout.py <task-worktree> --base <branch>` inspects git worktree state and prints merge/push/remove/delete commands that remain pending user confirmation.
+
+Run the workstream closeout first to ensure research evidence is distilled. Then run the worktree closeout to plan git lifecycle cleanup. Neither script should execute merge, push, worktree removal, or branch deletion.

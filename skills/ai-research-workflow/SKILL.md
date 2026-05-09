@@ -55,9 +55,33 @@ python3 scripts/resolve_workflow.py <project-root> --prompt "<user prompt>"
 python3 scripts/init_research_workspace.py <project-root> --preset guided
 python3 scripts/init_workstream.py <project-root> <slug> --title "..." --question "..." --deep-interview <path> --ralplan-prd <path> --ralplan-test-spec <path> --autoresearch-result <path>
 python3 scripts/update_workstream_state.py <project-root> <slug> --phase experiment-design --next-action "..."
+python3 scripts/summarize_research_state.py <project-root>
+python3 scripts/score_research_artifacts.py <project-root>
+python3 scripts/capture_question.py <project-root> --question "..." --answer-summary "..."
+python3 scripts/prepare_workstream_closeout.py <project-root> <slug> --write
+python3 scripts/preserve_negative_result.py <project-root> <slug> --finding "..." --evidence <path> --interpretation "..." --claim-update "..."
+python3 scripts/generate_report_outline.py <project-root> <slug> --kind paper-outline --write
 python3 scripts/validate_research_workspace.py <project-root> --phase idea-scouting
 python3 scripts/prepare_worktree_closeout.py <task-worktree> --base main
 ```
+
+## Command surface
+
+Prefer explicit subcommands when the user's intent matches one of these lanes. `scripts/resolve_workflow.py` recognizes the same subcommands and returns structured `routing.phase`, `routing.workflow_action`, `routing.next_artifacts`, `routing.guardrail_scripts`, and `requires_user_confirmation` fields.
+
+```text
+$ai-research-workflow scout              # idea scouting / candidate ranking
+$ai-research-workflow new-workstream     # mandatory deep-interview -> ralplan -> autoresearch gate
+$ai-research-workflow handoff            # current experiment is done; distill runs/scripts/results
+$ai-research-workflow qa                 # answer then capture Q&A when qa_capture is enabled
+$ai-research-workflow summarize          # portfolio/workstream state summary
+$ai-research-workflow score              # artifact quality score / research review
+$ai-research-workflow closeout           # workstream + report-before-merge closeout plan
+$ai-research-workflow negative-result    # preserve failed/null/inconclusive evidence and downgrade claims
+$ai-research-workflow draft              # paper/report/blog/rebuttal outline from stable artifacts
+```
+
+When no subcommand is present, use `resolve_workflow.py --prompt` plus the project config to infer the lane. Subcommands do not bypass safety gates: final topic promotion, workstream creation, merge, push, worktree removal, branch deletion, and stronger claims after negative results still require explicit user confirmation.
 
 ## Artifact setup
 
@@ -90,6 +114,8 @@ Minimum workstream layout:
   REPRODUCIBILITY.md
   PAPER_DRAFT.md
   SCRIPT_REGISTRY.md
+  CLOSEOUT.md       # optional workstream completion/report-before-merge plan
+  PAPER_OUTLINE.md  # optional generated report outline
   QUESTIONS.md      # optional when qa_capture is enabled
   scripts/
   runs/
@@ -174,6 +200,8 @@ Feedback memory records distilled knowledge, not raw logs. Keep raw run outputs 
 
 When Q&A capture is enabled and the user asks a research, design, architecture, experiment, interpretation, or workflow question rather than issuing a command, answer first, then append the question and answer summary to `.omx/ai-research/QUESTIONS.md` or `.omx/ai-research/<slug>/QUESTIONS.md`. Route durable concepts, decisions, issues, design notes, or growth lessons to the appropriate feedback artifacts.
 
+Use `scripts/capture_question.py` for deterministic question capture after the answer has been given. It refuses likely secret/credential text unless explicitly overridden. It is a capture helper, not a hook by itself; project or OMX hooks may call it only when `qa_capture` resolves to `research` or `all`.
+
 ## Research control plane vs project implementation
 
 `.omx/ai-research/` is the research portfolio control plane. `.omx/ai-research/<slug>/` is a workstream control plane.
@@ -220,7 +248,19 @@ Completion handoff requires:
 - update portfolio `RESEARCH.md` and `INDEX.md` when the overall synthesis, workstream status, or next priority changes
 - if the workstream used a task worktree, prepare a report-before-merge closeout plan covering validation, semantic Lore-format commit status, merge/rebase target, push target, worktree removal, branch deletion, and `.omx/worktrees/REGISTRY.md` update; do not merge, push, delete the worktree, or delete the branch until the user confirms
 
+Use `scripts/prepare_workstream_closeout.py` to write `CLOSEOUT.md` for the workstream-level handoff. Use `scripts/prepare_worktree_closeout.py` for git worktree closeout. These scripts prepare plans only; they do not execute merge, push, worktree removal, or branch deletion.
+
+If a run is negative, null, or inconclusive, preserve it before changing claims. `scripts/preserve_negative_result.py` appends the finding to `RESULTS.md` and the claim downgrade/retirement evidence to `CLAIMS.md`. Do not delete failed runs to make the story cleaner.
+
 Only skip artifact updates when relevant files or run outputs cannot be found. If skipped, record the missing paths and the next exact recovery command in the final response.
+
+## Portfolio summary and artifact review
+
+Use `scripts/summarize_research_state.py` when resuming a project, choosing the next workstream, or answering "what is the current research state?". It summarizes portfolio status, phases, blockers, run/script inventory, missing artifacts, and suggested next actions.
+
+Use `scripts/score_research_artifacts.py` during research review, completion handoff, reproducibility review, and before drafting. Scores are heuristic guardrails, not scientific truth; low scores mean the agent must inspect the corresponding artifacts before making stronger claims.
+
+Use `scripts/generate_report_outline.py` only after stable evidence exists. It can scaffold paper outlines, workshop reports, internal reports, blog summaries, or rebuttal notes, but it must preserve claim boundaries and evidence paths from `CLAIMS.md`.
 
 ## Workflow phases
 
@@ -236,6 +276,7 @@ Only skip artifact updates when relevant files or run outputs cannot be found. I
 9. Analyze results: produce `RESULTS.md` and `CLAIMS.md`; separate evidence from interpretation, preserve negative/inconclusive findings, and keep claims within evidence.
 10. Reproducibility review: produce `REPRODUCIBILITY.md`; missing seeds, data versions, commands, complete log paths, metrics, figures, or result paths are blockers.
 11. Paper draft or report: produce `PAPER_DRAFT.md` only after results and reproducibility review exist.
+12. Research review: summarize portfolio state, score artifact quality, prepare closeout plans, and generate report outlines without relaxing evidence-to-claim boundaries.
 
 ## Completion rules
 

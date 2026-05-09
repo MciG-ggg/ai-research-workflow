@@ -202,3 +202,11 @@ After running an experiment, the agent must report:
 - optional Research Feedback Memory, Question Capture, or Researcher Growth Review artifact paths when those modes were enabled
 - exit status
 - next action if the run failed or remained inconclusive
+
+## Research review helpers
+
+After a terminal experiment is complete, use `scripts/summarize_research_state.py` to recover the portfolio/workstream state and `scripts/score_research_artifacts.py` to identify weak artifacts before making stronger claims. These helpers are read-only; they score and summarize control-plane artifacts but do not run experiments, collect metrics, plot results, or publish docs.
+
+For negative or inconclusive evidence, use `scripts/preserve_negative_result.py` to append the finding to `RESULTS.md` and downgrade or retire affected claims in `CLAIMS.md`. A failed or null result is not cleanup trash; it is evidence that constrains future claims.
+
+For completion handoff, use `scripts/prepare_workstream_closeout.py` to write `CLOSEOUT.md` with run/script inventory, validation evidence, missing artifacts, blockers, and the report-before-merge confirmation boundary. Use `scripts/generate_report_outline.py` only after `RESULTS.md`, `CLAIMS.md`, and `REPRODUCIBILITY.md` are stable enough to support a bounded paper/report outline.

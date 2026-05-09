@@ -24,6 +24,68 @@ VALID_WORKTREE_CLOSEOUT = {"off", "report-before-merge"}
 VALID_FEEDBACK_MEMORY = {"off", "lite", "full"}
 VALID_QA_CAPTURE = {"off", "research", "all"}
 VALID_GROWTH_REVIEW = {"off", "milestone", "always"}
+VALID_SUBCOMMANDS = {
+    "scout": {
+        "phase": "idea-scouting",
+        "action": "generate_or_rank_candidate_research_ideas",
+        "artifacts": [".omx/ai-research/IDEA_SCOUTING.md"],
+        "scripts": ["resolve_workflow.py", "validate_research_workspace.py --phase idea-scouting"],
+    },
+    "new-workstream": {
+        "phase": "new-workstream",
+        "action": "gate_and_initialize_new_workstream",
+        "artifacts": [".omx/ai-research/INDEX.md", ".omx/ai-research/<slug>/RESEARCH.md", ".omx/ai-research/<slug>/STATE.json"],
+        "scripts": ["init_workstream.py", "validate_research_workspace.py --phase new-workstream --workstream <slug>"],
+    },
+    "handoff": {
+        "phase": "completion-handoff",
+        "action": "distill_completed_runs_and_scripts",
+        "artifacts": [".omx/ai-research/<slug>/RUNS.md", ".omx/ai-research/<slug>/RESULTS.md", ".omx/ai-research/<slug>/CLAIMS.md"],
+        "scripts": ["prepare_workstream_closeout.py", "validate_research_workspace.py --phase completion-handoff --workstream <slug>"],
+    },
+    "qa": {
+        "phase": "question-capture",
+        "action": "answer_then_capture_question_summary",
+        "artifacts": [".omx/ai-research/QUESTIONS.md", ".omx/ai-research/<slug>/QUESTIONS.md"],
+        "scripts": ["capture_question.py"],
+    },
+    "review": {
+        "phase": "research-review",
+        "action": "score_and_review_artifact_quality",
+        "artifacts": [".omx/ai-research/<slug>/CLAIMS.md", ".omx/ai-research/<slug>/REPRODUCIBILITY.md"],
+        "scripts": ["score_research_artifacts.py", "validate_research_workspace.py"],
+    },
+    "summarize": {
+        "phase": "portfolio-summary",
+        "action": "summarize_research_portfolio_state",
+        "artifacts": [".omx/ai-research/RESEARCH.md", ".omx/ai-research/INDEX.md"],
+        "scripts": ["summarize_research_state.py"],
+    },
+    "closeout": {
+        "phase": "report-before-merge",
+        "action": "prepare_workstream_and_worktree_closeout_plan",
+        "artifacts": [".omx/ai-research/<slug>/CLOSEOUT.md", ".omx/worktrees/REGISTRY.md"],
+        "scripts": ["prepare_workstream_closeout.py", "prepare_worktree_closeout.py"],
+    },
+    "draft": {
+        "phase": "paper-draft",
+        "action": "generate_report_or_paper_outline",
+        "artifacts": [".omx/ai-research/<slug>/PAPER_DRAFT.md", ".omx/ai-research/<slug>/PAPER_OUTLINE.md"],
+        "scripts": ["generate_report_outline.py"],
+    },
+    "score": {
+        "phase": "research-review",
+        "action": "score_research_artifacts",
+        "artifacts": [".omx/ai-research/<slug>/*.md"],
+        "scripts": ["score_research_artifacts.py"],
+    },
+    "negative-result": {
+        "phase": "result-analysis",
+        "action": "preserve_negative_or_inconclusive_result",
+        "artifacts": [".omx/ai-research/<slug>/RESULTS.md", ".omx/ai-research/<slug>/CLAIMS.md"],
+        "scripts": ["preserve_negative_result.py"],
+    },
+}
 
 
 @dataclass
@@ -75,6 +137,33 @@ def parse_config(project_root: Path) -> tuple[Config, list[str], str | None]:
 def contains_any(text: str, terms: list[str]) -> bool:
     lower = text.lower()
     return any(term.lower() in lower for term in terms)
+
+
+def detect_subcommand(prompt: str, override: str | None = None) -> str | None:
+    if override:
+        return override
+    stripped = prompt.strip().lower()
+    if not stripped:
+        return None
+    parts = stripped.split()
+    first = parts[0].lstrip("$").replace("_", "-")
+    if first == "ai-research-workflow" and len(parts) > 1:
+        first = parts[1].lstrip("$").replace("_", "-")
+    aliases = {
+        "idea-scouting": "scout",
+        "new": "new-workstream",
+        "wrap-up": "handoff",
+        "done": "handoff",
+        "question": "qa",
+        "summary": "summarize",
+        "state": "summarize",
+        "quality": "score",
+        "paper": "draft",
+        "report": "draft",
+        "negative": "negative-result",
+    }
+    first = aliases.get(first, first)
+    return first if first in VALID_SUBCOMMANDS else None
 
 
 def classify_prompt(prompt: str) -> dict[str, bool]:
@@ -146,6 +235,18 @@ def classify_prompt(prompt: str) -> dict[str, bool]:
         "创建 workstream",
         "进入 intake",
     ]
+    negative_terms = [
+        "negative result",
+        "inconclusive",
+        "failed result",
+        "null result",
+        "no improvement",
+        "负结果",
+        "无显著",
+        "失败结果",
+        "没提升",
+        "不显著",
+    ]
     question_starters = (
         "how ",
         "why ",
@@ -178,12 +279,22 @@ def classify_prompt(prompt: str) -> dict[str, bool]:
         "concrete_research_terms_present": concrete,
         "completion_handoff_signal": completion,
         "new_workstream_signal": new_workstream,
+        "negative_result_signal": contains_any(lower, negative_terms),
         "question_like_prompt": question_like,
     }
 
 
-def resolve(prompt: str, cfg: Config, config_warnings: list[str], config_path: str | None) -> dict[str, object]:
+def resolve(
+    prompt: str,
+    cfg: Config,
+    config_warnings: list[str],
+    config_path: str | None,
+    *,
+    command_override: str | None = None,
+) -> dict[str, object]:
     signals = classify_prompt(prompt)
+    subcommand = detect_subcommand(prompt, command_override)
+    command_spec = VALID_SUBCOMMANDS.get(subcommand or "")
     guided_or_autonomous = cfg.workflow_preset in {"guided", "autonomous"}
 
     idea_scouting = False
@@ -192,9 +303,16 @@ def resolve(prompt: str, cfg: Config, config_warnings: list[str], config_path: s
     elif cfg.idea_scouting == "auto" and guided_or_autonomous and signals["broad_or_vague_prompt"]:
         idea_scouting = True
 
-    completion_handoff = cfg.completion_handoff == "auto" and signals["completion_handoff_signal"]
+    if subcommand == "scout":
+        idea_scouting = True
+
+    completion_handoff = (cfg.completion_handoff == "auto" and signals["completion_handoff_signal"]) or subcommand == "handoff"
     report_before_merge = completion_handoff and cfg.worktree_closeout == "report-before-merge"
-    new_workstream_gate = bool(signals["new_workstream_signal"])
+    new_workstream_gate = bool(signals["new_workstream_signal"]) or subcommand == "new-workstream"
+    negative_result = signals["negative_result_signal"] or subcommand == "negative-result"
+    question_capture = signals["question_like_prompt"] or subcommand == "qa"
+    if subcommand == "closeout":
+        report_before_merge = cfg.worktree_closeout == "report-before-merge"
 
     ask_before: list[str] = []
     if idea_scouting:
@@ -204,10 +322,14 @@ def resolve(prompt: str, cfg: Config, config_warnings: list[str], config_path: s
         ask_before.append("creating a new workstream after deep-interview/ralplan/autoresearch gate")
     if report_before_merge:
         ask_before.extend(["merge", "push", "worktree removal", "branch deletion"])
+    if negative_result:
+        ask_before.append("strengthening or generalizing claims after a negative/inconclusive result")
 
     recommended_steps: list[str] = []
     if config_warnings:
         recommended_steps.append("fix invalid .omx/ai-research/CONFIG.md fields before relying on automatic routing")
+    if command_spec:
+        recommended_steps.append(f"execute subcommand {subcommand}: {command_spec['action']}")
     if idea_scouting:
         recommended_steps.append("write/update .omx/ai-research/IDEA_SCOUTING.md and apply the six-field promotion gate")
     if new_workstream_gate:
@@ -216,22 +338,64 @@ def resolve(prompt: str, cfg: Config, config_warnings: list[str], config_path: s
         recommended_steps.append("inspect runs/ and scripts/, then distill RUNS.md, SCRIPT_REGISTRY.md, RESULTS.md, and REPRODUCIBILITY.md")
     if report_before_merge:
         recommended_steps.append("prepare report-before-merge closeout plan; wait for confirmation before merge/push/delete")
+    if negative_result:
+        recommended_steps.append("preserve the negative/inconclusive result in RESULTS.md and CLAIMS.md before revising claims")
     if not recommended_steps:
         recommended_steps.append("continue normal research intake or resume the earliest failing artifact gate")
+
+    if command_spec:
+        workflow_phase = command_spec["phase"]
+        workflow_action = command_spec["action"]
+        next_artifacts = command_spec["artifacts"]
+        guardrail_scripts = command_spec["scripts"]
+    elif idea_scouting:
+        workflow_phase = "idea-scouting"
+        workflow_action = "scout_candidate_research_ideas"
+        next_artifacts = [".omx/ai-research/IDEA_SCOUTING.md"]
+        guardrail_scripts = ["validate_research_workspace.py --phase idea-scouting"]
+    elif new_workstream_gate:
+        workflow_phase = "new-workstream"
+        workflow_action = "complete_mandatory_workstream_gate"
+        next_artifacts = [".omx/ai-research/INDEX.md", ".omx/ai-research/<slug>/STATE.json"]
+        guardrail_scripts = ["init_workstream.py", "validate_research_workspace.py --phase new-workstream --workstream <slug>"]
+    elif completion_handoff:
+        workflow_phase = "completion-handoff"
+        workflow_action = "distill_completed_runs"
+        next_artifacts = [".omx/ai-research/<slug>/RUNS.md", ".omx/ai-research/<slug>/RESULTS.md"]
+        guardrail_scripts = ["prepare_workstream_closeout.py", "validate_research_workspace.py --phase completion-handoff --workstream <slug>"]
+    elif question_capture and cfg.qa_capture != "off":
+        workflow_phase = "question-capture"
+        workflow_action = "answer_then_capture_question"
+        next_artifacts = [".omx/ai-research/QUESTIONS.md"]
+        guardrail_scripts = ["capture_question.py"]
+    else:
+        workflow_phase = "normal-research"
+        workflow_action = "resume_earliest_failing_artifact_gate"
+        next_artifacts = [".omx/ai-research/RESEARCH.md", ".omx/ai-research/INDEX.md"]
+        guardrail_scripts = ["summarize_research_state.py", "score_research_artifacts.py"]
 
     return {
         "config_path": config_path,
         "config": asdict(cfg),
         "config_warnings": config_warnings,
+        "subcommand": subcommand,
         "signals": signals,
         "decisions": {
             "idea_scouting": idea_scouting,
             "completion_handoff": completion_handoff,
             "new_workstream_gate": new_workstream_gate,
             "report_before_merge_closeout": report_before_merge,
-            "question_capture_candidate": signals["question_like_prompt"],
+            "negative_result_preservation": negative_result,
+            "question_capture_candidate": question_capture,
             "ask_required": bool(ask_before),
             "ask_before": sorted(set(ask_before)),
+        },
+        "routing": {
+            "phase": workflow_phase,
+            "workflow_action": workflow_action,
+            "requires_user_confirmation": bool(ask_before),
+            "next_artifacts": next_artifacts,
+            "guardrail_scripts": guardrail_scripts,
         },
         "recommended_steps": recommended_steps,
     }
@@ -245,6 +409,7 @@ def main() -> int:
     parser.add_argument("--idea-scouting", choices=sorted(VALID_IDEA_SCOUTING), help="Override idea_scouting.")
     parser.add_argument("--completion-handoff", choices=sorted(VALID_COMPLETION_HANDOFF), help="Override completion_handoff.")
     parser.add_argument("--worktree-closeout", choices=sorted(VALID_WORKTREE_CLOSEOUT), help="Override worktree_closeout.")
+    parser.add_argument("--command", choices=sorted(VALID_SUBCOMMANDS), help="Explicit subcommand routing override.")
     args = parser.parse_args()
 
     prompt = args.prompt if args.prompt is not None else sys.stdin.read()
@@ -258,7 +423,7 @@ def main() -> int:
     if args.worktree_closeout:
         cfg.worktree_closeout = args.worktree_closeout
 
-    result = resolve(prompt, cfg, warnings, config_path)
+    result = resolve(prompt, cfg, warnings, config_path, command_override=args.command)
     print(json.dumps(result, ensure_ascii=False, indent=2, sort_keys=True))
     return 1 if warnings else 0
 

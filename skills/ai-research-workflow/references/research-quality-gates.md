@@ -191,3 +191,15 @@ Pass only if, when the user says the current experiment is done:
 - `STATE.json` was moved to `completion-handoff` or `report-before-merge` as appropriate
 - `CLAIMS.md` records supported, contradicted, inconclusive, downgraded, or retired claims from the finished experiment
 - missing evidence or skipped writes are reported with exact paths and recovery commands
+
+## Research review gate
+
+Before paper/report drafting or merge-back, run a research review pass:
+
+1. `scripts/summarize_research_state.py <project-root>` to inspect portfolio state, workstream phases, blockers, missing artifacts, run/script inventory, and suggested next actions.
+2. `scripts/score_research_artifacts.py <project-root>` to produce an artifact quality score. A high score is not proof of truth, but a low score is a blocker to stronger claims.
+3. `scripts/prepare_workstream_closeout.py <project-root> <slug> --write` when a workstream is done.
+4. `scripts/preserve_negative_result.py` whenever evidence is negative, null, failed, or inconclusive.
+5. `scripts/generate_report_outline.py` only after evidence-to-claim mapping is stable.
+
+Fail closed when the score highlights missing hypothesis, baseline fairness, run evidence, claim ledger, negative/inconclusive preservation, or reproducibility terms. The remedy is to improve the artifact or downgrade the claim, not to ignore the score.

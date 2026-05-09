@@ -66,6 +66,24 @@ optional IDEA_SCOUTING.md when no clear research question exists
 
 `.omx/ai-research/RESEARCH.md` and `.omx/ai-research/INDEX.md` are the portfolio control plane for the whole research program. Each `.omx/ai-research/<slug>/` directory is a workstream for one concrete direction. Actual method implementation, baseline reproduction, configs, tests, and project-native experiment code belong in the target repository root or its existing conventions, not under `.omx/ai-research/`.
 
+## Command surface
+
+Use subcommands when you want deterministic routing instead of relying only on natural language:
+
+```text
+$ai-research-workflow scout
+$ai-research-workflow new-workstream
+$ai-research-workflow handoff
+$ai-research-workflow qa
+$ai-research-workflow summarize
+$ai-research-workflow score
+$ai-research-workflow closeout
+$ai-research-workflow negative-result
+$ai-research-workflow draft
+```
+
+`resolve_workflow.py` mirrors these commands and emits structured routing fields: `phase`, `workflow_action`, `requires_user_confirmation`, `next_artifacts`, and `guardrail_scripts`.
+
 ## Update this skill
 
 If you installed from this repository, use the safe updater:
@@ -106,6 +124,8 @@ For each research project, the skill asks the agent to create or maintain a proj
   REPRODUCIBILITY.md
   PAPER_DRAFT.md
   SCRIPT_REGISTRY.md
+  CLOSEOUT.md       # optional completion/report-before-merge plan
+  PAPER_OUTLINE.md  # optional generated report outline
   scripts/
   runs/
 ```
@@ -147,11 +167,21 @@ Use `workflow_preset: guided` to reduce manual workflow naming: broad idea promp
 
 When enabled, the skill may add root feedback files such as `QUESTIONS.md`, `LEARNINGS.md`, `ISSUES.md`, `DECISIONS.md`, and `SKILL_GROWTH.md`, plus workstream files such as `QUESTIONS.md`, `DESIGN.md`, `NOTES.md`, and `REVIEW.md`. `QUESTIONS.md` records user questions and answer summaries when `--qa-capture` or `qa_capture` is enabled. These files store distilled issues, knowledge, architecture/design decisions, verification gaps, Q&A, and capability reflections; raw logs and run outputs stay under `runs/`.
 
+For deterministic Q&A capture after an answer is written, use `capture_question.py`. This is safe to call from an OMX hook only when `qa_capture` resolves to `research` or `all`.
+
 The skill intentionally does **not** ship universal experiment runner scripts. Different research projects use different training stacks, config systems, clusters, notebooks, plotting tools, and logging conventions. Instead, it defines where project-local scripts should live and how they should be named and documented.
 
 Run directories are raw evidence. After each terminal run, distill stable conclusions back into `RUNS.md`, `RESULTS.md`, `REPRODUCIBILITY.md`, and then into project-root docs, reports, code, configs, or tests when the result is reusable.
 
 When the user says the current experiment is done, the agent should treat that as an experiment completion handoff: inspect `runs/` and `scripts/`, update `RUNS.md` and `SCRIPT_REGISTRY.md`, persist valuable or user-requested content into `RESULTS.md`, `REPRODUCIBILITY.md`, or project-root docs, then report the paths written. If the workstream used a task worktree, the agent must also produce a report-before-merge closeout plan covering validation, semantic commits, merge/push target, worktree removal, branch deletion, and `.omx/worktrees/REGISTRY.md`; it waits for user confirmation before merging or deleting anything.
+
+Research review helpers add the remaining workflow polish:
+
+- `summarize_research_state.py`: current portfolio/workstream state, blockers, missing artifacts, run/script inventory, and next actions.
+- `score_research_artifacts.py`: heuristic artifact quality score for research review; low scores require inspection before stronger claims.
+- `prepare_workstream_closeout.py`: writes `CLOSEOUT.md` for completion handoff without merging or deleting anything.
+- `preserve_negative_result.py`: appends negative/null/inconclusive evidence to `RESULTS.md` and claim downgrades to `CLAIMS.md`.
+- `generate_report_outline.py`: scaffolds paper outlines, workshop reports, internal reports, blog summaries, or rebuttal notes from stable artifacts.
 
 ## Maintenance-only bundled scripts
 
@@ -164,6 +194,12 @@ python3 skills/ai-research-workflow/scripts/init_research_workspace.py <project-
 python3 skills/ai-research-workflow/scripts/init_workstream.py <project-root> <slug> --title "..." --question "..." --deep-interview <path> --ralplan-prd <path> --ralplan-test-spec <path> --autoresearch-result <path>
 python3 skills/ai-research-workflow/scripts/update_workstream_state.py <project-root> <slug> --phase running --next-action "monitor run"
 python3 skills/ai-research-workflow/scripts/resolve_workflow.py <project-root> --prompt "这个实验做完了，整理落盘"
+python3 skills/ai-research-workflow/scripts/summarize_research_state.py <project-root>
+python3 skills/ai-research-workflow/scripts/score_research_artifacts.py <project-root>
+python3 skills/ai-research-workflow/scripts/capture_question.py <project-root> --question "..." --answer-summary "..."
+python3 skills/ai-research-workflow/scripts/prepare_workstream_closeout.py <project-root> <slug> --write
+python3 skills/ai-research-workflow/scripts/preserve_negative_result.py <project-root> <slug> --finding "..." --evidence <path> --interpretation "..." --claim-update "..."
+python3 skills/ai-research-workflow/scripts/generate_report_outline.py <project-root> <slug> --kind paper-outline --write
 python3 skills/ai-research-workflow/scripts/validate_research_workspace.py <project-root> --phase completion-handoff
 python3 skills/ai-research-workflow/scripts/prepare_worktree_closeout.py <task-worktree> --base main
 python3 skills/ai-research-workflow/scripts/check_regression_fixtures.py

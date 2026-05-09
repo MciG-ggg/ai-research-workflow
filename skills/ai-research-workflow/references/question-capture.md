@@ -73,10 +73,18 @@ Append one concise row or bullet entry containing:
 - Routed updates: files also updated, or `none`
 - Follow-up: next question, decision, experiment, or `none`
 
+For deterministic capture, call:
+
+```bash
+python3 scripts/capture_question.py <project-root> --question "..." --answer-summary "..." --workstream <slug>
+```
+
+`capture_question.py` creates the appropriate `QUESTIONS.md` from `assets/templates/QUESTIONS.md` when needed, appends the Q&A ledger entry, and refuses likely secret/credential text unless explicitly overridden. It is a post-answer capture helper, not an experiment runner or docs publisher.
+
 ## Answer-first Rule
 
 Answer the user first. Persist the Q&A immediately after answering when enabled. If capture fails, say which file could not be written and why; do not silently claim it was recorded.
 
 ## Hook Boundary
 
-A future `UserPromptSubmit` hook may classify prompts as question-like and mark question capture as pending, but it must not write a final Q&A entry because the answer does not exist yet. The durable contract remains this file: after the assistant answers, it appends the Q&A to `QUESTIONS.md` and routes distilled knowledge to the appropriate feedback artifacts.
+A `UserPromptSubmit` hook may classify prompts as question-like and mark question capture as pending, but it must not write a final Q&A entry because the answer does not exist yet. The durable contract remains this file: after the assistant answers, it appends the Q&A to `QUESTIONS.md` and routes distilled knowledge to the appropriate feedback artifacts. Hooks may call `capture_question.py` only after an answer summary exists and only when `qa_capture` resolves to `research` or `all`.
