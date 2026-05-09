@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "workstream_slug": "TODO",
+  "phase": "intake",
+  "phase_status": "draft",
+  "allowed_phases": [
+    "idea-scouting",
+    "intake",
+    "literature",
+    "experiment-design",
+    "implementation",
+    "running",
+    "completion-handoff",
+    "report-before-merge",
+    "reproducibility-review",
+    "paper-draft",
+    "archived"
+  ],
+  "last_updated": "TODO",
+  "owner": "TODO",
+  "active_artifacts": [
+    "RESEARCH.md",
+    "EXPERIMENT.md",
+    "RUNS.md",
+    "RESULTS.md",
+    "CLAIMS.md"
+  ],
+  "gate_evidence": {
+    "deep_interview_autoresearch": "TODO",
+    "ralplan_prd": "TODO",
+    "ralplan_test_spec": "TODO",
+    "autoresearch_result": "TODO"
+  },
+  "current_blockers": [],
+  "next_action": "TODO",
+  "confirmation_required_before": [
+    "creating new workstream",
+    "promoting final topic",
+    "merge",
+    "push",
+    "worktree removal",
+    "branch deletion"
+  ]
+}

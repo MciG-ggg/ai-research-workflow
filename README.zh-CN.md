@@ -76,6 +76,7 @@ cd ai-research-workflow
 ```
 
 这个脚本会执行 `git pull --ff-only`、源码校验、staged `rsync -a --delete`、安装版校验。维护本地未提交改动时可以加 `--no-pull`。
+使用 `--dry-run` 可以只校验和预览，不替换安装版；使用 `--keep-backups N` 可以控制 backup 保留数量。
 
 如果你在开发这个 skill，希望 repo 里的修改立刻生效，可以使用 symlink 模式：
 
@@ -95,11 +96,13 @@ cd ai-research-workflow
   RESEARCH.md
   INDEX.md
 .omx/ai-research/<slug>/
+  STATE.json
   RESEARCH.md
   LITERATURE.md
   EXPERIMENT.md
   RUNS.md
   RESULTS.md
+  CLAIMS.md
   REPRODUCIBILITY.md
   PAPER_DRAFT.md
   SCRIPT_REGISTRY.md
@@ -114,6 +117,8 @@ Idea scouting 是可选阶段。用户要求生成候选 idea、判断已有 ide
 新建 workstream/小方向必须强制经过 `$deep-interview --autoresearch -> $ralplan -> $autoresearch`。在 `INDEX.md` 记录 deep-interview handoff、ralplan PRD/test spec、autoresearch state/completion artifact 路径之前，agent 不应创建新 slug、写实现或启动实验。
 
 Artifact 模板放在 `skills/ai-research-workflow/assets/templates/`。它们用于创建 portfolio、workstream、run、result、reproducibility、paper 和可选 feedback 文件。把 `TODO` 占位符替换成真实项目证据后，才能把 artifact 当作完成。
+
+每个 workstream 还包含 `STATE.json` 作为阶段状态，`CLAIMS.md` 作为 evidence-to-claim ledger。`EXPERIMENT.md` 包含 baseline fairness checklist 和 negative/inconclusive result policy，避免失败或无显著结果被丢掉。
 
 ## 可选反馈记忆和 Q&A 捕获
 
@@ -150,7 +155,19 @@ growth_review: off | milestone | always
 
 ## bundled scripts 只用于维护
 
-`skills/ai-research-workflow/scripts/` 下的脚本只用于维护和验证这个 framework。它们不能用作用户研究项目的实验 runner、指标收集器、绘图脚本或研究文档发布器。
+`skills/ai-research-workflow/scripts/` 下的脚本只用于维护和 framework guardrail：校验、初始化、路由判断、closeout plan 和演进这个 framework。它们不能用作用户研究项目的实验 runner、指标收集器、绘图脚本或研究文档发布器。
+
+常用 guardrails：
+
+```bash
+python3 skills/ai-research-workflow/scripts/init_research_workspace.py <project-root> --preset guided
+python3 skills/ai-research-workflow/scripts/resolve_workflow.py <project-root> --prompt "这个实验做完了，整理落盘"
+python3 skills/ai-research-workflow/scripts/validate_research_workspace.py <project-root> --phase completion-handoff
+python3 skills/ai-research-workflow/scripts/prepare_worktree_closeout.py <task-worktree> --base main
+python3 skills/ai-research-workflow/scripts/check_regression_fixtures.py
+```
+
+`validate_research_workspace.py` 支持 `idea-scouting`、`new-workstream`、`completion-handoff` 三种 phase-aware checks，也支持 `--error-on-todo` 和 `--check-paths` 做更严格审查。
 
 用户研究脚本应放在目标项目工作区：
 
@@ -186,6 +203,7 @@ growth_review: off | milestone | always
 
 ```bash
 python3 skills/ai-research-workflow/scripts/check_worktree_registry.py .
+python3 skills/ai-research-workflow/scripts/prepare_worktree_closeout.py . --base main
 ```
 
 详情见 `skills/ai-research-workflow/references/worktree-development.md`。

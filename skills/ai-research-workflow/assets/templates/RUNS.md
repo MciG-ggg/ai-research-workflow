@@ -43,3 +43,9 @@
 ## Failures and Recovery
 
 - TODO
+
+## Negative / Inconclusive Run Preservation
+
+- Negative or inconclusive run IDs: TODO
+- Evidence paths preserved in `RESULTS.md` / `CLAIMS.md`: TODO
+- Failure category and recovery decision: TODO

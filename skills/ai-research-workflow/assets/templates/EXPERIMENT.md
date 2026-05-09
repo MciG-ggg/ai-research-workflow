@@ -12,6 +12,15 @@ TODO
 
 - TODO
 
+## Baseline Fairness Checklist
+
+- Same data split / preprocessing: TODO
+- Same evaluation metric and aggregation: TODO
+- Comparable training, tuning, and inference budget: TODO
+- Hyperparameter search budget: TODO
+- Implementation source and version: TODO
+- Known baseline limitations or reproduction gaps: TODO
+
 ## Method Variants
 
 - TODO
@@ -63,6 +72,12 @@ TODO
 ## Failure Policy
 
 - TODO
+
+## Negative / Inconclusive Result Policy
+
+- Preserve negative and inconclusive results in `RUNS.md`, `RESULTS.md`, and `CLAIMS.md`: TODO
+- Distinguish environment failure, implementation bug, insufficient power, and hypothesis failure: TODO
+- Stop / rerun / redesign criteria: TODO
 
 ## Run Directory Contract
 

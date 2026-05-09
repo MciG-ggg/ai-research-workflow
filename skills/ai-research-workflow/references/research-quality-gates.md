@@ -2,6 +2,14 @@
 
 Use these gates before moving to the next phase or approving a final answer.
 
+For deterministic checks, run the phase-aware validator:
+
+```bash
+python3 scripts/validate_research_workspace.py <project-root> --phase idea-scouting --error-on-todo
+python3 scripts/validate_research_workspace.py <project-root> --phase new-workstream --workstream <slug>
+python3 scripts/validate_research_workspace.py <project-root> --phase completion-handoff --workstream <slug> --check-paths
+```
+
 ## Contents
 
 - [Intake gate](#intake-gate)
@@ -12,6 +20,7 @@ Use these gates before moving to the next phase or approving a final answer.
 - [Experiment gate](#experiment-gate)
 - [Implementation gate](#implementation-gate)
 - [Result gate](#result-gate)
+- [Claim ledger gate](#claim-ledger-gate)
 - [Reproducibility gate](#reproducibility-gate)
 - [Optional feedback memory gate](#optional-feedback-memory-gate)
 - [Optional question capture gate](#optional-question-capture-gate)
@@ -48,6 +57,7 @@ Pass only if:
 Pass only if:
 - The workflow stages that are relevant to the task are explicit: optional idea scouting, deep interview, planning, implementation, baseline reproduction, experiments, distillation, reproducibility review, and reporting.
 - The chosen OMX handoff path is appropriate for the current ambiguity and risk.
+- Workstream `STATE.json` records the current phase, next action, blockers, and confirmation boundaries.
 - Portfolio artifacts in `.omx/ai-research/` describe the overall research program, while workstream artifacts in `.omx/ai-research/<slug>/` describe one concrete direction.
 - Control-plane artifacts are clearly separated from project-root code/config/test/docs work.
 
@@ -75,6 +85,7 @@ Pass only if:
 
 Pass only if:
 - Baselines are comparable under fair settings.
+- The baseline fairness checklist covers same data split/preprocessing, same metric, comparable compute/tuning budget, hyperparameter budget, implementation source/version, and reproduction gaps.
 - Metrics match the research question.
 - Seeds, data splits, and commands are specified.
 - Existing project commands or project-local wrapper scripts are recorded in `SCRIPT_REGISTRY.md` before they are treated as part of the workflow.
@@ -82,6 +93,7 @@ Pass only if:
 - Multi-seed parallel plans assign each seed lane an explicit idle GPU/device, scheduler slot, or serial fallback.
 - Ablations test the core mechanism rather than cosmetic variants.
 - Failure policy distinguishes environment failures from hypothesis failures.
+- Negative/inconclusive result policy preserves failed, null, and underpowered results with a stop/rerun/redesign decision.
 
 ## Implementation gate
 
@@ -101,6 +113,7 @@ Pass only if:
 - Visualizations exist for numeric/comparative results or a reason is documented.
 - Variance or uncertainty is reported when multiple runs are expected.
 - Negative and inconclusive results are preserved.
+- `CLAIMS.md` is updated when evidence supports, contradicts, downgrades, retires, or leaves a claim inconclusive.
 - Claims do not exceed evidence.
 - Distilled updates outside `runs/` are recorded when the run changed stable conclusions or reusable project artifacts.
 - User-requested findings, reusable commands, cleanup decisions, and next-step TODOs from experiment completion handoff are persisted to `RUNS.md`, `SCRIPT_REGISTRY.md`, `RESULTS.md`, `REPRODUCIBILITY.md`, or project-root docs as appropriate.
@@ -108,6 +121,15 @@ Pass only if:
 - Portfolio `RESEARCH.md` and `INDEX.md` are updated when a result changes the overall synthesis, workstream status, or next priority.
 - Optional Research Feedback Memory artifacts are updated when the mode is enabled; when disabled, their absence is not a failure.
 - Optional Question Capture artifacts are updated when the mode is enabled and the user asked question-like prompts; when disabled, their absence is not a failure.
+
+## Claim ledger gate
+
+Pass only if:
+- `CLAIMS.md` exists for each active workstream that has results or draft report claims.
+- Every non-draft claim has evidence paths, scope/population, allowed wording, forbidden wording, and status.
+- Contradicted, negative, and inconclusive findings are preserved with scientific value and follow-up or stop condition.
+- Retired or downgraded claims record previous wording, new wording/status, reason, and evidence.
+- Paper/report wording links back to `CLAIMS.md` and does not introduce untracked claims.
 
 ## Reproducibility gate
 
@@ -166,4 +188,6 @@ Pass only if, when the user says the current experiment is done:
 - `RESULTS.md` and `REPRODUCIBILITY.md` were updated when the evidence changed conclusions or rerun requirements
 - valuable or user-requested content was written to stable artifacts instead of remaining only in chat
 - if a task worktree was used, a report-before-merge closeout plan was written and the agent did not merge, push, remove the worktree, or delete the branch before user confirmation
+- `STATE.json` was moved to `completion-handoff` or `report-before-merge` as appropriate
+- `CLAIMS.md` records supported, contradicted, inconclusive, downgraded, or retired claims from the finished experiment
 - missing evidence or skipped writes are reported with exact paths and recovery commands

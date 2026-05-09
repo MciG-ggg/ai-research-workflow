@@ -10,12 +10,14 @@ Use these contracts to keep scientific goals separate from execution details and
 - [Optional question capture artifacts](#optional-question-capture-artifacts)
 - [Portfolio artifacts](#portfolio-artifacts)
 - [Required artifacts](#required-artifacts)
+- [`STATE.json` minimum fields](#statejson-minimum-fields)
 - [Workstream `RESEARCH.md` minimum sections](#workstream-researchmd-minimum-sections)
 - [`LITERATURE.md` minimum sections](#literaturemd-minimum-sections)
 - [`EXPERIMENT.md` minimum sections](#experimentmd-minimum-sections)
 - [`SCRIPT_REGISTRY.md` minimum sections](#script_registrymd-minimum-sections)
 - [`RUNS.md` minimum sections](#runsmd-minimum-sections)
 - [`RESULTS.md` minimum sections](#resultsmd-minimum-sections)
+- [`CLAIMS.md` minimum sections](#claimsmd-minimum-sections)
 - [Published docs minimum sections](#published-docs-minimum-sections)
 - [Run distillation contract](#run-distillation-contract)
 
@@ -55,9 +57,13 @@ Optional feedback memory, question capture, and growth review artifacts, created
 
 `.omx/ai-research/<slug>/` is the workstream control plane. It stores research intent, plans, run indexes, evidence summaries, and reproducibility notes for one concrete direction.
 
+Each workstream has `STATE.json` for phase state and `CLAIMS.md` for the authoritative evidence-to-claim ledger.
+
 Project-root files are the implementation plane. Method code, baseline reproduction code, configs, tests, dataset adapters, benchmark entrypoints, and durable docs belong in the target repository's normal locations, not under `.omx/ai-research/`.
 
 Use the Markdown templates in `assets/templates/` when creating new artifacts. They are scaffolds, not evidence; replace TODO placeholders before treating an artifact as complete.
+
+Use `scripts/init_research_workspace.py` to initialize the portfolio `CONFIG.md`, `RESEARCH.md`, and `INDEX.md` from templates. It creates the portfolio control plane only and must not create a new workstream or bypass the mandatory workflow gate. Regression fixture cases for these contracts live in `assets/fixtures/research_workspace_cases.json` and are checked by `scripts/check_regression_fixtures.py`.
 
 ## Idea scouting artifact
 
@@ -89,6 +95,7 @@ Supported invocation flags:
 Optional `.omx/ai-research/CONFIG.md` fields:
 
 ```yaml
+schema_version: 1
 workflow_preset: conservative | guided | autonomous
 idea_scouting: auto | off | on
 completion_handoff: auto | off
@@ -209,14 +216,29 @@ New workstream mandatory workflow gate:
 | Artifact | Purpose | Created by phase |
 | --- | --- | --- |
 | `IDEA_SCOUTING.md` | Optional candidate idea generation, triage, lightweight evidence, promotion gate, and rejected-idea ledger | idea scouting |
+| `STATE.json` | Workstream phase state, gate evidence pointers, blockers, next action, and confirmation boundaries | every workstream phase |
 | `RESEARCH.md` | Scientific intent, hypothesis, contribution, success/falsification criteria, non-goals, claim boundaries | intake / question spec |
 | `LITERATURE.md` | Source-backed related work, baselines, datasets, benchmark constraints, evidence gaps | literature review |
 | `EXPERIMENT.md` | Runnable experimental protocol and validation plan | experiment design |
 | `SCRIPT_REGISTRY.md` | Project-local commands/scripts, ownership, inputs, outputs, dependencies, rerun safety, and validation status | implementation / experiment execution |
 | `RUNS.md` | Commands, environment, tmux session/status, data versions, seeds, seed-to-device/resource allocation, complete log paths, metrics paths, figure paths, result paths, failures | experiment execution |
 | `RESULTS.md` | Tables, analysis, uncertainty, ablations, threats to validity | analysis |
+| `CLAIMS.md` | Evidence-to-claim ledger, allowed/forbidden wording, negative/inconclusive findings, retired or downgraded claims | analysis / paper/report drafting |
 | `REPRODUCIBILITY.md` | Reproducibility checklist and blockers | reproducibility review |
 | `PAPER_DRAFT.md` | Claim-traceable paper/report draft | paper/report drafting |
+
+## `STATE.json` minimum fields
+
+- `schema_version: 1`
+- `workstream_slug`
+- `phase`: one of `idea-scouting`, `intake`, `literature`, `experiment-design`, `implementation`, `running`, `completion-handoff`, `report-before-merge`, `reproducibility-review`, `paper-draft`, or `archived`
+- `phase_status`
+- `last_updated`
+- `active_artifacts`
+- `gate_evidence`: deep-interview autoresearch, ralplan PRD/test spec, and autoresearch result paths when available
+- `current_blockers`
+- `next_action`
+- `confirmation_required_before`: final-topic promotion, new workstream creation, merge, push, worktree removal, and branch deletion when applicable
 
 ## Workstream `RESEARCH.md` minimum sections
 
@@ -252,6 +274,7 @@ New workstream mandatory workflow gate:
 - Experiment objective
 - Datasets and splits
 - Baselines
+- Baseline fairness checklist: same data split/preprocessing, same evaluation metric, comparable compute/tuning budget, hyperparameter search budget, implementation source/version, and known reproduction gaps
 - Method variants
 - Training or inference configuration
 - Metrics
@@ -263,6 +286,7 @@ New workstream mandatory workflow gate:
 - Logging and artifact paths
 - Reproduction commands
 - Failure policy
+- Negative / inconclusive result policy distinguishing environment failure, implementation bug, underpowered result, and hypothesis failure
 - Run directory contract
 - Detached tmux launch and monitoring plan
 - Complete log capture plan
@@ -306,13 +330,22 @@ New workstream mandatory workflow gate:
 - Result artifact paths
 - Summary tables
 - Hypothesis verdicts: supported, contradicted, inconclusive
+- Negative and inconclusive results with evidence paths, failure category, interpretation, and claim updates
 - Uncertainty / variance
 - Ablations
 - Error analysis
 - Threats to validity
 - Evidence-to-claim mapping
+- Link to `CLAIMS.md` as authoritative claim ledger
 - Visualization manifest path and figure captions
 - Run distillation notes: what moved from raw run evidence into stable conclusions, docs, configs, or code
+
+## `CLAIMS.md` minimum sections
+
+- Claim ledger with claim ID, claim, status, evidence paths, scope/population, allowed wording, forbidden wording, and last checked
+- Evidence requirements for supported, contradicted, inconclusive, draft, and retracted claims
+- Negative or inconclusive results with evidence path, likely cause, scientific value, and follow-up or stop condition
+- Retired or downgraded claims with previous wording, new wording/status, reason, and evidence
 
 
 ## Published docs minimum sections

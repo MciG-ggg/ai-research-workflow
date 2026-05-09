@@ -1,0 +1,107 @@
+[
+  {
+    "name": "valid-guided-portfolio",
+    "expect_exit": 0,
+    "args": [],
+    "dirs": [],
+    "files": {
+      ".omx/ai-research/CONFIG.md": "# Config\n\n```yaml\nworkflow_preset: guided\nidea_scouting: auto\ncompletion_handoff: auto\nworktree_closeout: report-before-merge\nfeedback_memory: off\nqa_capture: off\ngrowth_review: off\n```\n",
+      ".omx/ai-research/RESEARCH.md": "# Research Portfolio\n\nOverall objective: improve reproducible AI research workflow quality.\n",
+      ".omx/ai-research/INDEX.md": "# Research Workstream Index\n\nNo active workstreams yet.\n"
+    }
+  },
+  {
+    "name": "invalid-preset",
+    "expect_exit": 1,
+    "args": [],
+    "dirs": [],
+    "files": {
+      ".omx/ai-research/CONFIG.md": "# Config\n\n```yaml\nworkflow_preset: reckless\nidea_scouting: auto\ncompletion_handoff: auto\nworktree_closeout: report-before-merge\nfeedback_memory: off\nqa_capture: off\ngrowth_review: off\n```\n",
+      ".omx/ai-research/RESEARCH.md": "# Research Portfolio\n",
+      ".omx/ai-research/INDEX.md": "# Research Workstream Index\n"
+    }
+  },
+  {
+    "name": "idea-scouting-missing-artifact",
+    "expect_exit": 1,
+    "args": [],
+    "dirs": [],
+    "files": {
+      ".omx/ai-research/CONFIG.md": "# Config\n\n```yaml\nworkflow_preset: guided\nidea_scouting: on\ncompletion_handoff: auto\nworktree_closeout: report-before-merge\nfeedback_memory: off\nqa_capture: off\ngrowth_review: off\n```\n",
+      ".omx/ai-research/RESEARCH.md": "# Research Portfolio\n",
+      ".omx/ai-research/INDEX.md": "# Research Workstream Index\n"
+    }
+  },
+  {
+    "name": "valid-idea-scouting-phase",
+    "expect_exit": 0,
+    "args": [
+      "--phase",
+      "idea-scouting",
+      "--error-on-todo"
+    ],
+    "dirs": [],
+    "files": {
+      ".omx/ai-research/CONFIG.md": "# Config\n\n```yaml\nworkflow_preset: guided\nidea_scouting: on\ncompletion_handoff: auto\nworktree_closeout: report-before-merge\nfeedback_memory: off\nqa_capture: off\ngrowth_review: off\n```\n",
+      ".omx/ai-research/RESEARCH.md": "# Research Portfolio\n\nOverall objective: choose a feasible benchmark direction.\n",
+      ".omx/ai-research/INDEX.md": "# Research Workstream Index\n\nNo promoted workstream yet.\n",
+      ".omx/ai-research/IDEA_SCOUTING.md": "# Idea Scouting\n\n## Scouting Objective\n\nUser goal: find low-compute evaluation ideas.\n\n## Candidate Ideas\n\n| ID | Candidate idea | Falsifiable hypothesis | Evaluation metric / baseline | Lightweight evidence | Novelty risk | Feasibility budget | User-goal fit | Status |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| A | stress-test small rerankers | reranker calibration fails under paraphrase shift | nDCG against BM25 baseline | local benchmark gaps observed | adjacent robustness work exists | one day CPU eval | matches thesis scope | recommend |\n\n## Promotion Gate\n\n- Falsifiable hypothesis: reranker calibration degrades under paraphrase shift.\n- Evaluation metric / baseline / benchmark: nDCG versus BM25.\n- Lightweight evidence: existing local benchmark gap.\n- Novelty-risk note: adjacent robustness work must be checked.\n- Feasibility budget: one day CPU evaluation.\n- User-goal fit: high.\n"
+    }
+  },
+  {
+    "name": "invalid-new-workstream-gate",
+    "expect_exit": 1,
+    "args": [
+      "--phase",
+      "new-workstream",
+      "--workstream",
+      "demo"
+    ],
+    "dirs": [
+      ".omx/ai-research/demo/runs",
+      ".omx/ai-research/demo/scripts"
+    ],
+    "files": {
+      ".omx/ai-research/CONFIG.md": "# Config\n\n```yaml\nworkflow_preset: guided\nidea_scouting: auto\ncompletion_handoff: auto\nworktree_closeout: report-before-merge\nfeedback_memory: off\nqa_capture: off\ngrowth_review: off\n```\n",
+      ".omx/ai-research/RESEARCH.md": "# Research Portfolio\n",
+      ".omx/ai-research/INDEX.md": "# Research Workstream Index\n\n| Slug | Gate evidence |\n| --- | --- |\n| demo | missing gate evidence |\n",
+      ".omx/ai-research/demo/RESEARCH.md": "# Workstream\n\nResearch question exists but no deep / ralplan / autoresearch evidence paths are recorded.\n",
+      ".omx/ai-research/demo/LITERATURE.md": "# Literature\n",
+      ".omx/ai-research/demo/EXPERIMENT.md": "# Experiment\n",
+      ".omx/ai-research/demo/RUNS.md": "# Runs\n",
+      ".omx/ai-research/demo/RESULTS.md": "# Results\n",
+      ".omx/ai-research/demo/REPRODUCIBILITY.md": "# Reproducibility\n",
+      ".omx/ai-research/demo/PAPER_DRAFT.md": "# Paper Draft\n",
+      ".omx/ai-research/demo/SCRIPT_REGISTRY.md": "# Script Registry\n"
+    }
+  },
+  {
+    "name": "valid-completion-handoff-phase",
+    "expect_exit": 0,
+    "args": [
+      "--phase",
+      "completion-handoff",
+      "--workstream",
+      "demo"
+    ],
+    "dirs": [
+      ".omx/ai-research/demo/runs/run-001",
+      ".omx/ai-research/demo/scripts"
+    ],
+    "files": {
+      ".omx/ai-research/CONFIG.md": "# Config\n\n```yaml\nworkflow_preset: guided\nidea_scouting: auto\ncompletion_handoff: auto\nworktree_closeout: report-before-merge\nfeedback_memory: off\nqa_capture: off\ngrowth_review: off\n```\n",
+      ".omx/ai-research/RESEARCH.md": "# Research Portfolio\n\nCurrent synthesis: demo complete.\n",
+      ".omx/ai-research/INDEX.md": "# Research Workstream Index\n\n| Slug | Gate evidence |\n| --- | --- |\n| demo | deep mission, ralplan prd, autoresearch result |\n",
+      ".omx/ai-research/demo/RESEARCH.md": "# Workstream\n\nGate evidence: deep mission, ralplan prd, autoresearch result.\n",
+      ".omx/ai-research/demo/LITERATURE.md": "# Literature\n\nEvidence reviewed.\n",
+      ".omx/ai-research/demo/EXPERIMENT.md": "# Experiment\n\nMetric and baseline recorded.\n\n## Baseline Fairness Checklist\n\n- Same data split / preprocessing: yes\n- Same evaluation metric and aggregation: yes\n- Comparable training, tuning, and inference budget: yes\n- Hyperparameter search budget: fixed\n- Implementation source and version: fixture\n- Known baseline limitations or reproduction gaps: none\n\n## Negative / Inconclusive Result Policy\n\nPreserve negative and inconclusive result policy with stop/rerun criteria.\n",
+      ".omx/ai-research/demo/RUNS.md": "# Runs\n\n## Run Ledger\n\nlog path recorded, metrics path recorded, summary path recorded.\n\n## Distilled Updates Outside `runs/`\n\nReusable command and result summary persisted.\n\n## Worktree Closeout Plan\n\nWorktree closeout plan recorded. User confirmation required before merge/delete.\n",
+      ".omx/ai-research/demo/RESULTS.md": "# Results\n\nConclusion remains bounded by evidence.\n\n## Negative and Inconclusive Results\n\n| Result | Evidence path | Failure category | Interpretation | Preserved claim update |\n| --- | --- | --- | --- | --- |\n| inconclusive fixture | .omx/ai-research/demo/RUNS.md | underpowered | cannot claim win | CLAIMS.md updated |\n\n## Evidence-to-claim Mapping\n\nSee CLAIMS.md.\n",
+      ".omx/ai-research/demo/REPRODUCIBILITY.md": "# Reproducibility\n\nRerun command recorded.\n",
+      ".omx/ai-research/demo/PAPER_DRAFT.md": "# Paper Draft\n\nDraft deferred until more evidence.\n",
+      ".omx/ai-research/demo/SCRIPT_REGISTRY.md": "# Script Registry\n\n## Completion Handoff Notes\n\nNative command remained valid.\n",
+      ".omx/ai-research/demo/STATE.json": "{\n  \"schema_version\": 1,\n  \"workstream_slug\": \"demo\",\n  \"phase\": \"completion-handoff\",\n  \"phase_status\": \"draft\",\n  \"last_updated\": \"2026-05-09\",\n  \"active_artifacts\": [\"RUNS.md\", \"RESULTS.md\", \"CLAIMS.md\"],\n  \"gate_evidence\": {\"deep_interview_autoresearch\": \"deep mission\", \"ralplan_prd\": \"ralplan prd\", \"ralplan_test_spec\": \"ralplan test spec\", \"autoresearch_result\": \"autoresearch result\"},\n  \"current_blockers\": [],\n  \"next_action\": \"prepare report-before-merge plan\",\n  \"confirmation_required_before\": [\"merge\", \"push\", \"worktree removal\", \"branch deletion\"]\n}\n",
+      ".omx/ai-research/demo/CLAIMS.md": "# Claims Ledger\n\n## Claim Ledger\n\n| Claim ID | Claim | Status | Evidence paths | Scope / population | Allowed wording | Forbidden wording | Last checked |\n| --- | --- | --- | --- | --- | --- | --- | --- |\n| C1 | demo claim | inconclusive | .omx/ai-research/demo/RESULTS.md | demo fixture | inconclusive on fixture | general improvement | 2026-05-09 |\n\n## Evidence Requirements\n\nEvery claim has evidence paths.\n\n## Negative or Inconclusive Results\n\n| Finding | Evidence path | Likely cause | Scientific value | Follow-up / stop condition |\n| --- | --- | --- | --- | --- |\n| inconclusive fixture | .omx/ai-research/demo/RESULTS.md | underpowered | tests preservation | stop |\n\n## Retired or Downgraded Claims\n\n| Claim ID | Previous wording | New wording/status | Reason | Evidence |\n| --- | --- | --- | --- | --- |\n| C0 | strong claim | inconclusive | fixture evidence | .omx/ai-research/demo/RESULTS.md |\n"
+    }
+  }
+]

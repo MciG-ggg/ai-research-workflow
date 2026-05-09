@@ -76,6 +76,7 @@ cd ai-research-workflow
 ```
 
 The updater runs `git pull --ff-only`, source validation, staged `rsync -a --delete`, and installed-copy validation. For local development, skip pulling with `--no-pull`.
+Use `--dry-run` to validate and preview without replacing the installed skill. Use `--keep-backups N` to control backup retention.
 
 Developer symlink mode is available when you want repo edits to be picked up immediately:
 
@@ -95,11 +96,13 @@ For each research project, the skill asks the agent to create or maintain a proj
   RESEARCH.md
   INDEX.md
 .omx/ai-research/<slug>/
+  STATE.json
   RESEARCH.md
   LITERATURE.md
   EXPERIMENT.md
   RUNS.md
   RESULTS.md
+  CLAIMS.md
   REPRODUCIBILITY.md
   PAPER_DRAFT.md
   SCRIPT_REGISTRY.md
@@ -114,6 +117,8 @@ Idea scouting is optional. Use it when a user asks to generate candidate ideas, 
 New workstream creation is forced through `$deep-interview --autoresearch -> $ralplan -> $autoresearch`. The agent should not create a new slug, implement code, or launch experiments until `INDEX.md` records the deep-interview handoff, ralplan PRD/test spec, and autoresearch state/completion artifact paths.
 
 Artifact templates live under `skills/ai-research-workflow/assets/templates/`. They are starting points for portfolio, workstream, run, result, reproducibility, paper, and optional feedback files. Replace `TODO` placeholders before treating any artifact as complete.
+
+Each workstream also has `STATE.json` for phase state and `CLAIMS.md` for evidence-to-claim tracking. `EXPERIMENT.md` includes a baseline fairness checklist and negative/inconclusive result policy so failed or null findings stay scientifically useful.
 
 ## Optional feedback memory and Q&A capture
 
@@ -150,7 +155,19 @@ When the user says the current experiment is done, the agent should treat that a
 
 ## Maintenance-only bundled scripts
 
-The skill may include bundled scripts under `skills/ai-research-workflow/scripts/`, but those scripts are maintenance-only tools for validating and evolving this framework. They are not for running user experiments, collecting user metrics, plotting user results, or publishing user research docs.
+The skill may include bundled scripts under `skills/ai-research-workflow/scripts/`, but those scripts are maintenance and framework-guardrail tools for validating, initializing, routing, closeout planning, and evolving this framework. They remain maintenance-only in the sense that they are not for running user experiments, collecting user metrics, plotting user results, or publishing user research docs.
+
+Useful guardrails:
+
+```bash
+python3 skills/ai-research-workflow/scripts/init_research_workspace.py <project-root> --preset guided
+python3 skills/ai-research-workflow/scripts/resolve_workflow.py <project-root> --prompt "这个实验做完了，整理落盘"
+python3 skills/ai-research-workflow/scripts/validate_research_workspace.py <project-root> --phase completion-handoff
+python3 skills/ai-research-workflow/scripts/prepare_worktree_closeout.py <task-worktree> --base main
+python3 skills/ai-research-workflow/scripts/check_regression_fixtures.py
+```
+
+`validate_research_workspace.py` supports phase-aware checks for `idea-scouting`, `new-workstream`, and `completion-handoff`, plus `--error-on-todo` and `--check-paths` for stricter review.
 
 User research scripts belong in the target project workspace:
 
@@ -186,6 +203,7 @@ Maintenance helpers:
 
 ```bash
 python3 skills/ai-research-workflow/scripts/check_worktree_registry.py .
+python3 skills/ai-research-workflow/scripts/prepare_worktree_closeout.py . --base main
 ```
 
 See `skills/ai-research-workflow/references/worktree-development.md`.

@@ -9,7 +9,7 @@ description: "AI research workflow orchestration for turning vague AI/ML researc
 
 Turn an AI/ML research idea into artifact-gated research work. This is a framework skill, not a project-specific experiment runner. Keep scientific intent, implementation work, run evidence, and claims separated so evidence controls conclusions.
 
-Bundled scripts in this skill are maintenance-only. Do not use them as user experiment runners, metrics collectors, plotting scripts, or research-doc publishers. Generate or adapt project-local scripts only when the current project needs them.
+Bundled scripts in this skill are maintenance and framework-guardrail helpers only. Do not use them as user experiment runners, metrics collectors, plotting scripts, or research-doc publishers. Generate or adapt project-local scripts only when the current project needs them.
 
 This skill is an OMX workflow. By default it orchestrates:
 
@@ -45,6 +45,16 @@ Maintenance validation:
 ```bash
 python3 scripts/validate_framework_contract.py .
 python3 scripts/validate_research_workspace.py <project-root>
+python3 scripts/check_regression_fixtures.py
+```
+
+Framework guardrail helpers:
+
+```bash
+python3 scripts/resolve_workflow.py <project-root> --prompt "<user prompt>"
+python3 scripts/init_research_workspace.py <project-root> --preset guided
+python3 scripts/validate_research_workspace.py <project-root> --phase idea-scouting
+python3 scripts/prepare_worktree_closeout.py <task-worktree> --base main
 ```
 
 ## Artifact setup
@@ -68,11 +78,13 @@ Minimum workstream layout:
 
 ```text
 .omx/ai-research/<slug>/
+  STATE.json
   RESEARCH.md
   LITERATURE.md
   EXPERIMENT.md
   RUNS.md
   RESULTS.md
+  CLAIMS.md
   REPRODUCIBILITY.md
   PAPER_DRAFT.md
   SCRIPT_REGISTRY.md
@@ -81,13 +93,14 @@ Minimum workstream layout:
   runs/
 ```
 
-Use `assets/templates/portfolio-RESEARCH.md`, `portfolio-INDEX.md`, `workstream-RESEARCH.md`, and the artifact-specific templates as the starting point when creating these files. Templates define shape only; replace TODO placeholders with project evidence before treating an artifact as complete.
+Use `assets/templates/portfolio-RESEARCH.md`, `portfolio-INDEX.md`, `STATE.json`, `workstream-RESEARCH.md`, `CLAIMS.md`, and the artifact-specific templates as the starting point when creating these files. Templates define shape only; replace TODO placeholders with project evidence before treating an artifact as complete.
 
 ## Workflow presets and overrides
 
 Project config can reduce how often the user must name the workflow explicitly. Use `.omx/ai-research/CONFIG.md` from `assets/templates/CONFIG.md`:
 
 ```yaml
+schema_version: 1
 workflow_preset: conservative | guided | autonomous
 idea_scouting: auto | off | on
 completion_handoff: auto | off
@@ -141,6 +154,7 @@ Invocation flags:
 Optional project config lives at `.omx/ai-research/CONFIG.md`:
 
 ```yaml
+schema_version: 1
 workflow_preset: conservative | guided | autonomous
 idea_scouting: auto | off | on
 completion_handoff: auto | off
@@ -183,6 +197,8 @@ When this skill runs, designs, implements, or audits experiments, structured run
 
 For every actual experiment run, ensure the project has existing native commands or project-local scripts recorded in `.omx/ai-research/<slug>/SCRIPT_REGISTRY.md`. Put wrappers under `.omx/ai-research/<slug>/scripts/`. Commands/scripts must produce a distinct run directory with command record, complete log, structured metrics, summary, and figures when visualizations are appropriate.
 
+Each workstream keeps `STATE.json` as its phase state and `CLAIMS.md` as its evidence-to-claim ledger. Update `STATE.json` at workflow phase transitions. Update `CLAIMS.md` whenever results support, contradict, downgrade, or retire a claim.
+
 Run long experiments in detached tmux by default when tmux is available. For multiple independent variants, baselines, ablations, datasets, or multi-seed experiments, use `$team` or native subagents when parallelism is safe. Assign each seed lane an explicit idle GPU/device or scheduler slot and record the seed-to-device mapping in `RUNS.md`.
 
 When settled results or conclusions are finalized, publish them under project-root `docs/ai-research/<slug>/` and configure MkDocs when safe.
@@ -195,6 +211,7 @@ Completion handoff requires:
 - inspect `.omx/ai-research/<slug>/runs/` manifests, logs, metrics, summaries, and figures
 - inspect `.omx/ai-research/<slug>/scripts/` and update `SCRIPT_REGISTRY.md`
 - update `RUNS.md`, `RESULTS.md`, and `REPRODUCIBILITY.md` when evidence changes status, conclusions, rerun requirements, or failures
+- update `CLAIMS.md` and preserve negative or inconclusive results instead of deleting them
 - persist user-requested outputs, notable findings, reusable commands, decisions, and next-step TODOs into stable artifacts or project-root docs
 - update portfolio `RESEARCH.md` and `INDEX.md` when the overall synthesis, workstream status, or next priority changes
 - if the workstream used a task worktree, prepare a report-before-merge closeout plan covering validation, semantic Lore-format commit status, merge/rebase target, push target, worktree removal, branch deletion, and `.omx/worktrees/REGISTRY.md` update; do not merge, push, delete the worktree, or delete the branch until the user confirms
@@ -207,12 +224,12 @@ Only skip artifact updates when relevant files or run outputs cannot be found. I
 1. Research intake: produce portfolio and workstream `RESEARCH.md` with research question, falsifiable hypothesis, success/falsification criteria, non-goals, claim boundaries, and decision boundaries.
 2. Literature review: produce `LITERATURE.md` with source-backed evidence from primary sources when facts are current or niche.
 3. Research question spec: tighten hypotheses until each is testable.
-4. Experiment design: produce `EXPERIMENT.md` before writing or changing experiment code.
+4. Experiment design: produce `EXPERIMENT.md` before writing or changing experiment code, including baseline fairness and negative/inconclusive result policy.
 5. Project-root implementation and baseline reproduction: implement method, baseline, configs, tests, and entrypoints in the target repository root after `$ralplan`.
 6. Project-local orchestration scripts: reuse native project runners first; add thin wrappers only when needed and record them in `SCRIPT_REGISTRY.md`.
 7. Run experiments: produce `RUNS.md`, never fabricate results, and record complete log, metrics, summary, figures, command, environment, commit, seeds, and failures.
 8. Distill completed runs: update `RUNS.md`, `SCRIPT_REGISTRY.md`, `RESULTS.md`, `REPRODUCIBILITY.md`, project-root docs, and optional feedback/Q&A artifacts when enabled.
-9. Analyze results: produce `RESULTS.md`; separate evidence from interpretation and keep claims within evidence.
+9. Analyze results: produce `RESULTS.md` and `CLAIMS.md`; separate evidence from interpretation, preserve negative/inconclusive findings, and keep claims within evidence.
 10. Reproducibility review: produce `REPRODUCIBILITY.md`; missing seeds, data versions, commands, complete log paths, metrics, figures, or result paths are blockers.
 11. Paper draft or report: produce `PAPER_DRAFT.md` only after results and reproducibility review exist.
 

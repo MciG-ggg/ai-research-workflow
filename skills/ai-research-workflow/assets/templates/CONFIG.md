@@ -1,6 +1,7 @@
 # AI Research Workflow Config
 
 ```yaml
+schema_version: 1
 workflow_preset: guided
 idea_scouting: auto
 completion_handoff: auto
@@ -12,6 +13,7 @@ growth_review: off
 
 Allowed values:
 
+- `schema_version`: `1`
 - `workflow_preset`: `conservative`, `guided`, `autonomous`
 - `idea_scouting`: `auto`, `off`, `on`
 - `completion_handoff`: `auto`, `off`

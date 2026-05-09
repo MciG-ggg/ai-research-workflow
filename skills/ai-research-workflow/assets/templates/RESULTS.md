@@ -17,6 +17,12 @@
 
 - Supported / contradicted / inconclusive: TODO
 
+## Negative and Inconclusive Results
+
+| Result | Evidence path | Failure category | Interpretation | Preserved claim update |
+| --- | --- | --- | --- | --- |
+| TODO | TODO | environment / implementation / underpowered / hypothesis | TODO | TODO |
+
 ## Uncertainty / Variance
 
 - TODO
@@ -38,6 +44,8 @@
 | Claim | Evidence path | Status |
 | --- | --- | --- |
 | TODO | TODO | TODO |
+
+See `CLAIMS.md` for the authoritative claim ledger.
 
 ## Visualization Manifest and Captions
 

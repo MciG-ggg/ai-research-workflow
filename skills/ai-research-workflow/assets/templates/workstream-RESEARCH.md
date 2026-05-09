@@ -40,6 +40,11 @@ TODO
 
 - TODO
 
+## State and Claim Ledgers
+
+- Phase state: `STATE.json`
+- Claims ledger: `CLAIMS.md`
+
 ## Decision Boundaries
 
 - TODO

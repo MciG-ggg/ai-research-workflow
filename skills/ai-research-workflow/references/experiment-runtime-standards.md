@@ -46,6 +46,7 @@ The run directory is raw evidence, not the final research memory. After each run
 - Update `.omx/ai-research/<slug>/RUNS.md` with status, command, seed/device/resource, log path, metrics path, summary path, and failure notes.
 - Update `.omx/ai-research/<slug>/SCRIPT_REGISTRY.md` with scripts or native commands that were used, changed, validated, deprecated, or requested by the user.
 - Update `.omx/ai-research/<slug>/RESULTS.md` when the run changes tables, figures, comparisons, hypothesis verdicts, or threats to validity.
+- Update `.omx/ai-research/<slug>/CLAIMS.md` whenever a run supports, contradicts, downgrades, retires, or leaves a claim inconclusive.
 - Update `.omx/ai-research/<slug>/REPRODUCIBILITY.md` when the run reveals environment requirements, nondeterminism, missing data, missing compute, or rerun steps.
 - Promote stable conclusions to project-root `docs/`, `reports/`, benchmark cards, README sections, or MkDocs pages when useful.
 - Promote reusable method, baseline, config, or test changes to project-root files; do not bury them in `.omx/ai-research/`.
@@ -54,6 +55,7 @@ The run directory is raw evidence, not the final research memory. After each run
 - If Research Feedback Memory is enabled, update `LEARNINGS.md`, `ISSUES.md`, `DECISIONS.md`, and workstream `NOTES.md`/`DESIGN.md` with distilled run lessons, failed assumptions, decisions, reusable commands, and design rationale.
 - If Researcher Growth Review is enabled, update `SKILL_GROWTH.md` and workstream `REVIEW.md` with capability lessons tied to the completed run and evidence quality.
 - Keep raw logs, checkpoints, private data, and large temporary outputs in run storage; link or summarize them instead of copying them into project-root docs.
+- Preserve negative and inconclusive results as evidence. Do not discard them because they are not publishable wins.
 
 When the user says the current experiment is done, treat that as a terminal run distillation trigger. Inspect the run directory and scripts first, then persist valuable or user-requested content into stable artifacts before responding. If the workstream used a task worktree, report a merge/cleanup plan and wait for user confirmation before merging, pushing, removing the worktree, or deleting the branch.
 

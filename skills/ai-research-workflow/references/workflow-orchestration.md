@@ -5,6 +5,7 @@ This skill is a workflow, not only an experiment logging template. It coordinate
 ## Contents
 
 - [Default OMX sequence](#default-omx-sequence)
+- [Deterministic routing helpers](#deterministic-routing-helpers)
 - [Optional idea scouting](#optional-idea-scouting)
 - [Optional feedback mode resolution](#optional-feedback-mode-resolution)
 - [Portfolio and workstream control plane](#portfolio-and-workstream-control-plane)
@@ -41,6 +42,20 @@ Phase rules:
 - Use `$ralph`/`$autopilot` only after research and experiment specs exist and the remaining work is mainly implementation plus verification.
 
 If the user provides mature artifacts, resume at the earliest failing gate instead of repeating completed phases.
+
+## Deterministic routing helpers
+
+Use framework guardrail scripts when the workflow decision should be reproducible instead of purely prose-driven:
+
+```bash
+python3 scripts/resolve_workflow.py <project-root> --prompt "<user prompt>"
+python3 scripts/init_research_workspace.py <project-root> --preset guided
+python3 scripts/validate_research_workspace.py <project-root> --phase idea-scouting
+python3 scripts/validate_research_workspace.py <project-root> --phase new-workstream --workstream <slug>
+python3 scripts/validate_research_workspace.py <project-root> --phase completion-handoff --workstream <slug>
+```
+
+`resolve_workflow.py` emits JSON decisions for idea scouting, completion handoff, new-workstream gating, report-before-merge closeout, and ask-required boundaries. `init_research_workspace.py` initializes the portfolio control plane only; it must not create a new workstream or bypass the `$deep-interview --autoresearch -> $ralplan -> $autoresearch` gate.
 
 ## Optional idea scouting
 
@@ -87,6 +102,8 @@ Every project gets a root portfolio layer under `.omx/ai-research/`:
 - `.omx/ai-research/INDEX.md`: the workstream registry mapping each `<slug>` to its subquestion, status, artifact links, latest evidence, and next action.
 
 Each `.omx/ai-research/<slug>/` directory is a workstream, not the whole research program. It should link back to the portfolio `RESEARCH.md` and appear in `INDEX.md`.
+
+Each active workstream also keeps `STATE.json` as the current phase state and `CLAIMS.md` as the claim ledger. Update `STATE.json` when the workflow moves between intake, literature, experiment-design, running, completion-handoff, report-before-merge, reproducibility-review, paper-draft, or archived phases. Update `CLAIMS.md` whenever evidence changes allowed wording, forbidden wording, or the status of a claim.
 
 Before creating a new slug:
 

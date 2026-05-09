@@ -141,6 +141,14 @@ Default behavior is report-before-merge:
 4. Report the exact merge-back, push, worktree removal, branch deletion, and registry-update plan.
 5. Wait for user confirmation before running merge, push, `git worktree remove`, or branch deletion commands.
 
+Use the read-only framework guardrail script when available:
+
+```bash
+python3 scripts/prepare_worktree_closeout.py <task-worktree> --base main --validation <path>
+```
+
+`prepare_worktree_closeout.py` prints a report-before-merge plan and blockers; it must not merge, push, remove a worktree, or delete a branch.
+
 The closeout plan must include:
 
 - worktree path and branch
