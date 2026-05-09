@@ -76,6 +76,7 @@ Pass only if:
 - Distilled updates outside `runs/` are recorded when the run changed stable conclusions or reusable project artifacts.
 - User-requested findings, reusable commands, cleanup decisions, and next-step TODOs from experiment completion handoff are persisted to `RUNS.md`, `SCRIPT_REGISTRY.md`, `RESULTS.md`, `REPRODUCIBILITY.md`, or project-root docs as appropriate.
 - Portfolio `RESEARCH.md` and `INDEX.md` are updated when a result changes the overall synthesis, workstream status, or next priority.
+- Optional Research Feedback Memory artifacts are updated when the mode is enabled; when disabled, their absence is not a failure.
 
 ## Reproducibility gate
 
@@ -84,6 +85,29 @@ Pass only if:
 - Environment requirements are explicit.
 - Known non-determinism is disclosed.
 - Missing compute, credentials, or data access is reported as a blocker.
+
+## Optional feedback memory gate
+
+This gate is active only when `--feedback-memory` is present or `.omx/ai-research/CONFIG.md` sets `feedback_memory: lite` or `feedback_memory: full`. When Research Feedback Memory is disabled by default or by `--no-feedback`, skip this gate.
+
+Pass only if enabled feedback artifacts contain concise, reusable entries:
+- `LEARNINGS.md` records concepts, papers, methods, domain knowledge, or verification lessons with evidence links.
+- `ISSUES.md` records blockers, bugs, failed assumptions, recovery steps, or prevention notes.
+- `DECISIONS.md` records method, architecture, experiment, or workflow decisions with alternatives and rationale.
+- Workstream `NOTES.md` records useful process notes, reusable commands, or cross-links to stable artifacts.
+- Workstream `DESIGN.md` records non-obvious method, architecture, pipeline, or evaluation design rationale when `feedback_memory: full`.
+
+Fail only on enabled modes when valuable durable knowledge was discovered but left only in chat.
+
+## Optional growth review gate
+
+This gate is active only when `--growth-review` is present or `.omx/ai-research/CONFIG.md` sets `growth_review: milestone` or `growth_review: always`. When Researcher Growth Review is disabled by default or by `--no-feedback`, skip this gate.
+
+Pass only if enabled growth artifacts link capability lessons to concrete evidence:
+- `SKILL_GROWTH.md` records lessons across problem definition, research taste, experiment design, verification, systems engineering, expression/collaboration, or risk awareness.
+- Workstream `REVIEW.md` records milestone reflection, evidence quality, overclaim risk, and next capability practice items.
+
+Growth review must not weaken scientific gates or invent self-improvement claims without artifact evidence.
 
 
 ## Documentation publishing gate

@@ -105,6 +105,25 @@ python3 ~/.codex/skills/.system/skill-creator/scripts/quick_validate.py ~/.codex
 
 新建 workstream/小方向必须强制经过 `$deep-interview --autoresearch -> $ralplan -> $autoresearch`。在 `INDEX.md` 记录 deep-interview handoff、ralplan PRD/test spec、autoresearch state/completion artifact 路径之前，agent 不应创建新 slug、写实现或启动实验。
 
+## 可选反馈记忆
+
+Research Feedback Memory 和 Researcher Growth Review 默认关闭。只有当项目需要把长期学习反馈也沉淀下来时再启用：
+
+```text
+$ai-research-workflow --feedback-memory ...
+$ai-research-workflow --growth-review ...
+$ai-research-workflow --no-feedback ...
+```
+
+项目默认值可以写在 `.omx/ai-research/CONFIG.md`：
+
+```yaml
+feedback_memory: off | lite | full
+growth_review: off | milestone | always
+```
+
+启用后，skill 可以增加根目录反馈文件，例如 `LEARNINGS.md`、`ISSUES.md`、`DECISIONS.md`、`SKILL_GROWTH.md`，以及 workstream 内的 `DESIGN.md`、`NOTES.md`、`REVIEW.md`。这些文件只记录蒸馏后的问题、知识、架构/设计决策、验证缺口和能力复盘；原始日志和运行输出仍然放在 `runs/`。
+
 这个 skill 不内置通用实验 runner。不同研究项目会使用不同训练栈、配置系统、集群、notebook、绘图工具和日志约定。因此它只规定项目本地脚本应该放在哪里、如何命名、如何登记。
 
 运行目录是原始证据。每次运行终止后，把稳定结论蒸馏回 `RUNS.md`、`RESULTS.md`、`REPRODUCIBILITY.md`，并在结果可复用时同步到项目根目录的 docs、报告、代码、配置或测试。

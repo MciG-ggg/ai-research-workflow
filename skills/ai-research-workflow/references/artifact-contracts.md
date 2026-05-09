@@ -14,6 +14,21 @@ Portfolio control plane:
   INDEX.md
 ```
 
+Optional feedback memory and growth review artifacts, created only when enabled:
+
+```text
+.omx/ai-research/
+  CONFIG.md
+  LEARNINGS.md
+  ISSUES.md
+  DECISIONS.md
+  SKILL_GROWTH.md
+.omx/ai-research/<slug>/
+  DESIGN.md
+  NOTES.md
+  REVIEW.md
+```
+
 `.omx/ai-research/RESEARCH.md` stores the overall research program: central question, north-star hypotheses, success criteria, claim boundaries, current synthesis, active subquestions, and next priorities.
 
 `.omx/ai-research/INDEX.md` stores the workstream registry: each `<slug>`, status, relationship to the overall question, artifact links, latest evidence, and next action.
@@ -21,6 +36,77 @@ Portfolio control plane:
 `.omx/ai-research/<slug>/` is the workstream control plane. It stores research intent, plans, run indexes, evidence summaries, and reproducibility notes for one concrete direction.
 
 Project-root files are the implementation plane. Method code, baseline reproduction code, configs, tests, dataset adapters, benchmark entrypoints, and durable docs belong in the target repository's normal locations, not under `.omx/ai-research/`.
+
+## Optional feedback memory artifacts
+
+Research Feedback Memory and Researcher Growth Review are opt-in. They are disabled by default and must not create extra files unless enabled by invocation flags or `.omx/ai-research/CONFIG.md`.
+
+Supported invocation flags:
+
+- `--feedback-memory`: enable Research Feedback Memory for the current invocation.
+- `--growth-review`: enable Researcher Growth Review for the current invocation.
+- `--no-feedback`: force both optional modes off for the current invocation.
+
+Optional `.omx/ai-research/CONFIG.md` fields:
+
+```yaml
+feedback_memory: off | lite | full
+growth_review: off | milestone | always
+```
+
+Precedence is: `--no-feedback`, explicit enable flags, `.omx/ai-research/CONFIG.md`, then default off.
+
+`LEARNINGS.md` minimum sections:
+
+- Concepts, papers, methods, or domain knowledge learned
+- Evidence links to workstream artifacts, runs, code, or citations
+- Applicability notes and limits
+- Open questions or follow-up reading
+
+`ISSUES.md` minimum sections:
+
+- Problem, blocker, bug, failed assumption, or environment issue
+- Detection evidence and affected workstream/run
+- Root cause if known
+- Resolution, workaround, or next recovery command
+- Prevention note when reusable
+
+`DECISIONS.md` minimum sections:
+
+- Decision
+- Context and constraints
+- Alternatives considered and rejected
+- Evidence or rationale
+- Scope risk and revisit trigger
+
+`SKILL_GROWTH.md` minimum sections:
+
+- Capability area: problem definition, research taste, experiment design, verification, systems engineering, expression/collaboration, or risk awareness
+- Concrete episode and artifact links
+- Lesson learned
+- Next practice item
+
+Workstream `DESIGN.md` minimum sections when `feedback_memory` is `full`:
+
+- Method, architecture, data, evaluation, and pipeline design decisions
+- Constraints and rejected alternatives
+- Interfaces or project-root paths affected
+- Validation expectations and known risks
+
+Workstream `NOTES.md` minimum sections when Research Feedback Memory is enabled:
+
+- Durable process notes that are useful beyond the current chat
+- Reusable commands or checks
+- Cross-links to `RUNS.md`, `RESULTS.md`, `SCRIPT_REGISTRY.md`, and project-root files
+
+Workstream `REVIEW.md` minimum sections when Researcher Growth Review is enabled:
+
+- Milestone reviewed
+- Evidence quality and overclaim risk
+- Problem-definition, experiment-design, verification, and systems-engineering lessons
+- Next capability practice item
+
+Keep feedback files concise and distilled. Raw logs, checkpoints, private data, and large run outputs stay in `runs/` or external artifact storage.
 
 ## Portfolio artifacts
 

@@ -1,6 +1,6 @@
 ---
 name: ai-research-workflow
-description: "AI research workflow orchestration for turning vague AI/ML research ideas into validated project work and research artifacts: deep interview, literature review, falsifiable hypothesis spec, ralplan planning, method implementation, baseline reproduction, experiment design, experiment runs, result distillation, reproducibility review, and paper drafting. Use when Codex is asked to develop, implement, evaluate, reproduce, or write up an AI/ML research idea, benchmark, method, baseline, ablation, paper plan, experiment pipeline, or research report with clear hypotheses, baselines, metrics, validation, and claim boundaries."
+description: "AI research workflow orchestration for turning vague AI/ML research ideas into validated project work and research artifacts: deep interview, literature review, falsifiable hypothesis spec, ralplan planning, method implementation, baseline reproduction, experiment design, experiment runs, result distillation, reproducibility review, optional research feedback memory, optional researcher growth review, and paper drafting. Use when Codex is asked to develop, implement, evaluate, reproduce, or write up an AI/ML research idea, benchmark, method, baseline, ablation, paper plan, experiment pipeline, or research report with clear hypotheses, baselines, metrics, validation, and claim boundaries."
 ---
 
 # AI Research Workflow
@@ -79,7 +79,50 @@ Minimum framework layout:
   runs/
 ```
 
+Optional feedback layout, created only when enabled by flag or config:
+
+```text
+.omx/ai-research/
+  CONFIG.md
+  LEARNINGS.md
+  ISSUES.md
+  DECISIONS.md
+  SKILL_GROWTH.md
+.omx/ai-research/<slug>/
+  DESIGN.md
+  NOTES.md
+  REVIEW.md
+```
+
 Read `references/workflow-orchestration.md` before starting or resuming the full research workflow. Read `references/artifact-contracts.md` when authoring or auditing artifact contents. Read `references/project-local-script-registry.md` before creating or relying on project-local scripts. Read `references/experiment-runtime-standards.md` before designing, implementing, running, or auditing experiments. Read `references/research-quality-gates.md` before approving a handoff, result, or paper claim. Read `references/worktree-development.md` when making substantive target-repo changes. Run maintenance-only scripts only when updating or validating this skill, not while executing a user's research workflow.
+
+## Optional feedback and growth modes
+
+Research Feedback Memory and Researcher Growth Review are disabled by default. Do not create or update feedback artifacts unless the current invocation or project config enables them.
+
+Invocation flags:
+- `--feedback-memory`: enable Research Feedback Memory for this invocation. Record distilled issues, learnings, decisions, architecture or method tradeoffs, and reusable process notes.
+- `--growth-review`: enable Researcher Growth Review for this invocation. Record capability-focused reflection across problem definition, experiment design, verification, systems engineering, expression, and risk awareness.
+- `--no-feedback`: force both optional modes off for this invocation, even when project config enables them.
+
+Optional project config lives at `.omx/ai-research/CONFIG.md`:
+
+```yaml
+feedback_memory: off | lite | full
+growth_review: off | milestone | always
+```
+
+Resolution precedence:
+1. `--no-feedback` disables both optional modes for the current invocation.
+2. Explicit `--feedback-memory` or `--growth-review` enables that mode for the current invocation.
+3. `.omx/ai-research/CONFIG.md` supplies project defaults.
+4. Missing config means both modes stay off.
+
+When `feedback_memory` is `lite`, write concise cross-run notes to `LEARNINGS.md`, `ISSUES.md`, `DECISIONS.md`, and workstream `NOTES.md` only when they preserve reusable knowledge. When `feedback_memory` is `full`, also maintain workstream `DESIGN.md` for method, architecture, pipeline, and evaluation design rationale.
+
+When `growth_review` is `milestone`, update `SKILL_GROWTH.md` and workstream `REVIEW.md` only at major milestones such as workstream intake, experiment completion handoff, reproducibility review, or paper/report drafting. When `growth_review` is `always`, include a short growth review whenever a workflow phase closes. Do not ask extra reflection questions unless growth review is enabled and the answer would materially change the review; ask at most one.
+
+Feedback memory records distilled knowledge, not raw logs. Keep raw run outputs under `runs/` and link or summarize them.
 
 ## Research control plane vs project implementation
 
@@ -142,6 +185,8 @@ Only skip artifact updates when the relevant files or run outputs cannot be foun
 
 Start by reading or creating `.omx/ai-research/RESEARCH.md` and `.omx/ai-research/INDEX.md`. Decide whether the current request continues an existing workstream or requires a new `<slug>`, and update the portfolio index before deep work starts.
 
+Resolve optional feedback modes from invocation flags and `.omx/ai-research/CONFIG.md` before authoring artifacts. If enabled, initialize only the optional feedback files that are needed by the current phase; if disabled, leave them absent.
+
 For an existing workstream, use `$deep-interview --autoresearch` unless the user already provides clear hypotheses, success criteria, non-goals, forbidden claims, and evaluator/validation criteria. Use `$ralplan` before implementation-heavy work. Use `$autoresearch` for the durable validator-gated loop over literature, implementation, experiments, and claims.
 
 For a new workstream, `$deep-interview --autoresearch`, `$ralplan`, and `$autoresearch` are mandatory in that order. The new-workstream gate is complete only after the gate evidence is linked from portfolio `INDEX.md`.
@@ -173,6 +218,8 @@ Tighten `RESEARCH.md` until each hypothesis is testable. Convert vague goals int
 
 Produce `EXPERIMENT.md` before writing or changing experiment code. Include datasets, splits, baselines, fairness constraints, method variants, configs, metrics, statistical tests, ablations, seeds, runtime budget, logging/artifact paths, reproduction commands, failure policy, run directory contract, progress reporting, and visualization plan.
 
+If Research Feedback Memory is enabled, record non-obvious design decisions, rejected alternatives, architecture constraints, evaluation risks, and evidence expectations in `DECISIONS.md` or workstream `DESIGN.md` according to the resolved mode.
+
 ### 5. Project-root implementation and baseline reproduction
 
 After `$ralplan` and before expensive runs, implement or adapt the actual research method, baseline reproduction, configs, tests, and project-native experiment entrypoints in the target repository root. Use the task worktree rule for these edits.
@@ -203,6 +250,8 @@ After each run reaches a terminal state, distill reusable information out of `ru
 
 If the user explicitly says the current experiment is done, treat that as a terminal-run distillation trigger. First organize runs and scripts, then persist valuable or user-requested content into `RUNS.md`, `SCRIPT_REGISTRY.md`, `RESULTS.md`, `REPRODUCIBILITY.md`, and project-root docs when appropriate. Also update the portfolio `RESEARCH.md` and `INDEX.md` when the completed run changes the overall synthesis, workstream status, or next priority. The final response should summarize what was written and cite the file paths.
 
+If Research Feedback Memory is enabled during distillation, update `LEARNINGS.md`, `ISSUES.md`, `DECISIONS.md`, and workstream `NOTES.md`/`DESIGN.md` with durable lessons, blockers, failed assumptions, architecture/method decisions, and reusable commands. If Researcher Growth Review is enabled, update `SKILL_GROWTH.md` and workstream `REVIEW.md` with capability-focused reflection tied to concrete evidence.
+
 ### 9. Analyze results
 
 Produce `RESULTS.md`. Separate evidence from interpretation. Include raw result locations, complete experiment log path, metrics and summary data paths, visualization paths/captions, summary tables, uncertainty/variance, ablation interpretation, negative findings, threats to validity, and hypothesis verdicts.
@@ -210,6 +259,8 @@ Produce `RESULTS.md`. Separate evidence from interpretation. Include raw result 
 ### 10. Reproducibility review
 
 Produce `REPRODUCIBILITY.md` using the quality gates reference. Check whether a fresh agent could reproduce the result from artifacts alone. Missing seeds, data versions, commands, complete log paths, metrics files, visualization outputs for numeric/comparative results, or result paths are blockers.
+
+When optional feedback modes are enabled, include reproducibility lessons, verification gaps, and future capability practice items in the feedback artifacts without weakening the required reproducibility gate.
 
 ### 11. Paper draft or report
 

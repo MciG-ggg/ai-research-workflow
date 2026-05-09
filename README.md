@@ -105,6 +105,25 @@ The root `RESEARCH.md` captures the overall research program: central question, 
 
 New workstream creation is forced through `$deep-interview --autoresearch -> $ralplan -> $autoresearch`. The agent should not create a new slug, implement code, or launch experiments until `INDEX.md` records the deep-interview handoff, ralplan PRD/test spec, and autoresearch state/completion artifact paths.
 
+## Optional feedback memory
+
+Research Feedback Memory and Researcher Growth Review are disabled by default. Enable them only when a project wants durable learning notes in addition to normal research artifacts:
+
+```text
+$ai-research-workflow --feedback-memory ...
+$ai-research-workflow --growth-review ...
+$ai-research-workflow --no-feedback ...
+```
+
+Project defaults can be stored in `.omx/ai-research/CONFIG.md`:
+
+```yaml
+feedback_memory: off | lite | full
+growth_review: off | milestone | always
+```
+
+When enabled, the skill may add root feedback files such as `LEARNINGS.md`, `ISSUES.md`, `DECISIONS.md`, and `SKILL_GROWTH.md`, plus workstream files such as `DESIGN.md`, `NOTES.md`, and `REVIEW.md`. These files store distilled issues, knowledge, architecture/design decisions, verification gaps, and capability reflections; raw logs and run outputs stay under `runs/`.
+
 The skill intentionally does **not** ship universal experiment runner scripts. Different research projects use different training stacks, config systems, clusters, notebooks, plotting tools, and logging conventions. Instead, it defines where project-local scripts should live and how they should be named and documented.
 
 Run directories are raw evidence. After each terminal run, distill stable conclusions back into `RUNS.md`, `RESULTS.md`, `REPRODUCIBILITY.md`, and then into project-root docs, reports, code, configs, or tests when the result is reusable.

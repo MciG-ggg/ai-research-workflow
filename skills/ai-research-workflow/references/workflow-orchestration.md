@@ -29,6 +29,19 @@ Phase rules:
 
 If the user provides mature artifacts, resume at the earliest failing gate instead of repeating completed phases.
 
+## Optional feedback mode resolution
+
+Research Feedback Memory and Researcher Growth Review are disabled by default. At workflow entry, resolve these modes from the user invocation and project config before creating optional files:
+
+1. `--no-feedback` forces both modes off for the current invocation.
+2. `--feedback-memory` or `--growth-review` enables that mode for the current invocation.
+3. `.omx/ai-research/CONFIG.md` can set `feedback_memory: off | lite | full` and `growth_review: off | milestone | always`.
+4. Missing config leaves both modes off.
+
+When Research Feedback Memory is enabled, write distilled issues, learnings, decisions, design notes, architecture tradeoffs, reusable commands, and failed assumptions to the optional feedback artifacts defined in `artifact-contracts.md`. When Researcher Growth Review is enabled, write capability-focused reflections to `SKILL_GROWTH.md` and workstream `REVIEW.md`.
+
+Feedback writes happen at natural workflow boundaries: intake, experiment design, implementation handoff, experiment completion handoff, reproducibility review, and paper/report drafting. Do not interrupt default workflows with reflection questions unless growth review is enabled and one concise answer would materially improve the review.
+
 ## Portfolio and workstream control plane
 
 Every project gets a root portfolio layer under `.omx/ai-research/`:
@@ -88,6 +101,8 @@ A completed run directory is raw evidence. After each terminal run, distill reus
 4. Update `.omx/ai-research/<slug>/REPRODUCIBILITY.md` with new blockers, environment notes, nondeterminism, or rerun instructions.
 5. Promote stable conclusions to project-root `docs/`, `reports/`, benchmark cards, config docs, or README sections when useful.
 6. Promote reusable implementation changes to project-root code/config/tests, not to `.omx/ai-research/`.
+7. When Research Feedback Memory is enabled, update `LEARNINGS.md`, `ISSUES.md`, `DECISIONS.md`, and workstream `NOTES.md`/`DESIGN.md` with distilled lessons, blockers, decisions, reusable commands, and design rationale.
+8. When Researcher Growth Review is enabled, update `SKILL_GROWTH.md` and workstream `REVIEW.md` with concrete capability lessons tied to evidence.
 
 Do not copy raw logs, large outputs, checkpoints, private data, or temporary run files into project-root docs. Link to them or summarize them.
 
