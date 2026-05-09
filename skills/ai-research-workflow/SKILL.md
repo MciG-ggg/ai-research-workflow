@@ -53,6 +53,8 @@ Framework guardrail helpers:
 ```bash
 python3 scripts/resolve_workflow.py <project-root> --prompt "<user prompt>"
 python3 scripts/init_research_workspace.py <project-root> --preset guided
+python3 scripts/init_workstream.py <project-root> <slug> --title "..." --question "..." --deep-interview <path> --ralplan-prd <path> --ralplan-test-spec <path> --autoresearch-result <path>
+python3 scripts/update_workstream_state.py <project-root> <slug> --phase experiment-design --next-action "..."
 python3 scripts/validate_research_workspace.py <project-root> --phase idea-scouting
 python3 scripts/prepare_worktree_closeout.py <task-worktree> --base main
 ```
@@ -140,6 +142,8 @@ Required gate evidence:
 - `$autoresearch`: persisted autoresearch state with a `completion_artifact_path`, plus `.omx/specs/autoresearch-<slug>/mission.md`, `sandbox.md`, and `result.json`
 
 If any gate evidence is missing, stop at the gate, create or complete the missing workflow artifact, and report the blocker. Do not bypass this gate because the new direction seems obvious.
+
+After the user confirms workstream creation and all gate evidence exists, `scripts/init_workstream.py` may scaffold the control-plane files. It must not be used to bypass the confirmation or gate evidence requirements.
 
 ## Optional feedback and growth modes
 

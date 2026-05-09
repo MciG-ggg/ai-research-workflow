@@ -103,5 +103,119 @@
       ".omx/ai-research/demo/STATE.json": "{\n  \"schema_version\": 1,\n  \"workstream_slug\": \"demo\",\n  \"phase\": \"completion-handoff\",\n  \"phase_status\": \"draft\",\n  \"last_updated\": \"2026-05-09\",\n  \"active_artifacts\": [\"RUNS.md\", \"RESULTS.md\", \"CLAIMS.md\"],\n  \"gate_evidence\": {\"deep_interview_autoresearch\": \"deep mission\", \"ralplan_prd\": \"ralplan prd\", \"ralplan_test_spec\": \"ralplan test spec\", \"autoresearch_result\": \"autoresearch result\"},\n  \"current_blockers\": [],\n  \"next_action\": \"prepare report-before-merge plan\",\n  \"confirmation_required_before\": [\"merge\", \"push\", \"worktree removal\", \"branch deletion\"]\n}\n",
       ".omx/ai-research/demo/CLAIMS.md": "# Claims Ledger\n\n## Claim Ledger\n\n| Claim ID | Claim | Status | Evidence paths | Scope / population | Allowed wording | Forbidden wording | Last checked |\n| --- | --- | --- | --- | --- | --- | --- | --- |\n| C1 | demo claim | inconclusive | .omx/ai-research/demo/RESULTS.md | demo fixture | inconclusive on fixture | general improvement | 2026-05-09 |\n\n## Evidence Requirements\n\nEvery claim has evidence paths.\n\n## Negative or Inconclusive Results\n\n| Finding | Evidence path | Likely cause | Scientific value | Follow-up / stop condition |\n| --- | --- | --- | --- | --- |\n| inconclusive fixture | .omx/ai-research/demo/RESULTS.md | underpowered | tests preservation | stop |\n\n## Retired or Downgraded Claims\n\n| Claim ID | Previous wording | New wording/status | Reason | Evidence |\n| --- | --- | --- | --- | --- |\n| C0 | strong claim | inconclusive | fixture evidence | .omx/ai-research/demo/RESULTS.md |\n"
     }
+  },
+  {
+    "name": "legacy-workstream-warns-not-fails",
+    "expect_exit": 0,
+    "args": [],
+    "dirs": [
+      ".omx/ai-research/legacy/runs",
+      ".omx/ai-research/legacy/scripts"
+    ],
+    "files": {
+      ".omx/ai-research/CONFIG.md": "# Config\n\n```yaml\nschema_version: 1\nworkflow_preset: guided\nidea_scouting: auto\ncompletion_handoff: auto\nworktree_closeout: report-before-merge\nfeedback_memory: off\nqa_capture: off\ngrowth_review: off\n```\n",
+      ".omx/ai-research/RESEARCH.md": "# Research Portfolio\n\nLegacy project.\n",
+      ".omx/ai-research/INDEX.md": "# Research Workstream Index\n\n| Slug | Gate evidence |\n| --- | --- |\n| legacy | deep mission, ralplan prd, autoresearch result |\n",
+      ".omx/ai-research/legacy/RESEARCH.md": "# Legacy Workstream\n\nGate evidence: deep mission, ralplan prd, autoresearch result.\n",
+      ".omx/ai-research/legacy/LITERATURE.md": "# Literature\n",
+      ".omx/ai-research/legacy/EXPERIMENT.md": "# Experiment\n",
+      ".omx/ai-research/legacy/RUNS.md": "# Runs\n",
+      ".omx/ai-research/legacy/RESULTS.md": "# Results\n",
+      ".omx/ai-research/legacy/REPRODUCIBILITY.md": "# Reproducibility\n",
+      ".omx/ai-research/legacy/PAPER_DRAFT.md": "# Paper Draft\n",
+      ".omx/ai-research/legacy/SCRIPT_REGISTRY.md": "# Script Registry\n"
+    }
+  },
+  {
+    "name": "targeted-completion-allows-legacy-sibling",
+    "expect_exit": 0,
+    "args": [
+      "--phase",
+      "completion-handoff",
+      "--workstream",
+      "demo"
+    ],
+    "dirs": [
+      ".omx/ai-research/demo/runs/run-001",
+      ".omx/ai-research/demo/scripts",
+      ".omx/ai-research/legacy/runs",
+      ".omx/ai-research/legacy/scripts"
+    ],
+    "files": {
+      ".omx/ai-research/CONFIG.md": "# Config\n\n```yaml\nworkflow_preset: guided\nidea_scouting: auto\ncompletion_handoff: auto\nworktree_closeout: report-before-merge\nfeedback_memory: off\nqa_capture: off\ngrowth_review: off\n```\n",
+      ".omx/ai-research/RESEARCH.md": "# Research Portfolio\n\nCurrent synthesis: demo complete.\n",
+      ".omx/ai-research/INDEX.md": "# Research Workstream Index\n\n| Slug | Gate evidence |\n| --- | --- |\n| demo | deep mission, ralplan prd, autoresearch result |\n| legacy | deep mission, ralplan prd, autoresearch result |\n",
+      ".omx/ai-research/demo/RESEARCH.md": "# Workstream\n\nGate evidence: deep mission, ralplan prd, autoresearch result.\n",
+      ".omx/ai-research/demo/LITERATURE.md": "# Literature\n\nEvidence reviewed.\n",
+      ".omx/ai-research/demo/EXPERIMENT.md": "# Experiment\n\nMetric and baseline recorded.\n\n## Baseline Fairness Checklist\n\n- Same data split / preprocessing: yes\n- Same evaluation metric and aggregation: yes\n- Comparable training, tuning, and inference budget: yes\n- Hyperparameter search budget: fixed\n- Implementation source and version: fixture\n- Known baseline limitations or reproduction gaps: none\n\n## Negative / Inconclusive Result Policy\n\nPreserve negative and inconclusive result policy with stop/rerun criteria.\n",
+      ".omx/ai-research/demo/RUNS.md": "# Runs\n\n## Run Ledger\n\nlog path recorded, metrics path recorded, summary path recorded.\n\n## Distilled Updates Outside `runs/`\n\nReusable command and result summary persisted.\n\n## Worktree Closeout Plan\n\nWorktree closeout plan recorded. User confirmation required before merge/delete.\n",
+      ".omx/ai-research/demo/RESULTS.md": "# Results\n\nConclusion remains bounded by evidence.\n\n## Negative and Inconclusive Results\n\n| Result | Evidence path | Failure category | Interpretation | Preserved claim update |\n| --- | --- | --- | --- | --- |\n| inconclusive fixture | .omx/ai-research/demo/RUNS.md | underpowered | cannot claim win | CLAIMS.md updated |\n\n## Evidence-to-claim Mapping\n\nSee CLAIMS.md.\n",
+      ".omx/ai-research/demo/REPRODUCIBILITY.md": "# Reproducibility\n\nRerun command recorded.\n",
+      ".omx/ai-research/demo/PAPER_DRAFT.md": "# Paper Draft\n\nDraft deferred until more evidence.\n",
+      ".omx/ai-research/demo/SCRIPT_REGISTRY.md": "# Script Registry\n\n## Completion Handoff Notes\n\nNative command remained valid.\n",
+      ".omx/ai-research/demo/STATE.json": "{\n  \"schema_version\": 1,\n  \"workstream_slug\": \"demo\",\n  \"phase\": \"completion-handoff\",\n  \"phase_status\": \"draft\",\n  \"last_updated\": \"2026-05-09\",\n  \"active_artifacts\": [\"RUNS.md\", \"RESULTS.md\", \"CLAIMS.md\"],\n  \"gate_evidence\": {\"deep_interview_autoresearch\": \"deep mission\", \"ralplan_prd\": \"ralplan prd\", \"ralplan_test_spec\": \"ralplan test spec\", \"autoresearch_result\": \"autoresearch result\"},\n  \"current_blockers\": [],\n  \"next_action\": \"prepare report-before-merge plan\",\n  \"confirmation_required_before\": [\"merge\", \"push\", \"worktree removal\", \"branch deletion\"]\n}\n",
+      ".omx/ai-research/demo/CLAIMS.md": "# Claims Ledger\n\n## Claim Ledger\n\n| Claim ID | Claim | Status | Evidence paths | Scope / population | Allowed wording | Forbidden wording | Last checked |\n| --- | --- | --- | --- | --- | --- | --- | --- |\n| C1 | demo claim | inconclusive | .omx/ai-research/demo/RESULTS.md | demo fixture | inconclusive on fixture | general improvement | 2026-05-09 |\n\n## Evidence Requirements\n\nEvery claim has evidence paths.\n\n## Negative or Inconclusive Results\n\n| Finding | Evidence path | Likely cause | Scientific value | Follow-up / stop condition |\n| --- | --- | --- | --- | --- |\n| inconclusive fixture | .omx/ai-research/demo/RESULTS.md | underpowered | tests preservation | stop |\n\n## Retired or Downgraded Claims\n\n| Claim ID | Previous wording | New wording/status | Reason | Evidence |\n| --- | --- | --- | --- | --- |\n| C0 | strong claim | inconclusive | fixture evidence | .omx/ai-research/demo/RESULTS.md |\n",
+      ".omx/ai-research/legacy/RESEARCH.md": "# Legacy Workstream\n\nGate evidence: deep mission, ralplan prd, autoresearch result.\n",
+      ".omx/ai-research/legacy/LITERATURE.md": "# Literature\n",
+      ".omx/ai-research/legacy/EXPERIMENT.md": "# Experiment\n",
+      ".omx/ai-research/legacy/RUNS.md": "# Runs\n",
+      ".omx/ai-research/legacy/RESULTS.md": "# Results\n",
+      ".omx/ai-research/legacy/REPRODUCIBILITY.md": "# Reproducibility\n",
+      ".omx/ai-research/legacy/PAPER_DRAFT.md": "# Paper Draft\n",
+      ".omx/ai-research/legacy/SCRIPT_REGISTRY.md": "# Script Registry\n"
+    }
+  },
+  {
+    "name": "new-workstream-index-evidence-is-slug-specific",
+    "expect_exit": 1,
+    "args": [
+      "--phase",
+      "new-workstream",
+      "--workstream",
+      "demo"
+    ],
+    "dirs": [
+      ".omx/ai-research/demo/runs",
+      ".omx/ai-research/demo/scripts"
+    ],
+    "files": {
+      ".omx/ai-research/CONFIG.md": "# Config\n\n```yaml\nworkflow_preset: guided\nidea_scouting: auto\ncompletion_handoff: auto\nworktree_closeout: report-before-merge\nfeedback_memory: off\nqa_capture: off\ngrowth_review: off\n```\n",
+      ".omx/ai-research/RESEARCH.md": "# Research Portfolio\n",
+      ".omx/ai-research/INDEX.md": "# Research Workstream Index\n\n| Slug | Gate evidence |\n| --- | --- |\n| demo | proposed but gate evidence missing |\n| other | deep mission, ralplan prd, autoresearch result |\n",
+      ".omx/ai-research/demo/RESEARCH.md": "# Workstream\n\nGate evidence: deep mission, ralplan prd, autoresearch result.\n",
+      ".omx/ai-research/demo/LITERATURE.md": "# Literature\n",
+      ".omx/ai-research/demo/EXPERIMENT.md": "# Experiment\n\n## Baseline Fairness Checklist\n\n- Same data split / preprocessing: yes\n- Same evaluation metric and aggregation: yes\n- Comparable training, tuning, and inference budget: yes\n- Hyperparameter search budget: fixed\n- Implementation source and version: fixture\n\n## Negative / Inconclusive Result Policy\n\nPreserve negative and inconclusive result policy.\n",
+      ".omx/ai-research/demo/RUNS.md": "# Runs\n",
+      ".omx/ai-research/demo/RESULTS.md": "# Results\n",
+      ".omx/ai-research/demo/REPRODUCIBILITY.md": "# Reproducibility\n",
+      ".omx/ai-research/demo/PAPER_DRAFT.md": "# Paper Draft\n",
+      ".omx/ai-research/demo/SCRIPT_REGISTRY.md": "# Script Registry\n",
+      ".omx/ai-research/demo/STATE.json": "{\n  \"schema_version\": 1,\n  \"workstream_slug\": \"demo\",\n  \"phase\": \"intake\",\n  \"phase_status\": \"draft\",\n  \"last_updated\": \"2026-05-09\",\n  \"active_artifacts\": [\"RESEARCH.md\"],\n  \"gate_evidence\": {\"deep_interview_autoresearch\": \"deep mission\", \"ralplan_prd\": \"ralplan prd\", \"ralplan_test_spec\": \"ralplan test spec\", \"autoresearch_result\": \"autoresearch result\"},\n  \"current_blockers\": [],\n  \"next_action\": \"continue intake\",\n  \"confirmation_required_before\": [\"merge\", \"push\", \"worktree removal\", \"branch deletion\"]\n}\n",
+      ".omx/ai-research/demo/CLAIMS.md": "# Claims Ledger\n\n## Claim Ledger\n\n| Claim ID | Claim | Status | Evidence paths | Scope / population | Allowed wording | Forbidden wording | Last checked |\n| --- | --- | --- | --- | --- | --- | --- | --- |\n| C1 | demo | draft | RESULTS.md | fixture | draft | unsupported | 2026-05-09 |\n\n## Evidence Requirements\n\nEvery claim has evidence paths.\n\n## Negative or Inconclusive Results\n\nNone yet.\n\n## Retired or Downgraded Claims\n\nNone yet.\n"
+    }
+  },
+  {
+    "name": "invalid-state-slug-mismatch",
+    "expect_exit": 1,
+    "args": [],
+    "dirs": [
+      ".omx/ai-research/demo/runs",
+      ".omx/ai-research/demo/scripts"
+    ],
+    "files": {
+      ".omx/ai-research/CONFIG.md": "# Config\n\n```yaml\nworkflow_preset: guided\nidea_scouting: auto\ncompletion_handoff: auto\nworktree_closeout: report-before-merge\nfeedback_memory: off\nqa_capture: off\ngrowth_review: off\n```\n",
+      ".omx/ai-research/RESEARCH.md": "# Research Portfolio\n",
+      ".omx/ai-research/INDEX.md": "# Research Workstream Index\n\n| Slug | Gate evidence |\n| --- | --- |\n| demo | deep mission, ralplan prd, autoresearch result |\n",
+      ".omx/ai-research/demo/RESEARCH.md": "# Workstream\n\nGate evidence: deep mission, ralplan prd, autoresearch result.\n",
+      ".omx/ai-research/demo/LITERATURE.md": "# Literature\n",
+      ".omx/ai-research/demo/EXPERIMENT.md": "# Experiment\n",
+      ".omx/ai-research/demo/RUNS.md": "# Runs\n",
+      ".omx/ai-research/demo/RESULTS.md": "# Results\n",
+      ".omx/ai-research/demo/REPRODUCIBILITY.md": "# Reproducibility\n",
+      ".omx/ai-research/demo/PAPER_DRAFT.md": "# Paper Draft\n",
+      ".omx/ai-research/demo/SCRIPT_REGISTRY.md": "# Script Registry\n",
+      ".omx/ai-research/demo/CLAIMS.md": "# Claims Ledger\n\n## Claim Ledger\n\n## Evidence Requirements\n\n## Negative or Inconclusive Results\n\n## Retired or Downgraded Claims\n",
+      ".omx/ai-research/demo/STATE.json": "{\n  \"schema_version\": 1,\n  \"workstream_slug\": \"wrong\",\n  \"phase\": \"intake\",\n  \"next_action\": \"continue\"\n}\n"
+    }
   }
 ]

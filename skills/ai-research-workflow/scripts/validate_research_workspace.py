@@ -19,17 +19,16 @@ PORTFOLIO_FILES = ["RESEARCH.md", "INDEX.md"]
 IDEA_SCOUTING_FILES = ["IDEA_SCOUTING.md"]
 
 WORKSTREAM_FILES = [
-    "STATE.json",
     "RESEARCH.md",
     "LITERATURE.md",
     "EXPERIMENT.md",
     "RUNS.md",
     "RESULTS.md",
-    "CLAIMS.md",
     "REPRODUCIBILITY.md",
     "PAPER_DRAFT.md",
     "SCRIPT_REGISTRY.md",
 ]
+LIFECYCLE_WORKSTREAM_FILES = ["STATE.json", "CLAIMS.md"]
 
 FEEDBACK_ROOT_FILES = ["LEARNINGS.md", "ISSUES.md", "DECISIONS.md"]
 QA_ROOT_FILES = ["QUESTIONS.md"]
@@ -143,6 +142,20 @@ def has_non_placeholder_evidence(text: str, patterns: list[str]) -> bool:
     return bool(evidence_lines) and not all("todo" in line for line in evidence_lines)
 
 
+def index_text_for_slug(index_text: str, slug: str) -> str:
+    """Return INDEX.md lines that specifically describe a workstream slug."""
+
+    table_pattern = re.compile(rf"^\|\s*{re.escape(slug)}\s*\|", re.IGNORECASE)
+    bullet_pattern = re.compile(rf"^\s*[-*]\s*`?{re.escape(slug)}`?\s*[:—-]", re.IGNORECASE)
+    path_pattern = re.compile(rf"(?<![A-Za-z0-9_-]){re.escape(slug)}/", re.IGNORECASE)
+    lines = []
+    for line in index_text.splitlines():
+        stripped = line.strip()
+        if table_pattern.search(stripped) or bullet_pattern.search(stripped) or path_pattern.search(stripped):
+            lines.append(line)
+    return "\n".join(lines)
+
+
 def unresolved_todo_lines(text: str) -> list[str]:
     return [line.strip() for line in text.splitlines() if "TODO" in line]
 
@@ -173,7 +186,20 @@ def validate_workstream(path: Path, index_text: str, findings: list[Finding], *,
         add_missing_file(findings, artifact, f"workstream {slug}/{name}")
         add_todo_finding(findings, artifact, error_on_todo=error_on_todo, phase=phase)
 
-    if index_text and slug not in index_text:
+    for name in LIFECYCLE_WORKSTREAM_FILES:
+        artifact = path / name
+        if not artifact.is_file():
+            level = "error" if phase in {"new-workstream", "completion-handoff"} else "warning"
+            findings.append(
+                Finding(
+                    level,
+                    f"missing lifecycle artifact {slug}/{name}: {artifact}; run init_workstream.py or migrate the workstream",
+                )
+            )
+        else:
+            add_todo_finding(findings, artifact, error_on_todo=error_on_todo, phase=phase)
+
+    if index_text and not index_text_for_slug(index_text, slug):
         findings.append(Finding("error", f"portfolio INDEX.md does not mention workstream slug: {slug}"))
 
     research_path = path / "RESEARCH.md"
@@ -222,6 +248,13 @@ def validate_state_file(workstream: Path, findings: list[Finding], *, phase: str
         return
     if str(state.get("schema_version")) != "1":
         findings.append(Finding("error", f"{state_path} has unsupported schema_version={state.get('schema_version')!r}; expected 1"))
+    if state.get("workstream_slug") and state.get("workstream_slug") != workstream.name:
+        findings.append(
+            Finding(
+                "error",
+                f"{state_path} workstream_slug={state.get('workstream_slug')!r} does not match directory {workstream.name!r}",
+            )
+        )
     state_phase = state.get("phase")
     if state_phase not in VALID_STATE_PHASES:
         findings.append(Finding("error", f"{state_path} has invalid phase={state_phase!r}"))
@@ -352,9 +385,10 @@ def validate_new_workstream_phase(ai_root: Path, index_text: str, targets: list[
         return
     for workstream in targets:
         slug = workstream.name
-        if slug not in index_text:
+        slug_index_text = index_text_for_slug(index_text, slug)
+        if not slug_index_text:
             findings.append(Finding("error", f"portfolio INDEX.md does not mention new workstream slug: {slug}"))
-        if not has_non_placeholder_evidence(index_text, [slug, "deep", "ralplan", "autoresearch"]):
+        if not has_non_placeholder_evidence(slug_index_text, ["deep", "ralplan", "autoresearch"]):
             findings.append(
                 Finding(
                     "error",
@@ -444,7 +478,10 @@ def validate(
         findings.append(Finding("error", f"no workstream directories found under {ai_root}"))
 
     for workstream in workstreams:
-        validate_workstream(workstream, index_text, findings, error_on_todo=error_on_todo, phase=phase)
+        effective_phase = phase
+        if workstream_slug and phase in {"new-workstream", "completion-handoff"} and workstream.name != workstream_slug:
+            effective_phase = "all"
+        validate_workstream(workstream, index_text, findings, error_on_todo=error_on_todo, phase=effective_phase)
 
     validate_optional_modes(
         ai_root,

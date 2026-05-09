@@ -50,12 +50,14 @@ Use framework guardrail scripts when the workflow decision should be reproducibl
 ```bash
 python3 scripts/resolve_workflow.py <project-root> --prompt "<user prompt>"
 python3 scripts/init_research_workspace.py <project-root> --preset guided
+python3 scripts/init_workstream.py <project-root> <slug> --title "..." --question "..." --deep-interview <path> --ralplan-prd <path> --ralplan-test-spec <path> --autoresearch-result <path>
+python3 scripts/update_workstream_state.py <project-root> <slug> --phase running --next-action "monitor run"
 python3 scripts/validate_research_workspace.py <project-root> --phase idea-scouting
 python3 scripts/validate_research_workspace.py <project-root> --phase new-workstream --workstream <slug>
 python3 scripts/validate_research_workspace.py <project-root> --phase completion-handoff --workstream <slug>
 ```
 
-`resolve_workflow.py` emits JSON decisions for idea scouting, completion handoff, new-workstream gating, report-before-merge closeout, and ask-required boundaries. `init_research_workspace.py` initializes the portfolio control plane only; it must not create a new workstream or bypass the `$deep-interview --autoresearch -> $ralplan -> $autoresearch` gate.
+`resolve_workflow.py` emits JSON decisions for idea scouting, completion handoff, new-workstream gating, report-before-merge closeout, and ask-required boundaries. `init_research_workspace.py` initializes the portfolio control plane only. `init_workstream.py` scaffolds a workstream only after user confirmation and explicit deep-interview, ralplan, and autoresearch gate evidence. `update_workstream_state.py` updates `STATE.json` without touching research code or running experiments.
 
 ## Optional idea scouting
 

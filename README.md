@@ -161,6 +161,8 @@ Useful guardrails:
 
 ```bash
 python3 skills/ai-research-workflow/scripts/init_research_workspace.py <project-root> --preset guided
+python3 skills/ai-research-workflow/scripts/init_workstream.py <project-root> <slug> --title "..." --question "..." --deep-interview <path> --ralplan-prd <path> --ralplan-test-spec <path> --autoresearch-result <path>
+python3 skills/ai-research-workflow/scripts/update_workstream_state.py <project-root> <slug> --phase running --next-action "monitor run"
 python3 skills/ai-research-workflow/scripts/resolve_workflow.py <project-root> --prompt "这个实验做完了，整理落盘"
 python3 skills/ai-research-workflow/scripts/validate_research_workspace.py <project-root> --phase completion-handoff
 python3 skills/ai-research-workflow/scripts/prepare_worktree_closeout.py <task-worktree> --base main

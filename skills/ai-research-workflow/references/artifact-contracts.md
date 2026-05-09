@@ -63,7 +63,7 @@ Project-root files are the implementation plane. Method code, baseline reproduct
 
 Use the Markdown templates in `assets/templates/` when creating new artifacts. They are scaffolds, not evidence; replace TODO placeholders before treating an artifact as complete.
 
-Use `scripts/init_research_workspace.py` to initialize the portfolio `CONFIG.md`, `RESEARCH.md`, and `INDEX.md` from templates. It creates the portfolio control plane only and must not create a new workstream or bypass the mandatory workflow gate. Regression fixture cases for these contracts live in `assets/fixtures/research_workspace_cases.json` and are checked by `scripts/check_regression_fixtures.py`.
+Use `scripts/init_research_workspace.py` to initialize the portfolio `CONFIG.md`, `RESEARCH.md`, and `INDEX.md` from templates. It creates the portfolio control plane only and must not create a new workstream or bypass the mandatory workflow gate. Use `scripts/init_workstream.py` only after user confirmation and explicit deep-interview, ralplan, and autoresearch gate evidence are available. Use `scripts/update_workstream_state.py` for deterministic `STATE.json` phase updates. Regression fixture cases for these contracts live in `assets/fixtures/research_workspace_cases.json` and are checked by `scripts/check_regression_fixtures.py`.
 
 ## Idea scouting artifact
 
