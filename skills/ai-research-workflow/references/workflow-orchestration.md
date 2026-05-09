@@ -8,6 +8,7 @@ Use this default sequence unless existing artifacts prove that a phase is alread
 
 ```text
 $deep-interview --autoresearch
+  -> portfolio RESEARCH.md / INDEX.md check
   -> literature / research artifact drafting
   -> $ralplan for implementation and validation plan
   -> task worktree execution in the target repo
@@ -28,9 +29,26 @@ Phase rules:
 
 If the user provides mature artifacts, resume at the earliest failing gate instead of repeating completed phases.
 
+## Portfolio and workstream control plane
+
+Every project gets a root portfolio layer under `.omx/ai-research/`:
+
+- `.omx/ai-research/RESEARCH.md`: the overall research program, central question, north-star hypotheses, claim boundaries, current synthesis, and next priorities.
+- `.omx/ai-research/INDEX.md`: the workstream registry mapping each `<slug>` to its subquestion, status, artifact links, latest evidence, and next action.
+
+Each `.omx/ai-research/<slug>/` directory is a workstream, not the whole research program. It should link back to the portfolio `RESEARCH.md` and appear in `INDEX.md`.
+
+Before creating a new slug:
+
+1. Read or create the portfolio `RESEARCH.md` and `INDEX.md`.
+2. List existing `.omx/ai-research/<slug>/` directories.
+3. Reuse an existing workstream when the request is a continuation, replication, ablation, or follow-up within the same research question.
+4. Create a new slug only for a distinct subquestion, method family, baseline family, dataset/benchmark lane, or paper/report slice.
+5. Record the new slug, relationship to the overall objective, owned artifacts, and next action in `INDEX.md`.
+
 ## Control plane vs project implementation plane
 
-`.omx/ai-research/<slug>/` is the research control plane. It stores specs, decisions, run indexes, evidence summaries, and reproducibility notes.
+`.omx/ai-research/` is the portfolio control plane. `.omx/ai-research/<slug>/` is a workstream control plane. Together they store specs, decisions, run indexes, evidence summaries, reproducibility notes, and the global synthesis.
 
 Actual research work belongs in the target project root using that project's conventions. Examples:
 
@@ -56,6 +74,8 @@ A completed run directory is raw evidence. After each terminal run, distill reus
 Do not copy raw logs, large outputs, checkpoints, private data, or temporary run files into project-root docs. Link to them or summarize them.
 
 If the user says the current experiment is done, use this as an experiment completion handoff signal: inspect runs and scripts, persist valuable or user-requested content into stable artifacts, then report the paths written.
+
+When distillation changes the global picture, update `.omx/ai-research/RESEARCH.md` and `.omx/ai-research/INDEX.md` in the same pass so the portfolio layer remains the user's overall map of the work.
 
 ## Baseline and method work
 

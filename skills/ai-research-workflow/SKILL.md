@@ -31,7 +31,22 @@ Skip completed phases only when existing artifacts pass the relevant gate.
 
 ## Artifact setup
 
-Create or reuse a research workspace under `.omx/ai-research/<slug>/`.
+Maintain two research control-plane layers under `.omx/ai-research/`:
+
+- Portfolio layer: `.omx/ai-research/RESEARCH.md` and `.omx/ai-research/INDEX.md` capture the user's overall research program, current synthesis, active workstreams, and how small directions relate to the larger goal.
+- Workstream layer: `.omx/ai-research/<slug>/` captures a specific subquestion, method lane, baseline, ablation, experiment family, or paper/report slice.
+
+Before creating a new `<slug>`, inspect the portfolio `RESEARCH.md`, `INDEX.md`, and existing workstream directories. Reuse or update an existing workstream when the task is a continuation of the same subquestion. Create a new workstream only when the task has a distinct research question, validation target, or artifact boundary, and record that relationship in the portfolio index.
+
+Minimum portfolio layout:
+
+```text
+.omx/ai-research/
+  RESEARCH.md
+  INDEX.md
+```
+
+Create or reuse a workstream workspace under `.omx/ai-research/<slug>/`.
 
 Minimum framework layout:
 
@@ -53,7 +68,9 @@ Read `references/workflow-orchestration.md` before starting or resuming the full
 
 ## Research control plane vs project implementation
 
-`.omx/ai-research/<slug>/` is the research control plane: specs, decisions, run indexes, evidence summaries, and reproducibility notes.
+`.omx/ai-research/` is the research portfolio control plane. It holds the overall `RESEARCH.md` and `INDEX.md` so the user can see the larger research program rather than a pile of unrelated small directions.
+
+`.omx/ai-research/<slug>/` is the workstream control plane: specs, decisions, run indexes, evidence summaries, and reproducibility notes for one concrete direction.
 
 Actual research work belongs in the target project root using existing project conventions. Implement the user's method, reproduce baselines, add configs, tests, datasets adapters, training/evaluation entrypoints, and reports in project-root locations such as `src/`, `models/`, `baselines/`, `configs/`, `experiments/`, `scripts/`, `tests/`, `docs/`, or the repository's established equivalents. Do not put method code, baseline code, or production experiment code under `.omx/ai-research/`; only thin orchestration wrappers and metadata belong there.
 
@@ -108,11 +125,13 @@ Only skip artifact updates when the relevant files or run outputs cannot be foun
 
 ### 0. OMX workflow entry
 
-Start with `$deep-interview --autoresearch` unless the user already provides clear hypotheses, success criteria, non-goals, forbidden claims, and evaluator/validation criteria. Use `$ralplan` before implementation-heavy work. Use `$autoresearch` for the durable validator-gated loop over literature, implementation, experiments, and claims.
+Start by reading or creating `.omx/ai-research/RESEARCH.md` and `.omx/ai-research/INDEX.md`. Decide whether the current request continues an existing workstream or requires a new `<slug>`, and update the portfolio index before deep work starts.
+
+Use `$deep-interview --autoresearch` unless the user already provides clear hypotheses, success criteria, non-goals, forbidden claims, and evaluator/validation criteria. Use `$ralplan` before implementation-heavy work. Use `$autoresearch` for the durable validator-gated loop over literature, implementation, experiments, and claims.
 
 ### 1. Research intake
 
-Produce `RESEARCH.md` before implementation. Include:
+Produce or update portfolio `RESEARCH.md` before implementation so the overall research program remains visible. Then produce or update the workstream `RESEARCH.md` for the current `<slug>`. Include:
 - research question
 - falsifiable hypothesis
 - expected contribution type: method, system, dataset, benchmark, analysis, or negative result
@@ -165,7 +184,7 @@ Never fabricate results. If experiments cannot run locally, state the blocker an
 
 After each run reaches a terminal state, distill reusable information out of `runs/<run-id>/`. Update `RUNS.md` with status, command, seed/device/resource, log, metrics, summary, and failure notes. Update `RESULTS.md` when the run changes evidence or interpretation. Update `REPRODUCIBILITY.md` with new blockers or rerun instructions. Promote stable conclusions or reusable implementation changes to project-root docs, reports, configs, tests, or code as appropriate. Do not copy raw logs, checkpoints, private data, or large temporary outputs into project-root docs.
 
-If the user explicitly says the current experiment is done, treat that as a terminal-run distillation trigger. First organize runs and scripts, then persist valuable or user-requested content into `RUNS.md`, `SCRIPT_REGISTRY.md`, `RESULTS.md`, `REPRODUCIBILITY.md`, and project-root docs when appropriate. The final response should summarize what was written and cite the file paths.
+If the user explicitly says the current experiment is done, treat that as a terminal-run distillation trigger. First organize runs and scripts, then persist valuable or user-requested content into `RUNS.md`, `SCRIPT_REGISTRY.md`, `RESULTS.md`, `REPRODUCIBILITY.md`, and project-root docs when appropriate. Also update the portfolio `RESEARCH.md` and `INDEX.md` when the completed run changes the overall synthesis, workstream status, or next priority. The final response should summarize what was written and cite the file paths.
 
 ### 9. Analyze results
 
