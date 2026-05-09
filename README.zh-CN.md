@@ -103,6 +103,8 @@ python3 ~/.codex/skills/.system/skill-creator/scripts/quick_validate.py ~/.codex
 
 根目录 `RESEARCH.md` 记录整体研究目标、中心问题、north-star hypotheses、claim 边界、当前综合判断、活跃 workstreams 和下一步优先级。根目录 `INDEX.md` 记录每个 slug 的子问题、状态、artifact 链接、最新证据和下一步。创建新 slug 前，agent 应先检查这两个文件和已有 workstream；只有当新任务确实有独立研究问题或验证边界时才创建新 slug。
 
+新建 workstream/小方向必须强制经过 `$deep-interview --autoresearch -> $ralplan -> $autoresearch`。在 `INDEX.md` 记录 deep-interview handoff、ralplan PRD/test spec、autoresearch state/completion artifact 路径之前，agent 不应创建新 slug、写实现或启动实验。
+
 这个 skill 不内置通用实验 runner。不同研究项目会使用不同训练栈、配置系统、集群、notebook、绘图工具和日志约定。因此它只规定项目本地脚本应该放在哪里、如何命名、如何登记。
 
 运行目录是原始证据。每次运行终止后，把稳定结论蒸馏回 `RUNS.md`、`RESULTS.md`、`REPRODUCIBILITY.md`，并在结果可复用时同步到项目根目录的 docs、报告、代码、配置或测试。

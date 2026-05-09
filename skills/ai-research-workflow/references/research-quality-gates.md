@@ -22,6 +22,18 @@ Pass only if:
 - Portfolio artifacts in `.omx/ai-research/` describe the overall research program, while workstream artifacts in `.omx/ai-research/<slug>/` describe one concrete direction.
 - Control-plane artifacts are clearly separated from project-root code/config/test/docs work.
 
+## New workstream gate
+
+Pass only if, before a new `.omx/ai-research/<slug>/` workstream is created:
+- Portfolio `RESEARCH.md` and `INDEX.md` were inspected.
+- Existing workstreams were checked and reuse was rejected with a recorded reason.
+- `$deep-interview --autoresearch` completed and produced a validator-ready mission/intake artifact.
+- `$ralplan` completed and produced consensus planning output plus `.omx/plans/prd-<slug>.md` and `.omx/plans/test-spec-<slug>.md`.
+- `$autoresearch` was initialized with persisted state, `completion_artifact_path`, and `.omx/specs/autoresearch-<slug>/mission.md`, `sandbox.md`, and `result.json`.
+- Portfolio `INDEX.md` records the exact evidence paths for all three gates.
+
+Fail closed: if any item is missing, do not create the new slug, implement code, run experiments, or publish docs. Reuse an existing workstream instead when equivalent gate evidence is already linked there.
+
 ## Literature gate
 
 Pass only if:

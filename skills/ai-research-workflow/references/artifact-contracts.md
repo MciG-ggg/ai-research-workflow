@@ -39,12 +39,19 @@ Minimum `.omx/ai-research/RESEARCH.md` sections:
 
 Minimum `.omx/ai-research/INDEX.md` sections:
 
-- Workstream table: slug, status, subquestion, relationship to overall objective, key artifact links, latest evidence, next action
+- Workstream table: slug, status, subquestion, relationship to overall objective, key artifact links, latest evidence, mandatory workflow gate evidence, next action
 - New-workstream decision log: why a new slug was created instead of reusing an existing one
 - Archived or superseded workstreams
 - Cross-workstream dependencies and conflicts
 
 Before creating a new workstream, inspect portfolio `RESEARCH.md`, portfolio `INDEX.md`, and existing `.omx/ai-research/<slug>/` directories. Reuse an existing workstream unless the new task has a distinct research question, validation target, or artifact boundary.
+
+New workstream mandatory workflow gate:
+
+- `$deep-interview --autoresearch` must produce or link a validator-ready mission/intake artifact before a new slug is opened.
+- `$ralplan` must produce or link consensus planning output, `.omx/plans/prd-<slug>.md`, and `.omx/plans/test-spec-<slug>.md`.
+- `$autoresearch` must persist state with a `completion_artifact_path` and link `.omx/specs/autoresearch-<slug>/mission.md`, `sandbox.md`, and `result.json`.
+- `INDEX.md` must record the exact evidence paths for all three gates before implementation or experiment execution starts.
 
 ## Required artifacts
 
@@ -74,6 +81,7 @@ Before creating a new workstream, inspect portfolio `RESEARCH.md`, portfolio `IN
 - Decision boundaries
 - Open questions
 - Link to portfolio `RESEARCH.md`
+- Links to new-workstream gate evidence: deep-interview autoresearch handoff, ralplan PRD/test spec, autoresearch state/completion artifact
 - Parent workstream or sibling workstreams when relevant
 
 ## `LITERATURE.md` minimum sections

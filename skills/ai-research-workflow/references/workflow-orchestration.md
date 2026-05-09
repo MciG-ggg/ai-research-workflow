@@ -46,6 +46,24 @@ Before creating a new slug:
 4. Create a new slug only for a distinct subquestion, method family, baseline family, dataset/benchmark lane, or paper/report slice.
 5. Record the new slug, relationship to the overall objective, owned artifacts, and next action in `INDEX.md`.
 
+## New workstream mandatory workflow gate
+
+Creating a new workstream is a gated transition, not a directory operation. When the request requires a new slug, the following sequence is mandatory and ordered:
+
+```text
+$deep-interview --autoresearch
+  -> $ralplan
+  -> $autoresearch
+```
+
+The gate blocks creating `.omx/ai-research/<slug>/`, implementation, experiment launch, or docs publishing until the portfolio `INDEX.md` records these evidence paths:
+
+1. Deep interview autoresearch handoff: validator-ready mission/intake artifact, preferably `.omx/specs/autoresearch-<slug>/mission.md`, plus the workstream `RESEARCH.md` draft or exact planned path.
+2. Ralplan consensus: final plan plus `.omx/plans/prd-<slug>.md` and `.omx/plans/test-spec-<slug>.md`.
+3. Autoresearch state: persisted `$autoresearch` state with `completion_artifact_path`, plus `.omx/specs/autoresearch-<slug>/mission.md`, `sandbox.md`, and `result.json`.
+
+If any required evidence is missing, stop at the gate and complete the missing workflow. Do not bypass the gate because the user says the direction is small, obvious, or urgent. The only safe bypass is to reuse an existing workstream whose `INDEX.md` row already links equivalent gate evidence.
+
 ## Control plane vs project implementation plane
 
 `.omx/ai-research/` is the portfolio control plane. `.omx/ai-research/<slug>/` is a workstream control plane. Together they store specs, decisions, run indexes, evidence summaries, reproducibility notes, and the global synthesis.

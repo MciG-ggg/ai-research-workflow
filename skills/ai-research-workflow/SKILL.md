@@ -38,6 +38,21 @@ Maintain two research control-plane layers under `.omx/ai-research/`:
 
 Before creating a new `<slug>`, inspect the portfolio `RESEARCH.md`, `INDEX.md`, and existing workstream directories. Reuse or update an existing workstream when the task is a continuation of the same subquestion. Create a new workstream only when the task has a distinct research question, validation target, or artifact boundary, and record that relationship in the portfolio index.
 
+New workstream creation has a mandatory workflow gate. If the task requires a new `<slug>`, do not create the workstream directory, implement code, or run experiments until this sequence has completed and its artifact paths are recorded in `INDEX.md`:
+
+```text
+$deep-interview --autoresearch
+  -> $ralplan
+  -> $autoresearch
+```
+
+Required gate evidence:
+- `$deep-interview --autoresearch`: a validator-ready mission/intake artifact, preferably under `.omx/specs/autoresearch-<slug>/`, and a workstream `RESEARCH.md` draft linked to the portfolio
+- `$ralplan`: consensus planning output plus `.omx/plans/prd-<slug>.md` and `.omx/plans/test-spec-<slug>.md`
+- `$autoresearch`: persisted autoresearch state with a `completion_artifact_path`, plus `.omx/specs/autoresearch-<slug>/mission.md`, `sandbox.md`, and `result.json`
+
+If any gate evidence is missing, stop at the gate, create or complete the missing workflow artifact, and report the blocker. Do not bypass this gate because the new direction seems obvious.
+
 Minimum portfolio layout:
 
 ```text
@@ -127,7 +142,9 @@ Only skip artifact updates when the relevant files or run outputs cannot be foun
 
 Start by reading or creating `.omx/ai-research/RESEARCH.md` and `.omx/ai-research/INDEX.md`. Decide whether the current request continues an existing workstream or requires a new `<slug>`, and update the portfolio index before deep work starts.
 
-Use `$deep-interview --autoresearch` unless the user already provides clear hypotheses, success criteria, non-goals, forbidden claims, and evaluator/validation criteria. Use `$ralplan` before implementation-heavy work. Use `$autoresearch` for the durable validator-gated loop over literature, implementation, experiments, and claims.
+For an existing workstream, use `$deep-interview --autoresearch` unless the user already provides clear hypotheses, success criteria, non-goals, forbidden claims, and evaluator/validation criteria. Use `$ralplan` before implementation-heavy work. Use `$autoresearch` for the durable validator-gated loop over literature, implementation, experiments, and claims.
+
+For a new workstream, `$deep-interview --autoresearch`, `$ralplan`, and `$autoresearch` are mandatory in that order. The new-workstream gate is complete only after the gate evidence is linked from portfolio `INDEX.md`.
 
 ### 1. Research intake
 
