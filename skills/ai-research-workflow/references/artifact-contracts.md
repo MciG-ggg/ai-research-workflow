@@ -2,6 +2,21 @@
 
 Use these contracts to keep scientific goals separate from execution details and to keep `.omx/ai-research` metadata separate from project-root implementation work.
 
+## Contents
+
+- [Control plane vs project-root outputs](#control-plane-vs-project-root-outputs)
+- [Optional feedback memory artifacts](#optional-feedback-memory-artifacts)
+- [Portfolio artifacts](#portfolio-artifacts)
+- [Required artifacts](#required-artifacts)
+- [Workstream `RESEARCH.md` minimum sections](#workstream-researchmd-minimum-sections)
+- [`LITERATURE.md` minimum sections](#literaturemd-minimum-sections)
+- [`EXPERIMENT.md` minimum sections](#experimentmd-minimum-sections)
+- [`SCRIPT_REGISTRY.md` minimum sections](#script_registrymd-minimum-sections)
+- [`RUNS.md` minimum sections](#runsmd-minimum-sections)
+- [`RESULTS.md` minimum sections](#resultsmd-minimum-sections)
+- [Published docs minimum sections](#published-docs-minimum-sections)
+- [Run distillation contract](#run-distillation-contract)
+
 ## Control plane vs project-root outputs
 
 `.omx/ai-research/` has a portfolio control plane and one or more workstream control planes.
@@ -36,6 +51,8 @@ Optional feedback memory and growth review artifacts, created only when enabled:
 `.omx/ai-research/<slug>/` is the workstream control plane. It stores research intent, plans, run indexes, evidence summaries, and reproducibility notes for one concrete direction.
 
 Project-root files are the implementation plane. Method code, baseline reproduction code, configs, tests, dataset adapters, benchmark entrypoints, and durable docs belong in the target repository's normal locations, not under `.omx/ai-research/`.
+
+Use the Markdown templates in `assets/templates/` when creating new artifacts. They are scaffolds, not evidence; replace TODO placeholders before treating an artifact as complete.
 
 ## Optional feedback memory artifacts
 

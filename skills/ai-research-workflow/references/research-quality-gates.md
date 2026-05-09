@@ -2,6 +2,21 @@
 
 Use these gates before moving to the next phase or approving a final answer.
 
+## Contents
+
+- [Intake gate](#intake-gate)
+- [Workflow gate](#workflow-gate)
+- [New workstream gate](#new-workstream-gate)
+- [Literature gate](#literature-gate)
+- [Experiment gate](#experiment-gate)
+- [Implementation gate](#implementation-gate)
+- [Result gate](#result-gate)
+- [Reproducibility gate](#reproducibility-gate)
+- [Optional feedback memory gate](#optional-feedback-memory-gate)
+- [Optional growth review gate](#optional-growth-review-gate)
+- [Documentation publishing gate](#documentation-publishing-gate)
+- [Experiment completion handoff gate](#experiment-completion-handoff-gate)
+
 ## Intake gate
 
 Pass only if:

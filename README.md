@@ -105,6 +105,8 @@ The root `RESEARCH.md` captures the overall research program: central question, 
 
 New workstream creation is forced through `$deep-interview --autoresearch -> $ralplan -> $autoresearch`. The agent should not create a new slug, implement code, or launch experiments until `INDEX.md` records the deep-interview handoff, ralplan PRD/test spec, and autoresearch state/completion artifact paths.
 
+Artifact templates live under `skills/ai-research-workflow/assets/templates/`. They are starting points for portfolio, workstream, run, result, reproducibility, paper, and optional feedback files. Replace `TODO` placeholders before treating any artifact as complete.
+
 ## Optional feedback memory
 
 Research Feedback Memory and Researcher Growth Review are disabled by default. Enable them only when a project wants durable learning notes in addition to normal research artifacts:
@@ -240,6 +242,7 @@ publish_docs_<experiment>.sh
 python3 ~/.codex/skills/.system/skill-creator/scripts/quick_validate.py skills/ai-research-workflow
 python3 skills/ai-research-workflow/scripts/validate_framework_contract.py skills/ai-research-workflow
 python3 skills/ai-research-workflow/scripts/check_worktree_registry.py .
+python3 skills/ai-research-workflow/scripts/validate_research_workspace.py <project-root> --require-workstream
 ```
 
 ## License

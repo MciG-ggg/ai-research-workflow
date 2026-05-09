@@ -105,6 +105,8 @@ python3 ~/.codex/skills/.system/skill-creator/scripts/quick_validate.py ~/.codex
 
 新建 workstream/小方向必须强制经过 `$deep-interview --autoresearch -> $ralplan -> $autoresearch`。在 `INDEX.md` 记录 deep-interview handoff、ralplan PRD/test spec、autoresearch state/completion artifact 路径之前，agent 不应创建新 slug、写实现或启动实验。
 
+Artifact 模板放在 `skills/ai-research-workflow/assets/templates/`。它们用于创建 portfolio、workstream、run、result、reproducibility、paper 和可选 feedback 文件。把 `TODO` 占位符替换成真实项目证据后，才能把 artifact 当作完成。
+
 ## 可选反馈记忆
 
 Research Feedback Memory 和 Researcher Growth Review 默认关闭。只有当项目需要把长期学习反馈也沉淀下来时再启用：
@@ -240,6 +242,7 @@ publish_docs_<experiment>.sh
 python3 ~/.codex/skills/.system/skill-creator/scripts/quick_validate.py skills/ai-research-workflow
 python3 skills/ai-research-workflow/scripts/validate_framework_contract.py skills/ai-research-workflow
 python3 skills/ai-research-workflow/scripts/check_worktree_registry.py .
+python3 skills/ai-research-workflow/scripts/validate_research_workspace.py <project-root> --require-workstream
 ```
 
 ## License

@@ -2,6 +2,14 @@
 
 Use this reference when the skill is asked to do substantive AI research work in a target project repository. The goal is to keep each research task isolated, reduce merge conflicts, and make merge-back reviewable.
 
+## Contents
+
+- [When to open a worktree](#when-to-open-a-worktree)
+- [Worktree location and registry](#worktree-location-and-registry)
+- [Conflict-minimizing task design](#conflict-minimizing-task-design)
+- [Standard lifecycle](#standard-lifecycle)
+- [Conflict resolution rules](#conflict-resolution-rules)
+
 ## When to open a worktree
 
 Open a task worktree in the target project repository before editing for:

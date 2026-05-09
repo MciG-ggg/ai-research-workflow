@@ -4,6 +4,18 @@ These standards are mandatory by default whenever an AI agent designs, implement
 
 This document defines contracts, not universal scripts. Use project-native tooling first and create thin project-local wrappers only when needed. Record those wrappers in `SCRIPT_REGISTRY.md`.
 
+## Contents
+
+- [Run directory contract](#run-directory-contract)
+- [Terminal run distillation rules](#terminal-run-distillation-rules)
+- [Tmux orchestration rules](#tmux-orchestration-rules)
+- [Multi-seed and accelerator lane rules](#multi-seed-and-accelerator-lane-rules)
+- [Logging rules](#logging-rules)
+- [Progress rules](#progress-rules)
+- [Data output rules](#data-output-rules)
+- [Visualization rules](#visualization-rules)
+- [Agent final-report requirement](#agent-final-report-requirement)
+
 ## Run directory contract
 
 Every experiment run must write to one distinct run directory:

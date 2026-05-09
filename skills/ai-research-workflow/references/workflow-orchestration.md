@@ -2,6 +2,16 @@
 
 This skill is a workflow, not only an experiment logging template. It coordinates OMX modes and project work from vague idea to implemented method, reproduced baseline, evidence-backed results, and writeup.
 
+## Contents
+
+- [Default OMX sequence](#default-omx-sequence)
+- [Optional feedback mode resolution](#optional-feedback-mode-resolution)
+- [Portfolio and workstream control plane](#portfolio-and-workstream-control-plane)
+- [New workstream mandatory workflow gate](#new-workstream-mandatory-workflow-gate)
+- [Control plane vs project implementation plane](#control-plane-vs-project-implementation-plane)
+- [Run distillation rule](#run-distillation-rule)
+- [Baseline and method work](#baseline-and-method-work)
+
 ## Default OMX sequence
 
 Use this default sequence unless existing artifacts prove that a phase is already complete:
