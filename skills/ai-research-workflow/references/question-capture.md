@@ -88,3 +88,30 @@ Answer the user first. Persist the Q&A immediately after answering when enabled.
 ## Hook Boundary
 
 A `UserPromptSubmit` hook may classify prompts as question-like and mark question capture as pending, but it must not write a final Q&A entry because the answer does not exist yet. The durable contract remains this file: after the assistant answers, it appends the Q&A to `QUESTIONS.md` and routes distilled knowledge to the appropriate feedback artifacts. Hooks may call `capture_question.py` only after an answer summary exists and only when `qa_capture` resolves to `research` or `all`.
+
+## Hook Integration Helper
+
+Use `scripts/question_capture_hook.py` when a hook system needs deterministic two-stage capture:
+
+```bash
+python3 scripts/question_capture_hook.py --stage submit --project-root <project-root> --prompt "为什么这个结果有价值？"
+python3 scripts/question_capture_hook.py --stage answer --project-root <project-root> --answer-summary "The result constrains the claim boundary." --workstream <slug>
+```
+
+Submit stage behavior:
+
+- reads the prompt from `--prompt`, `--prompt-file`, supported hook environment variables, or stdin
+- parses `.omx/ai-research/CONFIG.md`
+- checks whether `qa_capture: research | all` enables capture for the inferred scope
+- refuses likely secret/credential text
+- writes only pending state to `.omx/state/ai-research-question-capture-pending.json` unless `--no-pending-write` is used
+- never writes the final Q&A ledger because the answer does not exist yet
+
+Answer stage behavior:
+
+- requires `--answer-summary` or `--answer-file`
+- uses the pending prompt unless `--prompt` is supplied again
+- appends to `.omx/ai-research/QUESTIONS.md` or `.omx/ai-research/<slug>/QUESTIONS.md`
+- removes the pending marker after successful capture unless `--keep-pending` is used
+
+`assets/hooks/question-capture.example.json` shows example hook wiring. Adapt paths to the local Codex/OMX hook runner; the skill does not install global hooks automatically.

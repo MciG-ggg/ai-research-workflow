@@ -37,6 +37,7 @@ Skip completed phases only when existing artifacts pass the relevant gate.
 - Read `references/idea-scouting.md` when the user asks for research idea generation, idea triage, or broad-direction scouting.
 - Read `references/question-capture.md` when the user asks a research/workflow question and Q&A capture is enabled.
 - Read `references/experiment-runtime-standards.md` before designing, implementing, running, or auditing experiments.
+- Use schema/version helpers when validating mature artifacts, migrating legacy workspaces, building a claim/evidence graph, or checking installed skill drift.
 - Read `references/project-local-script-registry.md` before creating or relying on project-local scripts.
 - Read `references/worktree-development.md` before substantive target-repo edits.
 
@@ -45,12 +46,15 @@ Maintenance validation:
 ```bash
 python3 scripts/validate_framework_contract.py .
 python3 scripts/validate_research_workspace.py <project-root>
+python3 scripts/validate_research_schema.py <project-root>
 python3 scripts/check_regression_fixtures.py
+python3 scripts/run_e2e_scenarios.py
 ```
 
 Framework guardrail helpers:
 
 ```bash
+python3 scripts/ai_research.py help
 python3 scripts/resolve_workflow.py <project-root> --prompt "<user prompt>"
 python3 scripts/init_research_workspace.py <project-root> --preset guided
 python3 scripts/init_workstream.py <project-root> <slug> --title "..." --question "..." --deep-interview <path> --ralplan-prd <path> --ralplan-test-spec <path> --autoresearch-result <path>
@@ -58,9 +62,15 @@ python3 scripts/update_workstream_state.py <project-root> <slug> --phase experim
 python3 scripts/summarize_research_state.py <project-root>
 python3 scripts/score_research_artifacts.py <project-root>
 python3 scripts/capture_question.py <project-root> --question "..." --answer-summary "..."
+python3 scripts/question_capture_hook.py --stage submit --project-root <project-root> --prompt "..."
+python3 scripts/question_capture_hook.py --stage answer --project-root <project-root> --answer-summary "..."
 python3 scripts/prepare_workstream_closeout.py <project-root> <slug> --write
 python3 scripts/preserve_negative_result.py <project-root> <slug> --finding "..." --evidence <path> --interpretation "..." --claim-update "..."
 python3 scripts/generate_report_outline.py <project-root> <slug> --kind paper-outline --write
+python3 scripts/validate_research_schema.py <project-root>
+python3 scripts/build_evidence_graph.py <project-root> <slug> --json
+python3 scripts/migrate_research_workspace.py <project-root> --write
+python3 scripts/check_skill_update.py
 python3 scripts/validate_research_workspace.py <project-root> --phase idea-scouting
 python3 scripts/prepare_worktree_closeout.py <task-worktree> --base main
 ```
@@ -80,6 +90,25 @@ $ai-research-workflow closeout           # workstream + report-before-merge clos
 $ai-research-workflow negative-result    # preserve failed/null/inconclusive evidence and downgrade claims
 $ai-research-workflow draft              # paper/report/blog/rebuttal outline from stable artifacts
 ```
+
+Bundled CLI facade for deterministic local use:
+
+```bash
+python3 scripts/ai_research.py help
+python3 scripts/ai_research.py resolve <project-root> --prompt "这个实验做完了，整理落盘"
+python3 scripts/ai_research.py schema <project-root>
+python3 scripts/ai_research.py graph <project-root> <slug> --json
+python3 scripts/ai_research.py update-check
+```
+
+If you want X, say Y:
+
+- Generate/rank candidate ideas -> `$ai-research-workflow scout`.
+- Start a new small direction -> `$ai-research-workflow new-workstream` and provide/complete the deep-interview, ralplan, and autoresearch gate.
+- Finish the current experiment -> `$ai-research-workflow handoff` or “current experiment is done; distill runs/scripts and prepare closeout”.
+- Preserve a failed/null result -> `$ai-research-workflow negative-result`.
+- Record a durable question/answer -> enable `--qa-capture` or `qa_capture: research`, answer first, then capture.
+- Check artifact quality before drafting -> `$ai-research-workflow score` plus `validate_research_schema.py` and `build_evidence_graph.py`.
 
 When no subcommand is present, use `resolve_workflow.py --prompt` plus the project config to infer the lane. Subcommands do not bypass safety gates: final topic promotion, workstream creation, merge, push, worktree removal, branch deletion, and stronger claims after negative results still require explicit user confirmation.
 
@@ -200,7 +229,9 @@ Feedback memory records distilled knowledge, not raw logs. Keep raw run outputs 
 
 When Q&A capture is enabled and the user asks a research, design, architecture, experiment, interpretation, or workflow question rather than issuing a command, answer first, then append the question and answer summary to `.omx/ai-research/QUESTIONS.md` or `.omx/ai-research/<slug>/QUESTIONS.md`. Route durable concepts, decisions, issues, design notes, or growth lessons to the appropriate feedback artifacts.
 
-Use `scripts/capture_question.py` for deterministic question capture after the answer has been given. It refuses likely secret/credential text unless explicitly overridden. It is a capture helper, not a hook by itself; project or OMX hooks may call it only when `qa_capture` resolves to `research` or `all`.
+Use `scripts/capture_question.py` for deterministic question capture after the answer has been given. It refuses likely secret/credential text unless explicitly overridden. `scripts/question_capture_hook.py` adds the two-stage hook surface: submit classifies and records pending state, answer appends only after an answer summary exists. `assets/hooks/question-capture.example.json` shows example wiring; hooks may call capture only when `qa_capture` resolves to `research` or `all`.
+
+Use `assets/schemas/` with `scripts/validate_research_schema.py` when CONFIG, STATE, claim rows, run rows, or portfolio index rows need machine-checkable guardrails.
 
 ## Research control plane vs project implementation
 
@@ -233,7 +264,7 @@ Each workstream keeps `STATE.json` as its phase state and `CLAIMS.md` as its evi
 
 Run long experiments in detached tmux by default when tmux is available. For multiple independent variants, baselines, ablations, datasets, or multi-seed experiments, use `$team` or native subagents when parallelism is safe. Assign each seed lane an explicit idle GPU/device or scheduler slot and record the seed-to-device mapping in `RUNS.md`.
 
-When settled results or conclusions are finalized, publish them under project-root `docs/ai-research/<slug>/` and configure MkDocs when safe.
+When settled results or conclusions are finalized and project policy allows, mirror distilled browser-readable docs under project-root `docs/ai-research/<slug>/` and report any MkDocs update needed. This is a project-local documentation update, not a bundled publishing script.
 
 ## Experiment completion handoff
 

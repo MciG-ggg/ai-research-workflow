@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AI Research Workflow Config",
+  "type": "object",
+  "required": ["schema_version", "workflow_preset", "idea_scouting", "completion_handoff", "worktree_closeout", "feedback_memory", "qa_capture", "growth_review"],
+  "properties": {
+    "schema_version": {"enum": [1, "1"]},
+    "workflow_preset": {"enum": ["conservative", "guided", "autonomous"]},
+    "idea_scouting": {"enum": ["auto", "off", "on"]},
+    "completion_handoff": {"enum": ["auto", "off"]},
+    "worktree_closeout": {"enum": ["off", "report-before-merge"]},
+    "feedback_memory": {"enum": ["off", "lite", "full"]},
+    "qa_capture": {"enum": ["off", "research", "all"]},
+    "growth_review": {"enum": ["off", "milestone", "always"]}
+  }
+}

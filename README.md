@@ -82,6 +82,25 @@ $ai-research-workflow negative-result
 $ai-research-workflow draft
 ```
 
+Unified local CLI facade:
+
+```bash
+python3 skills/ai-research-workflow/scripts/ai_research.py help
+python3 skills/ai-research-workflow/scripts/ai_research.py resolve <project-root> --prompt "这个实验做完了，整理落盘"
+python3 skills/ai-research-workflow/scripts/ai_research.py schema <project-root>
+python3 skills/ai-research-workflow/scripts/ai_research.py graph <project-root> <slug> --json
+python3 skills/ai-research-workflow/scripts/ai_research.py update-check
+```
+
+If you want X, say Y:
+
+- Candidate idea generation/ranking: `$ai-research-workflow scout`.
+- A new small direction/workstream: `$ai-research-workflow new-workstream`.
+- Finished experiment/run cleanup: `$ai-research-workflow handoff`.
+- Durable Q&A capture: `$ai-research-workflow qa` with `--qa-capture` or `qa_capture: research`.
+- Preserve a failed/null result: `$ai-research-workflow negative-result`.
+- Check research readiness: `$ai-research-workflow summarize` then `$ai-research-workflow score`.
+
 `resolve_workflow.py` mirrors these commands and emits structured routing fields: `phase`, `workflow_action`, `requires_user_confirmation`, `next_artifacts`, and `guardrail_scripts`.
 
 ## Update this skill
@@ -94,7 +113,7 @@ cd ai-research-workflow
 ```
 
 The updater runs `git pull --ff-only`, source validation, staged `rsync -a --delete`, and installed-copy validation. For local development, skip pulling with `--no-pull`.
-Use `--dry-run` to validate and preview without replacing the installed skill. Use `--keep-backups N` to control backup retention.
+Use `--dry-run` to validate and preview without replacing the installed skill. Use `--keep-backups N` to control backup retention. Use `check_skill_update.py` or `ai_research.py update-check` for a read-only version/update status surface before syncing.
 
 Developer symlink mode is available when you want repo edits to be picked up immediately:
 
@@ -167,7 +186,7 @@ Use `workflow_preset: guided` to reduce manual workflow naming: broad idea promp
 
 When enabled, the skill may add root feedback files such as `QUESTIONS.md`, `LEARNINGS.md`, `ISSUES.md`, `DECISIONS.md`, and `SKILL_GROWTH.md`, plus workstream files such as `QUESTIONS.md`, `DESIGN.md`, `NOTES.md`, and `REVIEW.md`. `QUESTIONS.md` records user questions and answer summaries when `--qa-capture` or `qa_capture` is enabled. These files store distilled issues, knowledge, architecture/design decisions, verification gaps, Q&A, and capability reflections; raw logs and run outputs stay under `runs/`.
 
-For deterministic Q&A capture after an answer is written, use `capture_question.py`. This is safe to call from an OMX hook only when `qa_capture` resolves to `research` or `all`.
+For deterministic Q&A capture after an answer is written, use `capture_question.py`. For hook wiring, use `question_capture_hook.py`: `--stage submit` only classifies and stores pending state under `.omx/state`, while `--stage answer` appends to `QUESTIONS.md` only after an answer summary exists. See `assets/hooks/question-capture.example.json`. This is safe to call from an OMX hook only when `qa_capture` resolves to `research` or `all`.
 
 The skill intentionally does **not** ship universal experiment runner scripts. Different research projects use different training stacks, config systems, clusters, notebooks, plotting tools, and logging conventions. Instead, it defines where project-local scripts should live and how they should be named and documented.
 
@@ -177,11 +196,18 @@ When the user says the current experiment is done, the agent should treat that a
 
 Research review helpers add the remaining workflow polish:
 
+- `ai_research.py`: unified CLI facade over common guardrail scripts.
 - `summarize_research_state.py`: current portfolio/workstream state, blockers, missing artifacts, run/script inventory, and next actions.
 - `score_research_artifacts.py`: heuristic artifact quality score for research review; low scores require inspection before stronger claims.
 - `prepare_workstream_closeout.py`: writes `CLOSEOUT.md` for completion handoff without merging or deleting anything.
 - `preserve_negative_result.py`: appends negative/null/inconclusive evidence to `RESULTS.md` and claim downgrades to `CLAIMS.md`.
 - `generate_report_outline.py`: scaffolds paper outlines, workshop reports, internal reports, blog summaries, or rebuttal notes from stable artifacts.
+- `question_capture_hook.py`: hook integration helper for pre-answer classification and post-answer capture.
+- `migrate_research_workspace.py`: dry-run-first migration tool for legacy control-plane workspaces.
+- `validate_research_schema.py`: schema/artifact validator using `assets/schemas/` for CONFIG, STATE, claims, runs, and index rows.
+- `build_evidence_graph.py`: claim/evidence graph helper for review and drafting.
+- `check_skill_update.py`: read-only version/update check surface using `assets/VERSION`.
+- `run_e2e_scenarios.py`: E2E scenario tests for the framework guardrails.
 
 ## Maintenance-only bundled scripts
 
@@ -190,6 +216,7 @@ The skill may include bundled scripts under `skills/ai-research-workflow/scripts
 Useful guardrails:
 
 ```bash
+python3 skills/ai-research-workflow/scripts/ai_research.py help
 python3 skills/ai-research-workflow/scripts/init_research_workspace.py <project-root> --preset guided
 python3 skills/ai-research-workflow/scripts/init_workstream.py <project-root> <slug> --title "..." --question "..." --deep-interview <path> --ralplan-prd <path> --ralplan-test-spec <path> --autoresearch-result <path>
 python3 skills/ai-research-workflow/scripts/update_workstream_state.py <project-root> <slug> --phase running --next-action "monitor run"
@@ -197,12 +224,19 @@ python3 skills/ai-research-workflow/scripts/resolve_workflow.py <project-root> -
 python3 skills/ai-research-workflow/scripts/summarize_research_state.py <project-root>
 python3 skills/ai-research-workflow/scripts/score_research_artifacts.py <project-root>
 python3 skills/ai-research-workflow/scripts/capture_question.py <project-root> --question "..." --answer-summary "..."
+python3 skills/ai-research-workflow/scripts/question_capture_hook.py --stage submit --project-root <project-root> --prompt "..."
+python3 skills/ai-research-workflow/scripts/question_capture_hook.py --stage answer --project-root <project-root> --answer-summary "..."
 python3 skills/ai-research-workflow/scripts/prepare_workstream_closeout.py <project-root> <slug> --write
 python3 skills/ai-research-workflow/scripts/preserve_negative_result.py <project-root> <slug> --finding "..." --evidence <path> --interpretation "..." --claim-update "..."
 python3 skills/ai-research-workflow/scripts/generate_report_outline.py <project-root> <slug> --kind paper-outline --write
 python3 skills/ai-research-workflow/scripts/validate_research_workspace.py <project-root> --phase completion-handoff
+python3 skills/ai-research-workflow/scripts/validate_research_schema.py <project-root>
+python3 skills/ai-research-workflow/scripts/build_evidence_graph.py <project-root> <slug> --json
+python3 skills/ai-research-workflow/scripts/migrate_research_workspace.py <project-root> --write
+python3 skills/ai-research-workflow/scripts/check_skill_update.py
 python3 skills/ai-research-workflow/scripts/prepare_worktree_closeout.py <task-worktree> --base main
 python3 skills/ai-research-workflow/scripts/check_regression_fixtures.py
+python3 skills/ai-research-workflow/scripts/run_e2e_scenarios.py
 ```
 
 `validate_research_workspace.py` supports phase-aware checks for `idea-scouting`, `new-workstream`, and `completion-handoff`, plus `--error-on-todo` and `--check-paths` for stricter review.
@@ -278,7 +312,7 @@ Usually keep local:
 
 ## Experiment run standards
 
-By default, this skill standardizes how experiments are executed, monitored, recorded, and published. Users should not need to request this separately:
+By default, this skill standardizes how experiments are planned, monitored, recorded, and distilled. It does **not** ship universal experiment runner scripts or publish docs automatically; users should not need to request the control-plane logging rules separately:
 
 - long runs should launch in detached tmux when available
 - independent lanes may run via OMX `$team` or native subagents when useful
@@ -287,7 +321,7 @@ By default, this skill standardizes how experiments are executed, monitored, rec
 - metrics and summaries are written to structured files
 - figures are generated for numeric/comparative results when appropriate
 - final reports include tmux/status/log/metrics/summary/figure paths
-- settled results and conclusions are mirrored into project-root `docs/ai-research/<slug>/` with MkDocs config when safe
+- settled results and conclusions may be mirrored into project-root `docs/ai-research/<slug>/` when user/project policy allows; this is project-local documentation, not a bundled publisher
 - multi-seed experiments may run one seed per subagent/team lane, with each lane assigned an explicit idle GPU/device or scheduler slot
 - method implementation and baseline reproduction happen in the target repository root, not inside `.omx/ai-research/`
 
@@ -315,6 +349,8 @@ python3 ~/.codex/skills/.system/skill-creator/scripts/quick_validate.py skills/a
 python3 skills/ai-research-workflow/scripts/validate_framework_contract.py skills/ai-research-workflow
 python3 skills/ai-research-workflow/scripts/check_worktree_registry.py .
 python3 skills/ai-research-workflow/scripts/validate_research_workspace.py <project-root> --require-workstream
+python3 skills/ai-research-workflow/scripts/validate_research_schema.py <project-root>
+python3 skills/ai-research-workflow/scripts/run_e2e_scenarios.py
 ```
 
 ## License

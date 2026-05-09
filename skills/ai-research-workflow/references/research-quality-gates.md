@@ -203,3 +203,14 @@ Before paper/report drafting or merge-back, run a research review pass:
 5. `scripts/generate_report_outline.py` only after evidence-to-claim mapping is stable.
 
 Fail closed when the score highlights missing hypothesis, baseline fairness, run evidence, claim ledger, negative/inconclusive preservation, or reproducibility terms. The remedy is to improve the artifact or downgrade the claim, not to ignore the score.
+
+## Schema, graph, and version gates
+
+Use these additional checks when a workstream is mature enough for closeout, drafting, or merge-back:
+
+1. Run `scripts/validate_research_schema.py <project-root>` to validate CONFIG, STATE, claim rows, run rows, and portfolio index rows against `assets/schemas/`.
+2. Run `scripts/build_evidence_graph.py <project-root> <slug> --json` to expose claim -> evidence -> run/script traceability before strengthening claims or drafting.
+3. Run `scripts/check_skill_update.py` when behavior looks stale; it reports `assets/VERSION`, source commit/dirty status, installed version, and optional remote status without changing files.
+4. Run `scripts/run_e2e_scenarios.py` only while maintaining this skill framework, not inside a user experiment.
+
+Fail closed if schema validation reports errors, if the evidence graph shows claims without evidence paths, or if the installed skill is stale and the observed behavior depends on a newer helper. The remedy is to fix artifacts or update the installed skill, not to relax scientific gates.

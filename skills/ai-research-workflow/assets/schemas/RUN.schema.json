@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AI Research Run Ledger Row",
+  "type": "object",
+  "required": ["run_id", "command", "status", "log_path", "metrics_path", "summary_path", "commit"],
+  "properties": {
+    "run_id": {"type": "string"},
+    "command": {"type": "string"},
+    "status": {"type": "string"},
+    "log_path": {"type": "string"},
+    "metrics_path": {"type": "string"},
+    "summary_path": {"type": "string"},
+    "commit": {"type": "string"},
+    "seed": {"type": "string"},
+    "device": {"type": "string"}
+  }
+}

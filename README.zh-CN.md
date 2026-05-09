@@ -82,6 +82,25 @@ $ai-research-workflow negative-result
 $ai-research-workflow draft
 ```
 
+统一本地 CLI facade：
+
+```bash
+python3 skills/ai-research-workflow/scripts/ai_research.py help
+python3 skills/ai-research-workflow/scripts/ai_research.py resolve <project-root> --prompt "这个实验做完了，整理落盘"
+python3 skills/ai-research-workflow/scripts/ai_research.py schema <project-root>
+python3 skills/ai-research-workflow/scripts/ai_research.py graph <project-root> <slug> --json
+python3 skills/ai-research-workflow/scripts/ai_research.py update-check
+```
+
+如果你想要 X，可以这么说 Y：
+
+- 生成/排序候选 idea：`$ai-research-workflow scout`。
+- 新开一个小方向/workstream：`$ai-research-workflow new-workstream`。
+- 当前实验做完并收尾：`$ai-research-workflow handoff`。
+- 记录有价值的问答：开启 `--qa-capture` 或 `qa_capture: research` 后用 `$ai-research-workflow qa`。
+- 保存负结果/无显著结果：`$ai-research-workflow negative-result`。
+- 检查研究状态和质量：`$ai-research-workflow summarize` 然后 `$ai-research-workflow score`。
+
 `resolve_workflow.py` 也识别这些命令，并输出结构化字段：`phase`、`workflow_action`、`requires_user_confirmation`、`next_artifacts` 和 `guardrail_scripts`。
 
 ## 更新这个 skill
@@ -94,7 +113,7 @@ cd ai-research-workflow
 ```
 
 这个脚本会执行 `git pull --ff-only`、源码校验、staged `rsync -a --delete`、安装版校验。维护本地未提交改动时可以加 `--no-pull`。
-使用 `--dry-run` 可以只校验和预览，不替换安装版；使用 `--keep-backups N` 可以控制 backup 保留数量。
+使用 `--dry-run` 可以只校验和预览，不替换安装版；使用 `--keep-backups N` 可以控制 backup 保留数量。使用 `check_skill_update.py` 或 `ai_research.py update-check` 可以先做只读版本/更新状态检查。
 
 如果你在开发这个 skill，希望 repo 里的修改立刻生效，可以使用 symlink 模式：
 
@@ -167,7 +186,7 @@ growth_review: off | milestone | always
 
 启用后，skill 可以增加根目录反馈文件，例如 `QUESTIONS.md`、`LEARNINGS.md`、`ISSUES.md`、`DECISIONS.md`、`SKILL_GROWTH.md`，以及 workstream 内的 `QUESTIONS.md`、`DESIGN.md`、`NOTES.md`、`REVIEW.md`。当 `--qa-capture` 或 `qa_capture` 启用时，`QUESTIONS.md` 记录用户疑问和回答摘要。这些文件只记录蒸馏后的问题、知识、架构/设计决策、验证缺口、Q&A 和能力复盘；原始日志和运行输出仍然放在 `runs/`。
 
-如果需要确定性 Q&A 记录，可以在回答之后调用 `capture_question.py`。它只应该在 `qa_capture` 解析为 `research` 或 `all` 时由 agent 或 OMX hook 调用。
+如果需要确定性 Q&A 记录，可以在回答之后调用 `capture_question.py`。hook 集成使用 `question_capture_hook.py`：`--stage submit` 只分类并在 `.omx/state` 写 pending 状态，`--stage answer` 只有在有 answer summary 后才追加 `QUESTIONS.md`。示例配置见 `assets/hooks/question-capture.example.json`。它只应该在 `qa_capture` 解析为 `research` 或 `all` 时由 agent 或 OMX hook 调用。
 
 这个 skill 不内置通用实验 runner。不同研究项目会使用不同训练栈、配置系统、集群、notebook、绘图工具和日志约定。因此它只规定项目本地脚本应该放在哪里、如何命名、如何登记。
 
@@ -177,11 +196,18 @@ growth_review: off | milestone | always
 
 新增的研究 review 辅助工具：
 
+- `ai_research.py`：统一 CLI facade，包装常用 guardrail 脚本。
 - `summarize_research_state.py`：汇总整体 portfolio/workstream 状态、blocker、缺失 artifact、run/script inventory 和下一步。
 - `score_research_artifacts.py`：给 artifact 做启发式质量评分；低分表示需要先检查再加强 claim。
 - `prepare_workstream_closeout.py`：写入 workstream 级 `CLOSEOUT.md`，只生成计划，不 merge/delete。
 - `preserve_negative_result.py`：把负结果/无显著/失败结果写入 `RESULTS.md`，并把 claim 降级写入 `CLAIMS.md`。
 - `generate_report_outline.py`：从稳定 artifact 生成 paper outline、workshop report、internal report、blog summary 或 rebuttal notes。
+- `question_capture_hook.py`：hook 集成辅助，支持回答前分类和回答后捕获。
+- `migrate_research_workspace.py`：默认 dry-run 的 legacy control-plane 迁移工具。
+- `validate_research_schema.py`：用 `assets/schemas/` 校验 CONFIG、STATE、claims、runs、index rows。
+- `build_evidence_graph.py`：构建 claim/evidence graph，用于 review 和写作。
+- `check_skill_update.py`：基于 `assets/VERSION` 的只读版本/更新检查。
+- `run_e2e_scenarios.py`：框架 guardrail 的 E2E 场景测试。
 
 ## bundled scripts 只用于维护
 
@@ -190,6 +216,7 @@ growth_review: off | milestone | always
 常用 guardrails：
 
 ```bash
+python3 skills/ai-research-workflow/scripts/ai_research.py help
 python3 skills/ai-research-workflow/scripts/init_research_workspace.py <project-root> --preset guided
 python3 skills/ai-research-workflow/scripts/init_workstream.py <project-root> <slug> --title "..." --question "..." --deep-interview <path> --ralplan-prd <path> --ralplan-test-spec <path> --autoresearch-result <path>
 python3 skills/ai-research-workflow/scripts/update_workstream_state.py <project-root> <slug> --phase running --next-action "monitor run"
@@ -197,12 +224,19 @@ python3 skills/ai-research-workflow/scripts/resolve_workflow.py <project-root> -
 python3 skills/ai-research-workflow/scripts/summarize_research_state.py <project-root>
 python3 skills/ai-research-workflow/scripts/score_research_artifacts.py <project-root>
 python3 skills/ai-research-workflow/scripts/capture_question.py <project-root> --question "..." --answer-summary "..."
+python3 skills/ai-research-workflow/scripts/question_capture_hook.py --stage submit --project-root <project-root> --prompt "..."
+python3 skills/ai-research-workflow/scripts/question_capture_hook.py --stage answer --project-root <project-root> --answer-summary "..."
 python3 skills/ai-research-workflow/scripts/prepare_workstream_closeout.py <project-root> <slug> --write
 python3 skills/ai-research-workflow/scripts/preserve_negative_result.py <project-root> <slug> --finding "..." --evidence <path> --interpretation "..." --claim-update "..."
 python3 skills/ai-research-workflow/scripts/generate_report_outline.py <project-root> <slug> --kind paper-outline --write
 python3 skills/ai-research-workflow/scripts/validate_research_workspace.py <project-root> --phase completion-handoff
+python3 skills/ai-research-workflow/scripts/validate_research_schema.py <project-root>
+python3 skills/ai-research-workflow/scripts/build_evidence_graph.py <project-root> <slug> --json
+python3 skills/ai-research-workflow/scripts/migrate_research_workspace.py <project-root> --write
+python3 skills/ai-research-workflow/scripts/check_skill_update.py
 python3 skills/ai-research-workflow/scripts/prepare_worktree_closeout.py <task-worktree> --base main
 python3 skills/ai-research-workflow/scripts/check_regression_fixtures.py
+python3 skills/ai-research-workflow/scripts/run_e2e_scenarios.py
 ```
 
 `validate_research_workspace.py` 支持 `idea-scouting`、`new-workstream`、`completion-handoff` 三种 phase-aware checks，也支持 `--error-on-todo` 和 `--check-paths` 做更严格审查。
@@ -278,7 +312,7 @@ python3 skills/ai-research-workflow/scripts/prepare_worktree_closeout.py . --bas
 
 ## 实验运行标准
 
-默认情况下，这个 skill 会规范实验如何执行、监控、记录和发布。用户不需要额外要求日志、指标、进度或图表。
+默认情况下，这个 skill 会规范实验如何规划、监控、记录和蒸馏。它不内置通用实验 runner，也不会自动发布文档；用户不需要额外要求的是 control-plane 日志/证据规则。
 
 - 长实验默认使用 detached tmux
 - 独立 lane 可在有收益时通过 OMX `$team` 或 native subagents 并行
@@ -287,7 +321,7 @@ python3 skills/ai-research-workflow/scripts/prepare_worktree_closeout.py . --bas
 - metrics 和 summary 写入结构化文件
 - 数值/对比结果需要合适的 figures
 - 最终报告包含 tmux/status/log/metrics/summary/figure 路径
-- 稳定结果和结论同步到项目根目录 `docs/ai-research/<slug>/`，安全时配置 MkDocs
+- 稳定结果和结论可以在项目策略允许时同步到项目根目录 `docs/ai-research/<slug>/`；这是项目本地文档，不是 bundled publisher
 - 多 seed 实验可以每个 seed 一个 subagent/team lane，并给每个 lane 分配明确的空闲 GPU/device 或 scheduler slot
 - 方法实现和 baseline 复现发生在目标项目根目录，不放在 `.omx/ai-research/`
 
@@ -315,6 +349,8 @@ python3 ~/.codex/skills/.system/skill-creator/scripts/quick_validate.py skills/a
 python3 skills/ai-research-workflow/scripts/validate_framework_contract.py skills/ai-research-workflow
 python3 skills/ai-research-workflow/scripts/check_worktree_registry.py .
 python3 skills/ai-research-workflow/scripts/validate_research_workspace.py <project-root> --require-workstream
+python3 skills/ai-research-workflow/scripts/validate_research_schema.py <project-root>
+python3 skills/ai-research-workflow/scripts/run_e2e_scenarios.py
 ```
 
 ## License

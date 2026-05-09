@@ -1,0 +1,10 @@
+{
+  "description": "Example hook wiring for ai-research-workflow Q&A capture. Adapt paths to your Codex/OMX hook runner.",
+  "pre_answer": "python3 ~/.codex/skills/ai-research-workflow/scripts/question_capture_hook.py --stage submit --project-root .",
+  "post_answer": "python3 ~/.codex/skills/ai-research-workflow/scripts/question_capture_hook.py --stage answer --project-root . --answer-summary '<assistant summary>'",
+  "requirements": [
+    "qa_capture must resolve to research or all",
+    "the post-answer hook must provide an answer summary",
+    "do not capture secrets, credentials, private data, transient status checks, or unanswered questions"
+  ]
+}

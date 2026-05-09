@@ -413,3 +413,19 @@ When the user says the current experiment is done, treat that message as an expe
 If a completed run changes the larger research picture, update portfolio `RESEARCH.md` with the new synthesis and portfolio `INDEX.md` with the workstream status, latest evidence, and next priority.
 
 If the workstream used a task worktree, the completion handoff must also write a report-before-merge closeout plan. Include current branch/worktree path, base branch, validation evidence still needed, semantic Lore-format commit status, merge/rebase command plan, push target, worktree removal command, branch deletion command, and `.omx/worktrees/REGISTRY.md` update. Do not execute merge, push, worktree removal, or branch deletion until the user confirms.
+
+## Schema and evidence graph artifacts
+
+Machine-checkable schemas live in `assets/schemas/`:
+
+- `assets/schemas/CONFIG.schema.json`: allowed config keys and values.
+- `assets/schemas/STATE.schema.json`: required workstream lifecycle state, gate evidence, blockers, next action, and confirmation boundaries.
+- `assets/schemas/CLAIM.schema.json`: claim ledger row shape, including status, evidence paths, scope, allowed wording, and forbidden wording.
+- `assets/schemas/RUN.schema.json`: run ledger row shape, including command, status, log path, metrics path, summary path, and commit.
+- `assets/schemas/INDEX_ROW.schema.json`: portfolio index row shape linking slug, status, subquestion, artifact links, gate evidence, and next action.
+
+Use `scripts/validate_research_schema.py <project-root>` as a guardrail-level schema validator. It performs stdlib validation for CONFIG, STATE, `CLAIMS.md`, `RUNS.md`, and root `INDEX.md` rows. Warnings mean the artifact is still scaffold-like; errors mean the control-plane contract is malformed.
+
+Use `scripts/build_evidence_graph.py <project-root> <slug> --json` before paper/report drafting or merge-back when claim traceability matters. The graph is a review aid: claim nodes link to evidence nodes, run nodes link to logs/metrics/summaries, and script nodes link to produced outputs. The graph does not prove a claim; it exposes whether evidence is traceable.
+
+Use `scripts/migrate_research_workspace.py <project-root>` for legacy workspaces. Default mode is dry-run. `--write` creates missing control-plane files only; `--force` is required to overwrite. Migration should mark unknown gate evidence as a blocker rather than pretending old work passed the new-workstream mandatory workflow gate.

@@ -207,3 +207,31 @@ Baseline reproduction and new method implementation are first-class workflow tas
 - Keep baseline commands/configs reproducible and trace them from `EXPERIMENT.md` and `RUNS.md`.
 - Implement methods in the project root with tests or smoke checks before expensive runs.
 - Record claim boundaries when a baseline cannot be reproduced due to missing data, compute, license, or environment.
+
+## Productized guardrail surfaces
+
+Use these helpers when a workflow needs more than natural-language routing:
+
+- `scripts/ai_research.py`: unified CLI facade over common guardrails. It is useful when the user wants subcommand-style behavior but the shell entry point is easier than remembering individual script names.
+- `scripts/question_capture_hook.py`: hook integration helper. `--stage submit` classifies and stores pending question state; `--stage answer` appends a final Q&A entry only after an answer summary exists.
+- `scripts/migrate_research_workspace.py`: legacy workspace migration tool. Default mode is dry-run; `--write` creates missing control-plane artifacts and `--force` is required before overwriting.
+- `scripts/validate_research_schema.py`: schema validator for `CONFIG.md`, workstream `STATE.json`, claim rows, run rows, and portfolio index rows using `assets/schemas/`.
+- `scripts/build_evidence_graph.py`: claim/evidence graph helper that links `CLAIMS.md` to evidence paths, runs, and project-local scripts.
+- `scripts/check_skill_update.py`: version/update check surface using `assets/VERSION`, source git status, installed skill version, and optional remote status.
+- `scripts/run_e2e_scenarios.py`: maintenance-only E2E scenario tests for routing, workstream init, Q&A capture, negative result preservation, closeout, schema validation, and graph generation.
+
+`assets/hooks/question-capture.example.json` is only example hook wiring; it does not install hooks automatically. `assets/schemas/STATE.schema.json`, `CONFIG.schema.json`, `CLAIM.schema.json`, `RUN.schema.json`, and `INDEX_ROW.schema.json` define framework artifact shape, not a research result schema.
+
+If you want X, say Y:
+
+| Desired action | Recommended command or phrase |
+| --- | --- |
+| Generate candidate topics | `$ai-research-workflow scout` |
+| Open a gated small direction | `$ai-research-workflow new-workstream` |
+| Finish and distill an experiment | `$ai-research-workflow handoff` or “current experiment is done” |
+| Capture a durable question | `$ai-research-workflow qa` after enabling `qa_capture` |
+| Preserve a negative/null result | `$ai-research-workflow negative-result` |
+| Check current portfolio status | `$ai-research-workflow summarize` |
+| Review readiness and claims | `$ai-research-workflow score`, `validate_research_schema.py`, and `build_evidence_graph.py` |
+
+These helpers remain control-plane guardrails. They do not run experiments, collect user metrics, plot results, publish docs, merge branches, push remotes, remove worktrees, or delete branches.
