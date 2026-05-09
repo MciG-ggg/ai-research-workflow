@@ -4,9 +4,47 @@ Use these contracts to keep scientific goals separate from execution details and
 
 ## Control plane vs project-root outputs
 
-`.omx/ai-research/<slug>/` is the research control plane. It stores research intent, plans, run indexes, evidence summaries, and reproducibility notes.
+`.omx/ai-research/` has a portfolio control plane and one or more workstream control planes.
+
+Portfolio control plane:
+
+```text
+.omx/ai-research/
+  RESEARCH.md
+  INDEX.md
+```
+
+`.omx/ai-research/RESEARCH.md` stores the overall research program: central question, north-star hypotheses, success criteria, claim boundaries, current synthesis, active subquestions, and next priorities.
+
+`.omx/ai-research/INDEX.md` stores the workstream registry: each `<slug>`, status, relationship to the overall question, artifact links, latest evidence, and next action.
+
+`.omx/ai-research/<slug>/` is the workstream control plane. It stores research intent, plans, run indexes, evidence summaries, and reproducibility notes for one concrete direction.
 
 Project-root files are the implementation plane. Method code, baseline reproduction code, configs, tests, dataset adapters, benchmark entrypoints, and durable docs belong in the target repository's normal locations, not under `.omx/ai-research/`.
+
+## Portfolio artifacts
+
+Minimum `.omx/ai-research/RESEARCH.md` sections:
+
+- Overall research objective
+- Central research question
+- North-star hypotheses
+- Success and falsification criteria
+- Claim boundaries and non-goals
+- Current synthesis / best-known answer
+- Active workstreams and how they relate to the central question
+- Evidence map linking to workstream artifacts
+- Open decisions and next priorities
+- Last updated
+
+Minimum `.omx/ai-research/INDEX.md` sections:
+
+- Workstream table: slug, status, subquestion, relationship to overall objective, key artifact links, latest evidence, next action
+- New-workstream decision log: why a new slug was created instead of reusing an existing one
+- Archived or superseded workstreams
+- Cross-workstream dependencies and conflicts
+
+Before creating a new workstream, inspect portfolio `RESEARCH.md`, portfolio `INDEX.md`, and existing `.omx/ai-research/<slug>/` directories. Reuse an existing workstream unless the new task has a distinct research question, validation target, or artifact boundary.
 
 ## Required artifacts
 
@@ -21,7 +59,7 @@ Project-root files are the implementation plane. Method code, baseline reproduct
 | `REPRODUCIBILITY.md` | Reproducibility checklist and blockers | reproducibility review |
 | `PAPER_DRAFT.md` | Claim-traceable paper/report draft | paper/report drafting |
 
-## `RESEARCH.md` minimum sections
+## Workstream `RESEARCH.md` minimum sections
 
 - Title
 - Research question
@@ -35,6 +73,8 @@ Project-root files are the implementation plane. Method code, baseline reproduct
 - Claim boundaries / forbidden claims
 - Decision boundaries
 - Open questions
+- Link to portfolio `RESEARCH.md`
+- Parent workstream or sibling workstreams when relevant
 
 ## `LITERATURE.md` minimum sections
 
@@ -142,3 +182,5 @@ Each terminal run directory remains raw evidence. After completion, extract dura
 - Keep raw logs, checkpoints, private data, and large temporary outputs in run/artifact storage; link or summarize them instead of copying them into project docs.
 
 When the user says the current experiment is done, treat that message as an experiment completion handoff trigger. Inspect available run directories and project-local scripts, then persist valuable or user-requested content into the stable artifacts above before giving the final answer. If a requested artifact cannot be written because evidence is missing, record the missing path and exact recovery step.
+
+If a completed run changes the larger research picture, update portfolio `RESEARCH.md` with the new synthesis and portfolio `INDEX.md` with the workstream status, latest evidence, and next priority.

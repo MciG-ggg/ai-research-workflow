@@ -52,6 +52,7 @@ Default sequence:
 
 ```text
 $deep-interview --autoresearch
+  -> portfolio RESEARCH.md / INDEX.md check
   -> literature and research artifacts
   -> $ralplan for implementation and validation shape
   -> task worktree in the target repo
@@ -62,7 +63,7 @@ $deep-interview --autoresearch
   -> paper/report drafting
 ```
 
-`.omx/ai-research/<slug>/` is the control plane. Actual method implementation, baseline reproduction, configs, tests, and project-native experiment code belong in the target repository root or its existing conventions, not under `.omx/ai-research/`.
+`.omx/ai-research/RESEARCH.md` and `.omx/ai-research/INDEX.md` are the portfolio control plane for the whole research program. Each `.omx/ai-research/<slug>/` directory is a workstream for one concrete direction. Actual method implementation, baseline reproduction, configs, tests, and project-native experiment code belong in the target repository root or its existing conventions, not under `.omx/ai-research/`.
 
 ## Update this skill
 
@@ -81,9 +82,12 @@ If you are maintaining this repository, validate the skill framework before sync
 
 ## Framework layout
 
-For each research project, the skill asks the agent to create or maintain a project-local research workspace:
+For each research project, the skill asks the agent to create or maintain a project-local research portfolio plus workstream workspaces:
 
 ```text
+.omx/ai-research/
+  RESEARCH.md
+  INDEX.md
 .omx/ai-research/<slug>/
   RESEARCH.md
   LITERATURE.md
@@ -96,6 +100,8 @@ For each research project, the skill asks the agent to create or maintain a proj
   scripts/
   runs/
 ```
+
+The root `RESEARCH.md` captures the overall research program: central question, north-star hypotheses, claim boundaries, current synthesis, active workstreams, and next priorities. The root `INDEX.md` maps each slug to its subquestion, status, artifact links, latest evidence, and next action. Before creating a new slug, the agent should inspect these files and existing workstreams, then reuse an existing workstream unless the new task has a distinct research question or validation boundary.
 
 The skill intentionally does **not** ship universal experiment runner scripts. Different research projects use different training stacks, config systems, clusters, notebooks, plotting tools, and logging conventions. Instead, it defines where project-local scripts should live and how they should be named and documented.
 
@@ -157,6 +163,8 @@ This repository tracks the skill framework itself:
 
 Good candidates for downstream git history:
 
+- root `RESEARCH.md`
+- root `INDEX.md`
 - `RESEARCH.md`
 - `LITERATURE.md`
 - `EXPERIMENT.md`

@@ -52,6 +52,7 @@ $ai-research-workflow turn this paper idea into a research plan and experiment w
 
 ```text
 $deep-interview --autoresearch
+  -> 检查总览 RESEARCH.md / INDEX.md
   -> 文献和研究 artifacts
   -> $ralplan 规划实现和验证形状
   -> 目标项目仓库中的 task worktree
@@ -62,7 +63,7 @@ $deep-interview --autoresearch
   -> 论文或报告草稿
 ```
 
-`.omx/ai-research/<slug>/` 是研究控制平面。真实的方法实现、baseline 复现、配置、测试和项目原生实验代码，应该放在目标项目仓库根目录或该仓库已有约定的位置，而不是放到 `.omx/ai-research/` 下面。
+`.omx/ai-research/RESEARCH.md` 和 `.omx/ai-research/INDEX.md` 是整个研究工作的 portfolio control plane。每个 `.omx/ai-research/<slug>/` 是一个具体方向的 workstream。真实的方法实现、baseline 复现、配置、测试和项目原生实验代码，应该放在目标项目仓库根目录或该仓库已有约定的位置，而不是放到 `.omx/ai-research/` 下面。
 
 ## 更新这个 skill
 
@@ -81,9 +82,12 @@ python3 ~/.codex/skills/.system/skill-creator/scripts/quick_validate.py ~/.codex
 
 ## 框架目录
 
-每个研究项目会创建或复用一个项目本地研究工作区：
+每个研究项目会创建或复用一个项目本地研究总览和若干 workstream 工作区：
 
 ```text
+.omx/ai-research/
+  RESEARCH.md
+  INDEX.md
 .omx/ai-research/<slug>/
   RESEARCH.md
   LITERATURE.md
@@ -96,6 +100,8 @@ python3 ~/.codex/skills/.system/skill-creator/scripts/quick_validate.py ~/.codex
   scripts/
   runs/
 ```
+
+根目录 `RESEARCH.md` 记录整体研究目标、中心问题、north-star hypotheses、claim 边界、当前综合判断、活跃 workstreams 和下一步优先级。根目录 `INDEX.md` 记录每个 slug 的子问题、状态、artifact 链接、最新证据和下一步。创建新 slug 前，agent 应先检查这两个文件和已有 workstream；只有当新任务确实有独立研究问题或验证边界时才创建新 slug。
 
 这个 skill 不内置通用实验 runner。不同研究项目会使用不同训练栈、配置系统、集群、notebook、绘图工具和日志约定。因此它只规定项目本地脚本应该放在哪里、如何命名、如何登记。
 
@@ -157,6 +163,8 @@ python3 skills/ai-research-workflow/scripts/check_worktree_registry.py .
 
 下游项目中适合进入 git 历史的文件：
 
+- 根目录 `RESEARCH.md`
+- 根目录 `INDEX.md`
 - `RESEARCH.md`
 - `LITERATURE.md`
 - `EXPERIMENT.md`

@@ -37,6 +37,7 @@ The run directory is raw evidence, not the final research memory. After each run
 - Update `.omx/ai-research/<slug>/REPRODUCIBILITY.md` when the run reveals environment requirements, nondeterminism, missing data, missing compute, or rerun steps.
 - Promote stable conclusions to project-root `docs/`, `reports/`, benchmark cards, README sections, or MkDocs pages when useful.
 - Promote reusable method, baseline, config, or test changes to project-root files; do not bury them in `.omx/ai-research/`.
+- Update portfolio `.omx/ai-research/RESEARCH.md` and `.omx/ai-research/INDEX.md` when the run changes the overall synthesis, workstream status, or next priority.
 - Keep raw logs, checkpoints, private data, and large temporary outputs in run storage; link or summarize them instead of copying them into project-root docs.
 
 When the user says the current experiment is done, treat that as a terminal run distillation trigger. Inspect the run directory and scripts first, then persist valuable or user-requested content into stable artifacts before responding.

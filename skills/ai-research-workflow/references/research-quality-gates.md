@@ -5,6 +5,9 @@ Use these gates before moving to the next phase or approving a final answer.
 ## Intake gate
 
 Pass only if:
+- Portfolio `.omx/ai-research/RESEARCH.md` exists or is created with the overall research program before opening a new workstream.
+- Portfolio `.omx/ai-research/INDEX.md` exists or is created with a workstream registry before opening a new workstream.
+- Existing workstreams were checked before a new slug was created.
 - The research question is specific enough to design an experiment.
 - The hypothesis is falsifiable.
 - Success and falsification criteria are explicit.
@@ -16,7 +19,8 @@ Pass only if:
 Pass only if:
 - The workflow stages that are relevant to the task are explicit: deep interview, planning, implementation, baseline reproduction, experiments, distillation, reproducibility review, and reporting.
 - The chosen OMX handoff path is appropriate for the current ambiguity and risk.
-- Control-plane artifacts in `.omx/ai-research/<slug>/` are clearly separated from project-root code/config/test/docs work.
+- Portfolio artifacts in `.omx/ai-research/` describe the overall research program, while workstream artifacts in `.omx/ai-research/<slug>/` describe one concrete direction.
+- Control-plane artifacts are clearly separated from project-root code/config/test/docs work.
 
 ## Literature gate
 
@@ -59,6 +63,7 @@ Pass only if:
 - Claims do not exceed evidence.
 - Distilled updates outside `runs/` are recorded when the run changed stable conclusions or reusable project artifacts.
 - User-requested findings, reusable commands, cleanup decisions, and next-step TODOs from experiment completion handoff are persisted to `RUNS.md`, `SCRIPT_REGISTRY.md`, `RESULTS.md`, `REPRODUCIBILITY.md`, or project-root docs as appropriate.
+- Portfolio `RESEARCH.md` and `INDEX.md` are updated when a result changes the overall synthesis, workstream status, or next priority.
 
 ## Reproducibility gate
 
