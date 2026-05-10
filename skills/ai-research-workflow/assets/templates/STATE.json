@@ -1,6 +1,11 @@
 {
   "schema_version": 1,
   "workstream_slug": "TODO",
+  "workstream_type": "experiment-campaign",
+  "allowed_workstream_types": [
+    "experiment-campaign",
+    "paper-reproduction"
+  ],
   "phase": "intake",
   "phase_status": "draft",
   "allowed_phases": [

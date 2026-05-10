@@ -6,6 +6,7 @@ Use these contracts to keep scientific goals separate from execution details and
 
 - [Control plane vs project-root outputs](#control-plane-vs-project-root-outputs)
 - [Idea scouting artifact](#idea-scouting-artifact)
+- [Paper registry and paper-reproduction artifacts](#paper-registry-and-paper-reproduction-artifacts)
 - [Optional feedback memory artifacts](#optional-feedback-memory-artifacts)
 - [Optional question capture artifacts](#optional-question-capture-artifacts)
 - [Portfolio artifacts](#portfolio-artifacts)
@@ -32,6 +33,7 @@ Portfolio control plane:
 ```text
 .omx/ai-research/
   IDEA_SCOUTING.md # optional before a clear research question exists
+  PAPERS.md        # optional SOTA/baseline registry when paper scouting is requested
   RESEARCH.md
   INDEX.md
 ```
@@ -61,7 +63,7 @@ Optional feedback memory, question capture, and growth review artifacts, created
 
 Each workstream has `STATE.json` for phase state and `CLAIMS.md` for the authoritative evidence-to-claim ledger.
 
-Project-root files are the implementation plane. Method code, baseline reproduction code, configs, tests, dataset adapters, benchmark entrypoints, and durable docs belong in the target repository's normal locations, not under `.omx/ai-research/`.
+Project-root files are the implementation plane. Method code, baseline or paper reproduction code, configs, tests, dataset adapters, benchmark entrypoints, and durable docs belong in the target repository's normal locations, not under `.omx/ai-research/`.
 
 Use the Markdown templates in `assets/templates/` when creating new artifacts. They are scaffolds, not evidence; replace TODO placeholders before treating an artifact as complete.
 
@@ -82,6 +84,38 @@ Use `assets/templates/IDEA_SCOUTING.md` when creating it.
 - Recommended next step and a reminder to ask the user before creating a workstream.
 
 Idea promotion gate: an idea may enter formal research intake only when it has a falsifiable hypothesis, evaluation metric or baseline, lightweight evidence, novelty-risk note, feasibility budget, and user-goal fit. Scouting does not guarantee absolute novelty and does not replace full `LITERATURE.md`.
+
+When idea scouting is driven by paper reproduction, `IDEA_SCOUTING.md` should link to `PAPERS.md`, name the target paper claim, summarize the minimal reproduction goal, and record paper-derived candidate ideas. It must still use the six-field promotion gate before recommending a formal workstream.
+
+## Paper registry and paper-reproduction artifacts
+
+`PAPERS.md` is optional and belongs at the portfolio root. It is created when the user asks to find, rank, or maintain SOTA/baseline papers, or when a paper-reproduction scouting pass needs a durable paper list.
+
+Use `assets/templates/PAPERS.md` when creating it.
+
+`PAPERS.md` minimum sections:
+
+- registry objective: research area, search date, maintainer, and scope;
+- search strategy: queries, sources, inclusion criteria, and exclusion criteria;
+- SOTA and baseline paper list: title, role, venue/date, link, code/data/checkpoint availability, key claim, benchmark/metric, reproduction priority, status, and notes;
+- baseline map for task/benchmark coverage and fairness risks;
+- reproduction candidates with target claim, minimal reproduction goal, materials needed, compute budget, tolerance, and candidate workstream;
+- maintenance log for additions, removals, priority changes, and evidence updates.
+
+`REPRODUCTION.md` is a workstream artifact used when a specific paper is selected for reproduction. It is a control-plane ledger, not the implementation location for paper code.
+
+Use `assets/templates/REPRODUCTION.md` when creating it.
+
+`REPRODUCTION.md` minimum sections:
+
+- target paper: link back to `PAPERS.md`, title, citation/link, role, and selection rationale;
+- reproduction objective: target claim, reproduction type, metric/tolerance, failure or inconclusive criteria, and non-goals;
+- available materials: official/third-party code, data, checkpoints, configs, seeds, environment details, and blockers;
+- minimal reproduction plan with project-local commands/scripts and expected evidence paths;
+- data/environment notes and deviations from the paper;
+- run evidence links to `RUNS.md`, logs, metrics, and summaries;
+- reproduction-derived ideas with falsifiable hypotheses, metrics/baselines, novelty risk, feasibility budget, and status;
+- conclusions and distillation into `PAPERS.md`, `IDEA_SCOUTING.md`, portfolio `RESEARCH.md`, and `INDEX.md`.
 
 ## Optional feedback memory artifacts
 
@@ -218,9 +252,11 @@ New workstream mandatory workflow gate:
 | Artifact | Purpose | Created by phase |
 | --- | --- | --- |
 | `IDEA_SCOUTING.md` | Optional candidate idea generation, triage, lightweight evidence, promotion gate, and rejected-idea ledger | idea scouting |
+| `PAPERS.md` | Optional SOTA/baseline paper registry, baseline map, reproduction candidates, and maintenance log | paper scouting / paper-reproduction scouting |
 | `STATE.json` | Workstream phase state, gate evidence pointers, blockers, next action, and confirmation boundaries | every workstream phase |
 | `RESEARCH.md` | Scientific intent, hypothesis, contribution, success/falsification criteria, non-goals, claim boundaries | intake / question spec |
 | `LITERATURE.md` | Source-backed related work, baselines, datasets, benchmark constraints, evidence gaps | literature review |
+| `REPRODUCTION.md` | Target-paper reproduction objective, materials, deviations, run evidence links, paper-derived ideas, and distillation | paper-reproduction workstream |
 | `EXPERIMENT.md` | Runnable experimental protocol and validation plan | experiment design |
 | `SCRIPT_REGISTRY.md` | Project-local commands/scripts, ownership, inputs, outputs, dependencies, rerun safety, and validation status | implementation / experiment execution |
 | `RUNS.md` | Commands, environment, tmux session/status, data versions, seeds, seed-to-device/resource allocation, complete log paths, metrics paths, figure paths, result paths, failures | experiment execution |
@@ -235,6 +271,8 @@ New workstream mandatory workflow gate:
 
 - `schema_version: 1`
 - `workstream_slug`
+- `workstream_type`: `paper-reproduction` or `experiment-campaign`
+- `allowed_workstream_types`
 - `phase`: one of `idea-scouting`, `intake`, `literature`, `experiment-design`, `implementation`, `running`, `completion-handoff`, `report-before-merge`, `reproducibility-review`, `paper-draft`, or `archived`
 - `phase_status`
 - `last_updated`
@@ -261,6 +299,15 @@ New workstream mandatory workflow gate:
 - Link to portfolio `RESEARCH.md`
 - Links to new-workstream gate evidence: deep-interview autoresearch handoff, ralplan PRD/test spec, autoresearch state/completion artifact
 - Parent workstream or sibling workstreams when relevant
+
+## Workstream type contract
+
+Every newly scaffolded workstream should declare its intent type in `STATE.json`.
+
+- `paper-reproduction`: use when the unit of work is reproducing one selected paper, baseline, or claim. `REPRODUCTION.md` is required and should link to portfolio `PAPERS.md`.
+- `experiment-campaign`: use when the unit of work is a hypothesis-driven experiment set, ablation campaign, benchmark/evaluation campaign, or method-variant test. `EXPERIMENT.md` is the primary design artifact.
+
+The type is orthogonal to lifecycle phase. Both types may move through `experiment-design`, `implementation`, `running`, `completion-handoff`, and `reproducibility-review`.
 
 ## `LITERATURE.md` minimum sections
 
@@ -411,6 +458,8 @@ Each terminal run directory remains raw evidence. After completion, extract dura
 When the user says the current experiment is done, treat that message as an experiment completion handoff trigger. Inspect available run directories and project-local scripts, then persist valuable or user-requested content into the stable artifacts above before giving the final answer. If a requested artifact cannot be written because evidence is missing, record the missing path and exact recovery step.
 
 If a completed run changes the larger research picture, update portfolio `RESEARCH.md` with the new synthesis and portfolio `INDEX.md` with the workstream status, latest evidence, and next priority.
+
+If the completed workstream reproduced or attempted to reproduce a paper, update portfolio `PAPERS.md` with the reproduction status, evidence links, blockers, and revised priority. If the reproduction revealed follow-up ideas, update `IDEA_SCOUTING.md` or the relevant workstream artifacts with those candidates before closing the workstream.
 
 If the workstream used a task worktree, the completion handoff must also write a report-before-merge closeout plan. Include current branch/worktree path, base branch, validation evidence still needed, semantic Lore-format commit status, merge/rebase command plan, push target, worktree removal command, branch deletion command, and `.omx/worktrees/REGISTRY.md` update. Do not execute merge, push, worktree removal, or branch deletion until the user confirms.
 

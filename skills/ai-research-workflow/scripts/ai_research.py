@@ -46,13 +46,16 @@ SCRIPT_COMMANDS = {
     "fixtures": "check_regression_fixtures.py",
 }
 
-ROUTE_ONLY = {"scout", "route", "commands"}
+ROUTE_ONLY = {"scout", "papers", "reproduce-paper", "experiment", "route", "commands"}
 
 EXAMPLES = """
 If you want X, say Y:
   Start a portfolio:          ai_research.py init <project-root> --preset guided
   Route a vague idea:         ai_research.py resolve <project-root> --prompt "generate candidate ideas"
   Scout ideas:                ai_research.py scout <project-root> --prompt "broad AI research direction"
+  Maintain paper registry:    ai_research.py papers <project-root> --prompt "find SOTA and baseline papers"
+  Reproduce one paper:        ai_research.py reproduce-paper <project-root> --prompt "reproduce this paper to find ideas"
+  Open experiment campaign:   ai_research.py experiment <project-root> --prompt "run an ablation experiment campaign"
   Create a gated workstream:  ai_research.py new-workstream <project-root> <slug> --title ... --question ... --deep-interview ... --ralplan-prd ... --ralplan-test-spec ... --autoresearch-result ...
   Capture a Q&A:              ai_research.py qa <project-root> --question ... --answer-summary ...
   Close a finished stream:    ai_research.py handoff <project-root> <slug> --write
@@ -96,6 +99,12 @@ def main() -> int:
         route_args = list(parsed.args)
         if command == "scout" and "--command" not in route_args:
             route_args.extend(["--command", "scout"])
+        if command == "papers" and "--command" not in route_args:
+            route_args.extend(["--command", "papers"])
+        if command == "reproduce-paper" and "--command" not in route_args:
+            route_args.extend(["--command", "reproduce-paper"])
+        if command == "experiment" and "--command" not in route_args:
+            route_args.extend(["--command", "experiment"])
         return dispatch("resolve_workflow.py", route_args)
     script = SCRIPT_COMMANDS.get(command)
     if script is None:

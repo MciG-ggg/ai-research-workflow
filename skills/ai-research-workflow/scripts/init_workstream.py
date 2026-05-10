@@ -34,6 +34,10 @@ WORKSTREAM_TEMPLATES = {
     "PAPER_DRAFT.md": "PAPER_DRAFT.md",
     "SCRIPT_REGISTRY.md": "SCRIPT_REGISTRY.md",
 }
+PAPER_REPRODUCTION_TEMPLATES = {
+    "REPRODUCTION.md": "REPRODUCTION.md",
+}
+VALID_WORKSTREAM_TYPES = {"experiment-campaign", "paper-reproduction"}
 VALID_SLUG_RE = re.compile(r"^[a-z0-9][a-z0-9_-]{1,80}$")
 
 
@@ -95,6 +99,8 @@ def write_state(path: Path, args: argparse.Namespace, *, force: bool, dry_run: b
     state = {
         "schema_version": 1,
         "workstream_slug": args.slug,
+        "workstream_type": args.workstream_type,
+        "allowed_workstream_types": sorted(VALID_WORKSTREAM_TYPES),
         "phase": args.phase,
         "phase_status": "initialized",
         "allowed_phases": [
@@ -112,7 +118,14 @@ def write_state(path: Path, args: argparse.Namespace, *, force: bool, dry_run: b
         ],
         "last_updated": utc_now(),
         "owner": args.owner,
-        "active_artifacts": ["RESEARCH.md", "EXPERIMENT.md", "RUNS.md", "RESULTS.md", "CLAIMS.md"],
+        "active_artifacts": [
+            "RESEARCH.md",
+            *(['REPRODUCTION.md'] if args.workstream_type == "paper-reproduction" else []),
+            "EXPERIMENT.md",
+            "RUNS.md",
+            "RESULTS.md",
+            "CLAIMS.md",
+        ],
         "gate_evidence": {
             "deep_interview_autoresearch": args.deep_interview,
             "ralplan_prd": args.ralplan_prd,
@@ -145,6 +158,7 @@ def patch_research(path: Path, args: argparse.Namespace, *, dry_run: bool, actio
     replacements = {
         "# Workstream Research Spec": f"# {args.title}",
         "TODO\n\n## Research Question": f"{args.title}\n\n## Research Question",
+        "TODO: experiment-campaign | paper-reproduction": args.workstream_type,
         "## Research Question\n\nTODO": f"## Research Question\n\n{args.question}",
         "- Deep-interview autoresearch handoff: TODO": f"- Deep-interview autoresearch handoff: {args.deep_interview}",
         "- Ralplan PRD/test spec: TODO": f"- Ralplan PRD/test spec: {args.ralplan_prd}; {args.ralplan_test_spec}",
@@ -170,9 +184,12 @@ def append_index(ai_root: Path, args: argparse.Namespace, *, dry_run: bool, acti
         f"deep: {args.deep_interview}; ralplan: {args.ralplan_prd}, {args.ralplan_test_spec}; "
         f"autoresearch: {args.autoresearch_result}"
     )
+    artifact_links = [f"{args.slug}/RESEARCH.md", f"{args.slug}/EXPERIMENT.md", f"{args.slug}/CLAIMS.md"]
+    if args.workstream_type == "paper-reproduction":
+        artifact_links.insert(1, f"{args.slug}/REPRODUCTION.md")
     row = (
-        f"| {args.slug} | initialized | {markdown_cell(args.question)} | workstream for current objective | "
-        f"{args.slug}/RESEARCH.md, {args.slug}/EXPERIMENT.md, {args.slug}/CLAIMS.md | pending runs | "
+        f"| {args.slug} | initialized | {markdown_cell(args.question)} | {args.workstream_type} workstream for current objective | "
+        f"{', '.join(artifact_links)} | pending runs | "
         f"{markdown_cell(evidence)} | {markdown_cell(args.next_action)} |"
     )
     text = index.read_text(encoding="utf-8") if index.exists() else "# Research Workstream Index\n\n"
@@ -198,12 +215,25 @@ def main() -> int:
     parser.add_argument("--phase", default="intake", choices=["intake", "literature", "experiment-design", "implementation"])
     parser.add_argument("--owner", default="agent", help="Owner label for STATE.json.")
     parser.add_argument("--next-action", default="complete intake artifacts", help="Next action for STATE.json and INDEX.md.")
+    parser.add_argument(
+        "--workstream-type",
+        choices=sorted(VALID_WORKSTREAM_TYPES),
+        default="experiment-campaign",
+        help="Workstream intent type. Use paper-reproduction for one selected paper; experiment-campaign for hypothesis/ablation/benchmark experiments.",
+    )
+    parser.add_argument(
+        "--paper-reproduction",
+        action="store_true",
+        help="Compatibility alias for --workstream-type paper-reproduction; also scaffolds REPRODUCTION.md.",
+    )
     parser.add_argument("--force", action="store_true", help="Overwrite existing workstream files.")
     parser.add_argument("--force-index-row", action="store_true", help="Append INDEX row even if slug already appears.")
     parser.add_argument("--dry-run", action="store_true", help="Print planned writes without changing files.")
     args = parser.parse_args()
 
     args.slug = validate_slug(args.slug)
+    if args.paper_reproduction:
+        args.workstream_type = "paper-reproduction"
     project_root = args.project_root.resolve()
     ai_root = project_root / ".omx" / "ai-research"
     workstream = ai_root / args.slug
@@ -219,6 +249,9 @@ def main() -> int:
             write_state(dest, args, force=args.force, dry_run=args.dry_run, actions=actions)
         else:
             copy_template(template_name, dest, force=args.force, dry_run=args.dry_run, actions=actions)
+    if args.workstream_type == "paper-reproduction":
+        for dest_name, template_name in PAPER_REPRODUCTION_TEMPLATES.items():
+            copy_template(template_name, workstream / dest_name, force=args.force, dry_run=args.dry_run, actions=actions)
     for dirname in ("runs", "scripts"):
         actions.append(f"ensure directory {workstream / dirname}")
         if not args.dry_run:

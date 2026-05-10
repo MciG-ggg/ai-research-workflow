@@ -18,6 +18,7 @@ from pathlib import Path
 from typing import Any
 
 REQUIRED = ["STATE.json", "RUNS.md", "SCRIPT_REGISTRY.md", "RESULTS.md", "CLAIMS.md", "REPRODUCIBILITY.md"]
+VALID_WORKSTREAM_TYPES = {"experiment-campaign", "paper-reproduction"}
 
 
 def utc_now() -> str:
@@ -65,11 +66,17 @@ def inspect_workstream(project_root: Path, slug: str, validation: list[str], wor
         blockers.extend(str(item) for item in state.get("current_blockers", []))
     if validation_evidence and not all(item["exists"] for item in validation_evidence):
         blockers.append("one or more validation evidence paths are missing")
+    workstream_type = state.get("workstream_type") if state.get("workstream_type") in VALID_WORKSTREAM_TYPES else "unknown"
+    if workstream_type == "unknown" and (workstream / "REPRODUCTION.md").is_file():
+        workstream_type = "paper-reproduction"
+    if workstream_type == "paper-reproduction" and not (workstream / "REPRODUCTION.md").is_file():
+        blockers.append("paper-reproduction workstream is missing REPRODUCTION.md")
     return {
         "generated_at": utc_now(),
         "project_root": str(project_root),
         "slug": slug,
         "workstream_path": str(workstream),
+        "workstream_type": workstream_type,
         "phase": state.get("phase", "unknown"),
         "phase_status": state.get("phase_status", "unknown"),
         "next_action": state.get("next_action", "missing next_action"),
@@ -96,11 +103,14 @@ def markdown(plan: dict[str, Any]) -> str:
     ]
     if plan["worktree_path"]:
         closeout_lines.append("- Run prepare_worktree_closeout.py for report-before-merge; do not merge/push/delete until user confirms.")
+    if plan["workstream_type"] == "paper-reproduction":
+        closeout_lines.append("- Update REPRODUCTION.md and portfolio PAPERS.md with reproduction verdict, evidence links, blockers, and derived ideas.")
     blockers = plan["blockers"] or ["none detected by control-plane inspection"]
     return f"""# Workstream Closeout Plan
 
 - Generated at: {plan['generated_at']}
 - Workstream: `{plan['slug']}`
+- Type: `{plan['workstream_type']}`
 - Path: `{plan['workstream_path']}`
 - Phase / status: `{plan['phase']}` / `{plan['phase_status']}`
 - Next action: {plan['next_action']}

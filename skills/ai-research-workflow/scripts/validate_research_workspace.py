@@ -17,6 +17,7 @@ from pathlib import Path
 
 PORTFOLIO_FILES = ["RESEARCH.md", "INDEX.md"]
 IDEA_SCOUTING_FILES = ["IDEA_SCOUTING.md"]
+PAPER_REGISTRY_FILES = ["PAPERS.md"]
 
 WORKSTREAM_FILES = [
     "RESEARCH.md",
@@ -41,7 +42,8 @@ VALID_COMPLETION_HANDOFF = {"auto", "off"}
 VALID_WORKTREE_CLOSEOUT = {"off", "report-before-merge"}
 VALID_QA_CAPTURE = {"off", "research", "all"}
 VALID_GROWTH_REVIEW = {"off", "milestone", "always"}
-VALID_PHASES = {"all", "idea-scouting", "new-workstream", "completion-handoff"}
+VALID_WORKSTREAM_TYPES = {"experiment-campaign", "paper-reproduction"}
+VALID_PHASES = {"all", "idea-scouting", "paper-scouting", "paper-reproduction", "new-workstream", "completion-handoff"}
 VALID_STATE_PHASES = {
     "idea-scouting",
     "intake",
@@ -262,6 +264,16 @@ def validate_state_file(workstream: Path, findings: list[Finding], *, phase: str
         findings.append(Finding("warning", f"{state_path} phase={state_phase!r} differs from validator phase={phase!r}"))
     if not state.get("next_action"):
         findings.append(Finding("warning", f"{state_path} is missing next_action"))
+    workstream_type = state.get("workstream_type")
+    if workstream_type is None:
+        level = "error" if phase in {"new-workstream", "paper-reproduction"} else "warning"
+        findings.append(Finding(level, f"{state_path} is missing workstream_type"))
+    elif workstream_type not in VALID_WORKSTREAM_TYPES:
+        findings.append(Finding("error", f"{state_path} has invalid workstream_type={workstream_type!r}"))
+    if phase == "paper-reproduction" and workstream_type != "paper-reproduction":
+        findings.append(Finding("error", f"{state_path} must use workstream_type='paper-reproduction' for paper-reproduction phase"))
+    if workstream_type == "paper-reproduction" and not (workstream / "REPRODUCTION.md").is_file():
+        findings.append(Finding("error", f"{state_path} declares paper-reproduction but REPRODUCTION.md is missing"))
 
 
 def validate_experiment_quality(workstream: Path, findings: list[Finding], *, strict: bool) -> None:
@@ -374,6 +386,60 @@ def validate_idea_scouting_phase(ai_root: Path, findings: list[Finding], *, erro
         if term.lower() not in text.lower():
             findings.append(Finding("error", f"{path} missing idea promotion field: {term}"))
     add_todo_finding(findings, path, error_on_todo=error_on_todo, phase="idea-scouting")
+
+
+def validate_paper_scouting_phase(ai_root: Path, findings: list[Finding], *, error_on_todo: bool) -> None:
+    path = ai_root / "PAPERS.md"
+    add_missing_file(findings, path, "paper-scouting root PAPERS.md")
+    if not path.is_file():
+        return
+    text = read_text(path)
+    required = [
+        "SOTA",
+        "baseline",
+        "Code/data/checkpoints",
+        "Key claim",
+        "Benchmark / metric",
+        "Reproduction priority",
+        "Maintenance Log",
+    ]
+    for term in required:
+        if term.lower() not in text.lower():
+            findings.append(Finding("error", f"{path} missing paper-registry field: {term}"))
+    add_todo_finding(findings, path, error_on_todo=error_on_todo, phase="paper-scouting")
+
+
+def validate_paper_reproduction_phase(
+    ai_root: Path,
+    targets: list[Path],
+    findings: list[Finding],
+    *,
+    error_on_todo: bool,
+) -> None:
+    validate_paper_scouting_phase(ai_root, findings, error_on_todo=error_on_todo)
+    if not targets:
+        findings.append(Finding("error", "paper-reproduction phase requires one selected workstream directory"))
+        return
+    for workstream in targets:
+        path = workstream / "REPRODUCTION.md"
+        add_missing_file(findings, path, f"paper-reproduction workstream {workstream.name}/REPRODUCTION.md")
+        if not path.is_file():
+            continue
+        text = read_text(path)
+        required = [
+            "Target Paper",
+            "Reproduction Objective",
+            "Available Materials",
+            "Minimal Reproduction Plan",
+            "Run Evidence Links",
+            "Deviations from Paper",
+            "Reproduction-Derived Ideas",
+            "Conclusions and Distillation",
+        ]
+        for term in required:
+            if term.lower() not in text.lower():
+                findings.append(Finding("error", f"{path} missing paper-reproduction field: {term}"))
+        add_todo_finding(findings, path, error_on_todo=error_on_todo, phase="paper-reproduction")
 
 
 def validate_new_workstream_phase(ai_root: Path, index_text: str, targets: list[Path], findings: list[Finding]) -> None:
@@ -494,6 +560,10 @@ def validate(
 
     if phase == "idea-scouting":
         validate_idea_scouting_phase(ai_root, findings, error_on_todo=error_on_todo)
+    elif phase == "paper-scouting":
+        validate_paper_scouting_phase(ai_root, findings, error_on_todo=error_on_todo)
+    elif phase == "paper-reproduction":
+        validate_paper_reproduction_phase(ai_root, targets, findings, error_on_todo=error_on_todo)
     elif phase == "new-workstream":
         validate_new_workstream_phase(ai_root, index_text, targets, findings)
     elif phase == "completion-handoff":
@@ -517,7 +587,7 @@ def main() -> int:
         "--phase",
         choices=sorted(VALID_PHASES),
         default="all",
-        help="Run extra phase-aware checks for idea-scouting, new-workstream, or completion-handoff.",
+        help="Run extra phase-aware checks for idea-scouting, paper-scouting, paper-reproduction, new-workstream, or completion-handoff.",
     )
     parser.add_argument("--workstream", help="Restrict phase-aware checks to one workstream slug.")
     parser.add_argument("--error-on-todo", action="store_true", help="Treat remaining TODO placeholders as errors.")

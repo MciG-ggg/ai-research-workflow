@@ -52,6 +52,8 @@ $ai-research-workflow turn this paper idea into a research plan and experiment w
 
 ```text
 没有明确研究问题时先写可选 IDEA_SCOUTING.md
+  -> 需要找 SOTA/baseline 论文时维护可选 PAPERS.md
+  -> 需要通过复现论文找 idea 时开启单篇复现 workstream
   -> $deep-interview --autoresearch
   -> 检查总览 RESEARCH.md / INDEX.md
   -> 文献和研究 artifacts
@@ -72,6 +74,9 @@ $ai-research-workflow turn this paper idea into a research plan and experiment w
 
 ```text
 $ai-research-workflow scout
+$ai-research-workflow papers
+$ai-research-workflow reproduce-paper
+$ai-research-workflow experiment
 $ai-research-workflow new-workstream
 $ai-research-workflow handoff
 $ai-research-workflow qa
@@ -95,6 +100,9 @@ python3 skills/ai-research-workflow/scripts/ai_research.py update-check
 如果你想要 X，可以这么说 Y：
 
 - 生成/排序候选 idea：`$ai-research-workflow scout`。
+- 找 SOTA/baseline 论文并维护文章列表：`$ai-research-workflow papers`。
+- 复现某一篇论文并从中找 idea：`$ai-research-workflow reproduce-paper`。
+- 开一个假设/消融/benchmark 实验 campaign：`$ai-research-workflow experiment`。
 - 新开一个小方向/workstream：`$ai-research-workflow new-workstream`。
 - 当前实验做完并收尾：`$ai-research-workflow handoff`。
 - 记录有价值的问答：开启 `--qa-capture` 或 `qa_capture: research` 后用 `$ai-research-workflow qa`。
@@ -130,12 +138,14 @@ cd ai-research-workflow
 ```text
 .omx/ai-research/
   IDEA_SCOUTING.md # 没有明确研究问题时可选
+  PAPERS.md        # 可选 SOTA/baseline 论文池
   RESEARCH.md
   INDEX.md
 .omx/ai-research/<slug>/
   STATE.json
   RESEARCH.md
   LITERATURE.md
+  REPRODUCTION.md  # 单篇论文复现 workstream 使用
   EXPERIMENT.md
   RUNS.md
   RESULTS.md
@@ -149,9 +159,11 @@ cd ai-research-workflow
   runs/
 ```
 
-可选根目录 `IDEA_SCOUTING.md` 用来在正式研究问题还不清楚时记录候选 idea、轻量证据、novelty risk、可行性预算和用户目标匹配度。根目录 `RESEARCH.md` 记录整体研究目标、中心问题、north-star hypotheses、claim 边界、当前综合判断、活跃 workstreams 和下一步优先级。根目录 `INDEX.md` 记录每个 slug 的子问题、状态、artifact 链接、最新证据和下一步。创建新 slug 前，agent 应先检查这些文件和已有 workstream；只有当新任务确实有独立研究问题或验证边界时才创建新 slug。
+可选根目录 `IDEA_SCOUTING.md` 用来在正式研究问题还不清楚时记录候选 idea、轻量证据、novelty risk、可行性预算和用户目标匹配度。可选根目录 `PAPERS.md` 用来维护 SOTA/baseline 论文池：论文角色、核心 claim、benchmark/metric、code/data/checkpoint 可用性、复现优先级和当前状态。根目录 `RESEARCH.md` 记录整体研究目标、中心问题、north-star hypotheses、claim 边界、当前综合判断、活跃 workstreams 和下一步优先级。根目录 `INDEX.md` 记录每个 slug 的子问题、状态、artifact 链接、最新证据和下一步。创建新 slug 前，agent 应先检查这些文件和已有 workstream；只有当新任务确实有独立研究问题或验证边界时才创建新 slug。
 
-Idea scouting 是可选阶段。用户要求生成候选 idea、判断已有 idea 值不值得做，或把宽泛方向收敛成研究问题时才启用。候选 idea 只有在具备可证伪假设、可评估指标/baseline、轻量证据、novelty risk、可行性预算和用户目标匹配度后，才能被推荐进入 intake。创建 workstream 前仍必须先问用户。
+Idea scouting 是可选阶段。用户要求生成候选 idea、判断已有 idea 值不值得做，或把宽泛方向收敛成研究问题时才启用。用户要求找 SOTA/baseline 论文并维护文章列表时，用 `$ai-research-workflow papers` 更新 `PAPERS.md`。用户要求复现某篇论文并从复现过程中找 idea 时，用 `$ai-research-workflow reproduce-paper` 准备单篇复现 workstream；该 workstream 使用 `REPRODUCTION.md` 记录目标 claim、可用材料、偏离原文之处、run evidence 链接、复现产生的 idea 和最终整理。候选 idea 只有在具备可证伪假设、可评估指标/baseline、轻量证据、novelty risk、可行性预算和用户目标匹配度后，才能被推荐进入 intake。创建 workstream 前仍必须先问用户。
+
+新建 workstream 会在 `STATE.json` 中声明 `workstream_type`。`paper-reproduction` 表示围绕某篇论文/baseline/claim 的复现；`experiment-campaign` 表示围绕某个假设、消融、benchmark 或方法评估的一组实验。“跑实验”是两个类型都可能进入的阶段，不应该单独作为类型；类型记录的是这个 workstream 为什么存在。
 
 新建 workstream/小方向必须强制经过 `$deep-interview --autoresearch -> $ralplan -> $autoresearch`。在 `INDEX.md` 记录 deep-interview handoff、ralplan PRD/test spec、autoresearch state/completion artifact 路径之前，agent 不应创建新 slug、写实现或启动实验。
 

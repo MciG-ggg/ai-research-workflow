@@ -15,6 +15,8 @@ This skill is an OMX workflow. By default it orchestrates:
 
 ```text
 optional idea scouting when no clear research question exists
+  -> optional SOTA/baseline paper registry when paper scouting is requested
+  -> optional paper-reproduction scouting when the user explicitly wants ideas from reproducing a paper
   -> $deep-interview --autoresearch
   -> portfolio RESEARCH.md / INDEX.md check
   -> literature and research artifacts
@@ -73,6 +75,8 @@ python3 scripts/migrate_research_workspace.py <project-root> --write
 python3 scripts/check_skill_update.py
 python3 scripts/validate_research_workspace.py <project-root> --phase idea-scouting
 python3 scripts/prepare_worktree_closeout.py <task-worktree> --base main
+python3 scripts/validate_research_workspace.py <project-root> --phase paper-scouting
+python3 scripts/validate_research_workspace.py <project-root> --phase paper-reproduction --workstream <slug>
 ```
 
 ## Command surface
@@ -81,6 +85,9 @@ Prefer explicit subcommands when the user's intent matches one of these lanes. `
 
 ```text
 $ai-research-workflow scout              # idea scouting / candidate ranking
+$ai-research-workflow papers             # find and maintain SOTA/baseline paper registry
+$ai-research-workflow reproduce-paper    # gate a workstream for reproducing one selected paper
+$ai-research-workflow experiment         # gate an experiment-campaign workstream
 $ai-research-workflow new-workstream     # mandatory deep-interview -> ralplan -> autoresearch gate
 $ai-research-workflow handoff            # current experiment is done; distill runs/scripts/results
 $ai-research-workflow qa                 # answer then capture Q&A when qa_capture is enabled
@@ -104,6 +111,9 @@ python3 scripts/ai_research.py update-check
 If you want X, say Y:
 
 - Generate/rank candidate ideas -> `$ai-research-workflow scout`.
+- Find and maintain SOTA/baseline papers -> `$ai-research-workflow papers` or “帮我找 SOTA 和 baseline 论文”.
+- Reproduce one paper to find ideas -> `$ai-research-workflow reproduce-paper` or “开 workstream 复现这篇论文”.
+- Open an experiment campaign -> `$ai-research-workflow experiment` or “开一个实验 workstream”.
 - Start a new small direction -> `$ai-research-workflow new-workstream` and provide/complete the deep-interview, ralplan, and autoresearch gate.
 - Finish the current experiment -> `$ai-research-workflow handoff` or “current experiment is done; distill runs/scripts and prepare closeout”.
 - Preserve a failed/null result -> `$ai-research-workflow negative-result`.
@@ -124,6 +134,7 @@ Minimum portfolio layout:
 ```text
 .omx/ai-research/
   IDEA_SCOUTING.md # optional when idea_scouting is enabled or the question is not yet clear
+  PAPERS.md        # optional SOTA/baseline paper registry when paper scouting is requested
   RESEARCH.md
   INDEX.md
   QUESTIONS.md      # optional when qa_capture is enabled
@@ -136,6 +147,7 @@ Minimum workstream layout:
   STATE.json
   RESEARCH.md
   LITERATURE.md
+  REPRODUCTION.md  # optional/required for a paper-reproduction workstream
   EXPERIMENT.md
   RUNS.md
   RESULTS.md
@@ -150,7 +162,14 @@ Minimum workstream layout:
   runs/
 ```
 
-Use `assets/templates/portfolio-RESEARCH.md`, `portfolio-INDEX.md`, `STATE.json`, `workstream-RESEARCH.md`, `CLAIMS.md`, and the artifact-specific templates as the starting point when creating these files. Templates define shape only; replace TODO placeholders with project evidence before treating an artifact as complete.
+Use `assets/templates/portfolio-RESEARCH.md`, `portfolio-INDEX.md`, `PAPERS.md`, `STATE.json`, `workstream-RESEARCH.md`, `REPRODUCTION.md`, `CLAIMS.md`, and the artifact-specific templates as the starting point when creating these files. Templates define shape only; replace TODO placeholders with project evidence before treating an artifact as complete.
+
+Every new workstream has a `workstream_type` in `STATE.json`:
+
+- `paper-reproduction`: one selected paper, baseline, or claim is being reproduced; scaffold `REPRODUCTION.md`.
+- `experiment-campaign`: a hypothesis, ablation, benchmark, method variant, or evaluation campaign is being tested; `EXPERIMENT.md` is the primary design artifact.
+
+Use `scripts/init_workstream.py --workstream-type paper-reproduction` or the compatibility flag `--paper-reproduction` for the first type. Use `--workstream-type experiment-campaign` for ordinary experiment campaigns.
 
 ## Workflow presets and overrides
 
@@ -177,6 +196,10 @@ Idea Scouting is optional and is not the default path for already-clear research
 
 Write `.omx/ai-research/IDEA_SCOUTING.md` from `assets/templates/IDEA_SCOUTING.md`. The agent may choose search sources, generate candidate ideas, rank/filter candidates, and write the scouting artifact. It must not choose the final topic, guarantee absolute novelty, replace full `LITERATURE.md`, implement code, run experiments, or create a new workstream without user confirmation.
 
+When the user explicitly asks to find SOTA/baseline papers, maintain the portfolio paper registry at `.omx/ai-research/PAPERS.md` using `assets/templates/PAPERS.md`. The registry tracks candidate SOTA papers, baseline papers, benchmark/dataset papers, code/data/checkpoint availability, key claims, reproduction priority, and maintenance history.
+
+When the user explicitly asks to reproduce a paper to find ideas, treat this as paper-reproduction scouting: update `PAPERS.md`, add the paper-derived idea section in `IDEA_SCOUTING.md`, and if the user confirms one paper, enter the new-workstream gate for a paper-reproduction workstream. The actual reproduction plan and evidence belong in the workstream `REPRODUCTION.md`, `EXPERIMENT.md`, `RUNS.md`, `RESULTS.md`, `CLAIMS.md`, and `REPRODUCIBILITY.md`. Do not launch reproduction runs, download data, or create the workstream without the normal confirmation and gate evidence.
+
 An idea may be recommended for formal research intake only when the promotion gate has all six fields: falsifiable hypothesis, evaluation metric/baseline, lightweight evidence, novelty risk, feasibility budget, and user-goal fit. If the user confirms promotion, enter the new-workstream gate.
 
 ## New workstream gate
@@ -199,6 +222,8 @@ Required gate evidence:
 If any gate evidence is missing, stop at the gate, create or complete the missing workflow artifact, and report the blocker. Do not bypass this gate because the new direction seems obvious.
 
 After the user confirms workstream creation and all gate evidence exists, `scripts/init_workstream.py` may scaffold the control-plane files. It must not be used to bypass the confirmation or gate evidence requirements.
+
+Choose the workstream type before scaffolding. If the selected unit of work is a paper/claim/baseline reproduction, use `paper-reproduction`. If the selected unit of work is a hypothesis-driven run set, ablation, benchmark, or method evaluation, use `experiment-campaign`. “Running experiments” is a phase that both types may enter; the type records the research intent.
 
 ## Optional feedback and growth modes
 
@@ -238,6 +263,8 @@ Use `assets/schemas/` with `scripts/validate_research_schema.py` when CONFIG, ST
 `.omx/ai-research/` is the research portfolio control plane. `.omx/ai-research/<slug>/` is a workstream control plane.
 
 Actual research work belongs in the target project root using existing project conventions. Implement the user's method, reproduce baselines, add configs, tests, dataset adapters, training/evaluation entrypoints, and reports in project-root locations such as `src/`, `models/`, `baselines/`, `configs/`, `experiments/`, `scripts/`, `tests/`, `docs/`, or established equivalents. Do not put method code, baseline code, or production experiment code under `.omx/ai-research/`; only thin orchestration wrappers and metadata belong there.
+
+For a paper-reproduction workstream, `.omx/ai-research/<slug>/REPRODUCTION.md` is the control-plane ledger for the target paper, claim, reproduction type, available materials, deviations, run evidence links, reproduction-derived ideas, and final distillation. Project-root code/config/data adapters still live in the target repository's normal implementation plane.
 
 ## Task worktree rule
 

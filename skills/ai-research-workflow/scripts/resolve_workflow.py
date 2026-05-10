@@ -31,6 +31,43 @@ VALID_SUBCOMMANDS = {
         "artifacts": [".omx/ai-research/IDEA_SCOUTING.md"],
         "scripts": ["resolve_workflow.py", "validate_research_workspace.py --phase idea-scouting"],
     },
+    "papers": {
+        "phase": "paper-scouting",
+        "action": "find_and_maintain_sota_baseline_papers",
+        "artifacts": [".omx/ai-research/PAPERS.md"],
+        "scripts": ["resolve_workflow.py", "validate_research_workspace.py --phase paper-scouting"],
+    },
+    "reproduce-paper": {
+        "phase": "paper-reproduction",
+        "action": "gate_one_paper_reproduction_workstream",
+        "artifacts": [
+            ".omx/ai-research/PAPERS.md",
+            ".omx/ai-research/<slug>/REPRODUCTION.md",
+            ".omx/ai-research/<slug>/EXPERIMENT.md",
+            ".omx/ai-research/<slug>/RUNS.md",
+            ".omx/ai-research/<slug>/RESULTS.md",
+        ],
+        "scripts": [
+            "resolve_workflow.py",
+            "init_workstream.py --paper-reproduction",
+            "validate_research_workspace.py --phase paper-reproduction --workstream <slug>",
+        ],
+    },
+    "experiment": {
+        "phase": "new-workstream",
+        "action": "gate_experiment_campaign_workstream",
+        "artifacts": [
+            ".omx/ai-research/INDEX.md",
+            ".omx/ai-research/<slug>/STATE.json",
+            ".omx/ai-research/<slug>/EXPERIMENT.md",
+            ".omx/ai-research/<slug>/RUNS.md",
+            ".omx/ai-research/<slug>/RESULTS.md",
+        ],
+        "scripts": [
+            "init_workstream.py --workstream-type experiment-campaign",
+            "validate_research_workspace.py --phase new-workstream --workstream <slug>",
+        ],
+    },
     "new-workstream": {
         "phase": "new-workstream",
         "action": "gate_and_initialize_new_workstream",
@@ -161,6 +198,15 @@ def detect_subcommand(prompt: str, override: str | None = None) -> str | None:
         "paper": "draft",
         "report": "draft",
         "negative": "negative-result",
+        "paper-scouting": "papers",
+        "paper-registry": "papers",
+        "sota": "papers",
+        "baseline-papers": "papers",
+        "repro": "reproduce-paper",
+        "reproduction": "reproduce-paper",
+        "paper-repro": "reproduce-paper",
+        "experiment-campaign": "experiment",
+        "run-experiment": "experiment",
     }
     first = aliases.get(first, first)
     return first if first in VALID_SUBCOMMANDS else None
@@ -247,6 +293,55 @@ def classify_prompt(prompt: str) -> dict[str, bool]:
         "没提升",
         "不显著",
     ]
+    paper_scouting_terms = [
+        "sota",
+        "state of the art",
+        "baseline paper",
+        "baseline papers",
+        "paper list",
+        "paper registry",
+        "papers to reproduce",
+        "find papers",
+        "找论文",
+        "论文列表",
+        "论文池",
+        "文章列表",
+        "sota论文",
+        "baseline论文",
+        "基线论文",
+        "维护论文",
+    ]
+    paper_reproduction_terms = [
+        "reproduce paper",
+        "reproduce this paper",
+        "paper reproduction",
+        "replicate paper",
+        "replicate this paper",
+        "reproduce baseline",
+        "reproduce the baseline",
+        "ideas from reproducing",
+        "from paper to idea",
+        "复现论文",
+        "复现这篇",
+        "复现文章",
+        "复现 baseline",
+        "复现baseline",
+        "从论文找 idea",
+        "通过复现",
+        "开 workstream 复现",
+    ]
+    experiment_campaign_terms = [
+        "experiment campaign",
+        "run experiment campaign",
+        "open experiment workstream",
+        "experiment workstream",
+        "开实验 workstream",
+        "开实验小方向",
+        "开一个实验",
+        "跑实验 workstream",
+        "跑一组实验",
+        "实验 campaign",
+    ]
     question_starters = (
         "how ",
         "why ",
@@ -280,6 +375,9 @@ def classify_prompt(prompt: str) -> dict[str, bool]:
         "completion_handoff_signal": completion,
         "new_workstream_signal": new_workstream,
         "negative_result_signal": contains_any(lower, negative_terms),
+        "paper_scouting_signal": contains_any(lower, paper_scouting_terms),
+        "paper_reproduction_signal": contains_any(lower, paper_reproduction_terms),
+        "experiment_campaign_signal": contains_any(lower, experiment_campaign_terms),
         "question_like_prompt": question_like,
     }
 
@@ -305,10 +403,18 @@ def resolve(
 
     if subcommand == "scout":
         idea_scouting = True
+    paper_scouting = bool(signals["paper_scouting_signal"]) or subcommand == "papers"
+    paper_reproduction = bool(signals["paper_reproduction_signal"]) or subcommand == "reproduce-paper"
+    paper_scouting = paper_scouting or paper_reproduction
+    if paper_scouting or paper_reproduction:
+        idea_scouting = True
 
     completion_handoff = (cfg.completion_handoff == "auto" and signals["completion_handoff_signal"]) or subcommand == "handoff"
     report_before_merge = completion_handoff and cfg.worktree_closeout == "report-before-merge"
     new_workstream_gate = bool(signals["new_workstream_signal"]) or subcommand == "new-workstream"
+    experiment_campaign = bool(signals["experiment_campaign_signal"]) or subcommand == "experiment"
+    if experiment_campaign:
+        new_workstream_gate = True
     negative_result = signals["negative_result_signal"] or subcommand == "negative-result"
     question_capture = signals["question_like_prompt"] or subcommand == "qa"
     if subcommand == "closeout":
@@ -318,6 +424,8 @@ def resolve(
     if idea_scouting:
         ask_before.append("promoting final topic from IDEA_SCOUTING.md")
         ask_before.append("creating .omx/ai-research/<slug>")
+    if paper_reproduction:
+        ask_before.append("selecting a paper for reproduction workstream")
     if new_workstream_gate:
         ask_before.append("creating a new workstream after deep-interview/ralplan/autoresearch gate")
     if report_before_merge:
@@ -330,6 +438,12 @@ def resolve(
         recommended_steps.append("fix invalid .omx/ai-research/CONFIG.md fields before relying on automatic routing")
     if command_spec:
         recommended_steps.append(f"execute subcommand {subcommand}: {command_spec['action']}")
+    if paper_scouting:
+        recommended_steps.append("write/update .omx/ai-research/PAPERS.md with SOTA/baseline paper candidates and reproduction priority")
+    if paper_reproduction:
+        recommended_steps.append("select one paper only after confirmation, then prepare a gated paper-reproduction workstream with REPRODUCTION.md")
+    if experiment_campaign:
+        recommended_steps.append("prepare a gated experiment-campaign workstream with EXPERIMENT.md as the primary design artifact")
     if idea_scouting:
         recommended_steps.append("write/update .omx/ai-research/IDEA_SCOUTING.md and apply the six-field promotion gate")
     if new_workstream_gate:
@@ -348,21 +462,41 @@ def resolve(
         workflow_action = command_spec["action"]
         next_artifacts = command_spec["artifacts"]
         guardrail_scripts = command_spec["scripts"]
-    elif idea_scouting:
-        workflow_phase = "idea-scouting"
-        workflow_action = "scout_candidate_research_ideas"
-        next_artifacts = [".omx/ai-research/IDEA_SCOUTING.md"]
-        guardrail_scripts = ["validate_research_workspace.py --phase idea-scouting"]
+    elif paper_reproduction:
+        workflow_phase = "paper-reproduction"
+        workflow_action = "gate_one_paper_reproduction_workstream"
+        next_artifacts = [".omx/ai-research/PAPERS.md", ".omx/ai-research/<slug>/REPRODUCTION.md"]
+        guardrail_scripts = [
+            "init_workstream.py --paper-reproduction",
+            "validate_research_workspace.py --phase paper-reproduction --workstream <slug>",
+        ]
+    elif paper_scouting:
+        workflow_phase = "paper-scouting"
+        workflow_action = "find_and_maintain_sota_baseline_papers"
+        next_artifacts = [".omx/ai-research/PAPERS.md"]
+        guardrail_scripts = ["validate_research_workspace.py --phase paper-scouting"]
     elif new_workstream_gate:
         workflow_phase = "new-workstream"
-        workflow_action = "complete_mandatory_workstream_gate"
-        next_artifacts = [".omx/ai-research/INDEX.md", ".omx/ai-research/<slug>/STATE.json"]
-        guardrail_scripts = ["init_workstream.py", "validate_research_workspace.py --phase new-workstream --workstream <slug>"]
+        workflow_action = "gate_experiment_campaign_workstream" if experiment_campaign else "complete_mandatory_workstream_gate"
+        next_artifacts = [
+            ".omx/ai-research/INDEX.md",
+            ".omx/ai-research/<slug>/STATE.json",
+            *([] if not experiment_campaign else [".omx/ai-research/<slug>/EXPERIMENT.md"]),
+        ]
+        guardrail_scripts = [
+            "init_workstream.py --workstream-type experiment-campaign" if experiment_campaign else "init_workstream.py",
+            "validate_research_workspace.py --phase new-workstream --workstream <slug>",
+        ]
     elif completion_handoff:
         workflow_phase = "completion-handoff"
         workflow_action = "distill_completed_runs"
         next_artifacts = [".omx/ai-research/<slug>/RUNS.md", ".omx/ai-research/<slug>/RESULTS.md"]
         guardrail_scripts = ["prepare_workstream_closeout.py", "validate_research_workspace.py --phase completion-handoff --workstream <slug>"]
+    elif idea_scouting:
+        workflow_phase = "idea-scouting"
+        workflow_action = "scout_candidate_research_ideas"
+        next_artifacts = [".omx/ai-research/IDEA_SCOUTING.md"]
+        guardrail_scripts = ["validate_research_workspace.py --phase idea-scouting"]
     elif question_capture and cfg.qa_capture != "off":
         workflow_phase = "question-capture"
         workflow_action = "answer_then_capture_question"
@@ -384,6 +518,9 @@ def resolve(
             "idea_scouting": idea_scouting,
             "completion_handoff": completion_handoff,
             "new_workstream_gate": new_workstream_gate,
+            "paper_scouting": paper_scouting,
+            "paper_reproduction_scouting": paper_reproduction,
+            "experiment_campaign": experiment_campaign,
             "report_before_merge_closeout": report_before_merge,
             "negative_result_preservation": negative_result,
             "question_capture_candidate": question_capture,

@@ -6,6 +6,8 @@ For deterministic checks, run the phase-aware validator:
 
 ```bash
 python3 scripts/validate_research_workspace.py <project-root> --phase idea-scouting --error-on-todo
+python3 scripts/validate_research_workspace.py <project-root> --phase paper-scouting --error-on-todo
+python3 scripts/validate_research_workspace.py <project-root> --phase paper-reproduction --workstream <slug> --error-on-todo
 python3 scripts/validate_research_workspace.py <project-root> --phase new-workstream --workstream <slug>
 python3 scripts/validate_research_workspace.py <project-root> --phase completion-handoff --workstream <slug> --check-paths
 ```
@@ -14,6 +16,8 @@ python3 scripts/validate_research_workspace.py <project-root> --phase completion
 
 - [Intake gate](#intake-gate)
 - [Idea scouting gate](#idea-scouting-gate)
+- [Paper registry gate](#paper-registry-gate)
+- [Paper reproduction gate](#paper-reproduction-gate)
 - [Workflow gate](#workflow-gate)
 - [New workstream gate](#new-workstream-gate)
 - [Literature gate](#literature-gate)
@@ -52,10 +56,39 @@ Pass only if:
 - The final topic is not chosen for the user; creating a new workstream still requires user confirmation.
 - Scouting is not treated as full literature review and does not replace `LITERATURE.md`.
 
+When paper reproduction is used to generate ideas, `IDEA_SCOUTING.md` also links to `PAPERS.md`, identifies the target paper claim, records the minimal reproduction goal, and converts paper/reproduction gaps into candidate ideas instead of treating reproduction as a final result by itself.
+
+## Paper registry gate
+
+This gate is active only when the user asks to find SOTA/baseline papers, maintain a paper list, compare paper candidates, or prepare a paper-reproduction scouting pass.
+
+Pass only if:
+- `.omx/ai-research/PAPERS.md` exists and records the research area, search date, search strategy, and sources.
+- The paper list distinguishes SOTA, baseline, survey, dataset, benchmark, and method-paper roles when relevant.
+- Each prioritized paper records key claim, benchmark/metric, code/data/checkpoint availability, reproduction priority, status, and notes.
+- The baseline map records comparable baselines and known fairness or reproduction risks.
+- Reproduction candidates identify target claim, minimal reproduction goal, required materials, compute budget, expected tolerance, and candidate workstream.
+- The maintenance log records why papers were added, removed, selected, parked, or reprioritized.
+
+## Paper reproduction gate
+
+This gate is active only for a workstream whose purpose is reproducing or partially reproducing one selected paper.
+
+Pass only if:
+- Portfolio `PAPERS.md` links the selected paper to the workstream and target claim.
+- Workstream `REPRODUCTION.md` exists.
+- `REPRODUCTION.md` records target paper, reproduction objective, reproduction type, metric/tolerance, non-goals, available materials, blockers, minimal reproduction plan, deviations, run evidence links, paper-derived ideas, and distillation targets.
+- `EXPERIMENT.md` records baseline fairness, metric, data split/preprocessing, seeds, hardware/runtime budget, failure policy, and negative/inconclusive result policy.
+- `RUNS.md`, `RESULTS.md`, `CLAIMS.md`, and `REPRODUCIBILITY.md` are updated when reproduction evidence exists or when reproduction is blocked.
+- Completion handoff updates `PAPERS.md` and portfolio `RESEARCH.md` / `INDEX.md` when the reproduction changes the broader research map.
+- Reproduction work does not start before the normal new-workstream gate and user confirmation.
+
 ## Workflow gate
 
 Pass only if:
 - The workflow stages that are relevant to the task are explicit: optional idea scouting, deep interview, planning, implementation, baseline reproduction, experiments, distillation, reproducibility review, and reporting.
+- Paper registry and paper-reproduction stages are explicit when the user asks to find SOTA/baseline papers or reproduce one paper.
+- New workstreams declare `workstream_type`: `paper-reproduction` for one selected paper/baseline/claim reproduction, or `experiment-campaign` for hypothesis/ablation/benchmark/method evaluation campaigns.
 - The chosen OMX handoff path is appropriate for the current ambiguity and risk.
 - Workstream `STATE.json` records the current phase, next action, blockers, and confirmation boundaries.
 - Portfolio artifacts in `.omx/ai-research/` describe the overall research program, while workstream artifacts in `.omx/ai-research/<slug>/` describe one concrete direction.
@@ -119,6 +152,7 @@ Pass only if:
 - User-requested findings, reusable commands, cleanup decisions, and next-step TODOs from experiment completion handoff are persisted to `RUNS.md`, `SCRIPT_REGISTRY.md`, `RESULTS.md`, `REPRODUCIBILITY.md`, or project-root docs as appropriate.
 - When a task worktree was used, the completion handoff includes a report-before-merge closeout plan covering validation, semantic commit status, merge/rebase target, push target, worktree removal, branch deletion, and `.omx/worktrees/REGISTRY.md` update.
 - Portfolio `RESEARCH.md` and `INDEX.md` are updated when a result changes the overall synthesis, workstream status, or next priority.
+- Portfolio `PAPERS.md` is updated when a paper reproduction succeeds, fails, is blocked, becomes inconclusive, or changes SOTA/baseline priority.
 - Optional Research Feedback Memory artifacts are updated when the mode is enabled; when disabled, their absence is not a failure.
 - Optional Question Capture artifacts are updated when the mode is enabled and the user asked question-like prompts; when disabled, their absence is not a failure.
 

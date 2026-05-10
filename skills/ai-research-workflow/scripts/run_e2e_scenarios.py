@@ -94,7 +94,36 @@ def scenario_main_workspace(tmp: Path) -> None:
     project.mkdir()
     py("init_research_workspace.py", project, "--preset", "guided", "--idea-scouting", "on", "--qa-capture", "research")
     py("resolve_workflow.py", project, "--prompt", "Generate AI research ideas for efficient evaluation", "--command", "scout")
+    paper_route = py("resolve_workflow.py", project, "--prompt", "帮我找 SOTA 和 baseline 论文并维护文章列表")
+    assert json.loads(paper_route.stdout)["decisions"]["paper_scouting"] is True
+    repro_route = py("resolve_workflow.py", project, "--prompt", "通过复现这篇论文找 idea")
+    repro_json = json.loads(repro_route.stdout)
+    assert repro_json["routing"]["phase"] == "paper-reproduction"
+    assert repro_json["decisions"]["paper_reproduction_scouting"] is True
+    experiment_route = py("resolve_workflow.py", project, "--prompt", "开一个实验 workstream 跑一组 ablation")
+    experiment_json = json.loads(experiment_route.stdout)
+    assert experiment_json["decisions"]["experiment_campaign"] is True
+    assert experiment_json["routing"]["phase"] == "new-workstream"
     gates = write_gate_files(project)
+    py(
+        "init_workstream.py",
+        project,
+        "paper-fixture",
+        "--title",
+        "Paper Fixture",
+        "--question",
+        "Can the selected paper claim be approximately reproduced?",
+        "--deep-interview",
+        gates["deep"],
+        "--ralplan-prd",
+        gates["prd"],
+        "--ralplan-test-spec",
+        gates["test"],
+        "--autoresearch-result",
+        gates["auto"],
+        "--paper-reproduction",
+        "--dry-run",
+    )
     py(
         "init_workstream.py",
         project,

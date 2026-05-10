@@ -4,6 +4,10 @@
 
 TODO
 
+## Workstream Type
+
+TODO: experiment-campaign | paper-reproduction
+
 ## Research Question
 
 TODO

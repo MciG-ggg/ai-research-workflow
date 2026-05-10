@@ -21,6 +21,8 @@ Use this default sequence unless existing artifacts prove that a phase is alread
 
 ```text
 optional idea scouting when no clear research question exists
+  -> optional SOTA/baseline paper registry when requested
+  -> optional paper-reproduction scouting when explicitly requested
   -> $deep-interview --autoresearch
   -> portfolio RESEARCH.md / INDEX.md check
   -> literature / research artifact drafting
@@ -36,6 +38,8 @@ optional idea scouting when no clear research question exists
 Phase rules:
 
 - Use Idea Scouting before formal intake when the user asks to generate ideas, evaluate whether an idea is worth doing, or only provides a broad area without a falsifiable research question.
+- Use Paper Registry Scouting when the user asks to find SOTA/baseline papers or maintain a paper list; write `.omx/ai-research/PAPERS.md`.
+- Use Paper-Reproduction Scouting when the user explicitly wants to reproduce a paper to find ideas; prepare the paper and workstream artifacts without running experiments or creating a slug before confirmation.
 - Use `$deep-interview --autoresearch` when the research mission, hypothesis, evaluator, non-goals, claim boundaries, or launch criteria are unclear.
 - Use `$ralplan` before implementation-heavy work to produce a plan, tradeoffs, file ownership, and validation shape.
 - Use `$autoresearch` when the work needs a persistent professor/critic or validator-gated loop over literature, implementation, experiments, and claims.
@@ -60,6 +64,8 @@ python3 scripts/prepare_workstream_closeout.py <project-root> <slug> --write
 python3 scripts/preserve_negative_result.py <project-root> <slug> --finding "..." --evidence <path> --interpretation "..." --claim-update "..."
 python3 scripts/generate_report_outline.py <project-root> <slug> --kind paper-outline --write
 python3 scripts/validate_research_workspace.py <project-root> --phase idea-scouting
+python3 scripts/validate_research_workspace.py <project-root> --phase paper-scouting
+python3 scripts/validate_research_workspace.py <project-root> --phase paper-reproduction --workstream <slug>
 python3 scripts/validate_research_workspace.py <project-root> --phase new-workstream --workstream <slug>
 python3 scripts/validate_research_workspace.py <project-root> --phase completion-handoff --workstream <slug>
 ```
@@ -75,6 +81,9 @@ The skill supports these explicit lanes. Use them when the user wants less manua
 | Subcommand | Phase | Primary artifacts |
 | --- | --- | --- |
 | `scout` | idea-scouting | `IDEA_SCOUTING.md` |
+| `papers` | paper-scouting | `PAPERS.md` |
+| `reproduce-paper` | paper-reproduction gate | `PAPERS.md`, `<slug>/REPRODUCTION.md` |
+| `experiment` | new-workstream gate | `<slug>/EXPERIMENT.md`, `<slug>/RUNS.md`, `<slug>/RESULTS.md` |
 | `new-workstream` | new-workstream gate | `INDEX.md`, `<slug>/STATE.json`, `<slug>/RESEARCH.md` |
 | `handoff` | completion-handoff | `RUNS.md`, `SCRIPT_REGISTRY.md`, `RESULTS.md`, `CLAIMS.md`, `REPRODUCIBILITY.md` |
 | `qa` | question-capture | `QUESTIONS.md` |
@@ -99,6 +108,10 @@ Activation:
 5. Skip when a formal workstream can already pass the intake gate.
 
 Write `.omx/ai-research/IDEA_SCOUTING.md` using `assets/templates/IDEA_SCOUTING.md`. The scouting pass may search sources, generate candidates, rank/filter them, and mark weak ideas as parked or rejected.
+
+When the user asks to find SOTA/baseline papers, write `.omx/ai-research/PAPERS.md` using `assets/templates/PAPERS.md`. This paper registry is portfolio-level and should be maintained across scouting passes. It tracks paper role, key claim, benchmark/metric, code/data/checkpoint availability, reproduction priority, status, and maintenance history.
+
+When the user asks to reproduce a paper to find ideas, use paper-reproduction scouting. Update `PAPERS.md`, add paper-derived candidate ideas to `IDEA_SCOUTING.md`, and ask before selecting one paper for a workstream. On confirmation, enter the new-workstream mandatory gate and create a workstream with `REPRODUCTION.md` from `assets/templates/REPRODUCTION.md`. Paper-reproduction scouting never downloads data, runs experiments, or creates worktrees by itself.
 
 Promotion gate: recommend a candidate for formal intake only when it has a falsifiable hypothesis, evaluation metric/baseline, lightweight evidence, novelty-risk note, feasibility budget, and user-goal fit. Ask the user before creating `.omx/ai-research/<slug>/`; on confirmation, enter the new-workstream mandatory workflow gate.
 
@@ -129,6 +142,7 @@ Every project gets a root portfolio layer under `.omx/ai-research/`:
 
 - `.omx/ai-research/RESEARCH.md`: the overall research program, central question, north-star hypotheses, claim boundaries, current synthesis, and next priorities.
 - `.omx/ai-research/INDEX.md`: the workstream registry mapping each `<slug>` to its subquestion, status, artifact links, latest evidence, and next action.
+- `.omx/ai-research/PAPERS.md`: optional SOTA/baseline paper registry when paper scouting or paper reproduction is requested.
 
 Each `.omx/ai-research/<slug>/` directory is a workstream, not the whole research program. It should link back to the portfolio `RESEARCH.md` and appear in `INDEX.md`.
 
@@ -160,6 +174,15 @@ The gate blocks creating `.omx/ai-research/<slug>/`, implementation, experiment 
 
 If any required evidence is missing, stop at the gate and complete the missing workflow. Do not bypass the gate because the user says the direction is small, obvious, or urgent. The only safe bypass is to reuse an existing workstream whose `INDEX.md` row already links equivalent gate evidence.
 
+### Workstream type selection
+
+Choose a `workstream_type` before scaffolding:
+
+- `paper-reproduction`: the workstream is anchored to one selected paper, baseline, or claim. Scaffold `REPRODUCTION.md` and link the workstream from `PAPERS.md`.
+- `experiment-campaign`: the workstream is anchored to a hypothesis, ablation set, benchmark/evaluation campaign, or method variant. `EXPERIMENT.md` is the primary design artifact.
+
+“Running experiments” is a phase inside both types, not a sufficient type by itself. Use the type to preserve why the workstream exists and what must be distilled back to the portfolio.
+
 ## Control plane vs project implementation plane
 
 `.omx/ai-research/` is the portfolio control plane. `.omx/ai-research/<slug>/` is a workstream control plane. Together they store specs, decisions, run indexes, evidence summaries, reproducibility notes, and the global synthesis.
@@ -167,7 +190,7 @@ If any required evidence is missing, stop at the gate and complete the missing w
 Actual research work belongs in the target project root using that project's conventions. Examples:
 
 - method implementation: `src/`, `models/`, `methods/`, `algorithms/`, or the existing package layout
-- baseline reproduction: `baselines/`, `configs/`, `scripts/`, `experiments/`, or existing benchmark layout
+- baseline or paper reproduction: `baselines/`, `configs/`, `scripts/`, `experiments/`, or existing benchmark layout
 - training/evaluation entrypoints: project-native CLIs, notebooks, Make targets, Hydra configs, CI jobs, or shell scripts
 - tests and verification: `tests/`, `evals/`, CI config, smoke tests, benchmark checks
 - user-facing reports/docs: `docs/`, `reports/`, `mkdocs.yml`, README sections, benchmark cards
@@ -195,6 +218,8 @@ If the workstream used a task worktree, completion handoff also includes a repor
 
 When distillation changes the global picture, update `.omx/ai-research/RESEARCH.md` and `.omx/ai-research/INDEX.md` in the same pass so the portfolio layer remains the user's overall map of the work.
 
+For a paper-reproduction workstream, completion handoff also updates `.omx/ai-research/PAPERS.md` with reproduction status, evidence links, blockers, and revised priority. If the reproduction generated new candidate ideas, update `.omx/ai-research/IDEA_SCOUTING.md` or the relevant workstream artifacts with those ideas before closing the stream.
+
 Negative or inconclusive runs are first-class evidence. Preserve them in `RESULTS.md` and `CLAIMS.md` before changing the story, and downgrade or retire unsupported claims instead of deleting failed evidence.
 
 At handoff, run a research review pass: summarize portfolio state, score artifact quality, and generate report outlines only after evidence-to-claim mapping is stable.
@@ -204,6 +229,7 @@ At handoff, run a research review pass: summarize portfolio state, score artifac
 Baseline reproduction and new method implementation are first-class workflow tasks:
 
 - Reproduce baselines before claiming improvement unless the research question explicitly excludes them.
+- Reproduce a selected paper only inside a confirmed workstream with `REPRODUCTION.md`, `EXPERIMENT.md`, `RUNS.md`, `RESULTS.md`, `CLAIMS.md`, and `REPRODUCIBILITY.md` linked.
 - Keep baseline commands/configs reproducible and trace them from `EXPERIMENT.md` and `RUNS.md`.
 - Implement methods in the project root with tests or smoke checks before expensive runs.
 - Record claim boundaries when a baseline cannot be reproduced due to missing data, compute, license, or environment.
@@ -227,6 +253,9 @@ If you want X, say Y:
 | Desired action | Recommended command or phrase |
 | --- | --- |
 | Generate candidate topics | `$ai-research-workflow scout` |
+| Find SOTA/baseline papers | `$ai-research-workflow papers` |
+| Reproduce one selected paper | `$ai-research-workflow reproduce-paper` |
+| Open an experiment campaign | `$ai-research-workflow experiment` |
 | Open a gated small direction | `$ai-research-workflow new-workstream` |
 | Finish and distill an experiment | `$ai-research-workflow handoff` or “current experiment is done” |
 | Capture a durable question | `$ai-research-workflow qa` after enabling `qa_capture` |

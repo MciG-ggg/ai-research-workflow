@@ -38,6 +38,8 @@ PORTFOLIO_TEMPLATES = {
     "INDEX.md": "portfolio-INDEX.md",
 }
 EXCLUDED_DIRS = {"runs", "logs", "state", "worktrees", "scripts", "docs"}
+VALID_WORKSTREAM_TYPES = {"experiment-campaign", "paper-reproduction"}
+DEFAULT_WORKSTREAM_TYPE = "experiment-campaign"
 
 
 def utc_now() -> str:
@@ -94,10 +96,16 @@ def ensure_dir(path: Path, actions: list[dict[str, Any]], *, write: bool) -> Non
         path.mkdir(parents=True, exist_ok=True)
 
 
-def state_json(slug: str) -> str:
+def infer_workstream_type(workstream: Path) -> str:
+    return "paper-reproduction" if (workstream / "REPRODUCTION.md").is_file() else DEFAULT_WORKSTREAM_TYPE
+
+
+def state_json(slug: str, workstream_type: str = DEFAULT_WORKSTREAM_TYPE) -> str:
     state = {
         "schema_version": 1,
         "workstream_slug": slug,
+        "workstream_type": workstream_type,
+        "allowed_workstream_types": sorted(VALID_WORKSTREAM_TYPES),
         "phase": "intake",
         "phase_status": "legacy-migrated",
         "allowed_phases": [
@@ -136,6 +144,37 @@ def state_json(slug: str) -> str:
     return json.dumps(state, ensure_ascii=False, indent=2, sort_keys=True) + "\n"
 
 
+def ensure_state(path: Path, workstream: Path, actions: list[dict[str, Any]], *, write: bool, force: bool) -> None:
+    inferred_type = infer_workstream_type(workstream)
+    if force or not path.exists():
+        write_file(path, state_json(workstream.name, inferred_type), actions, write=write, force=force, detail="legacy state scaffold")
+        return
+
+    try:
+        state = json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        record(actions, "patch_state", path, "skip-invalid-json", str(exc))
+        return
+    if not isinstance(state, dict):
+        record(actions, "patch_state", path, "skip-non-object", "STATE.json root is not an object")
+        return
+
+    changed = False
+    if state.get("workstream_type") not in VALID_WORKSTREAM_TYPES:
+        state["workstream_type"] = inferred_type
+        changed = True
+    if state.get("allowed_workstream_types") != sorted(VALID_WORKSTREAM_TYPES):
+        state["allowed_workstream_types"] = sorted(VALID_WORKSTREAM_TYPES)
+        changed = True
+    if not changed:
+        record(actions, "patch_state", path, "already-current", "workstream_type present")
+        return
+
+    record(actions, "patch_state", path, "would-patch" if not write else "patched", "add workstream_type metadata")
+    if write:
+        path.write_text(json.dumps(state, ensure_ascii=False, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+
 def migrate(project_root: Path, *, write: bool, force: bool, include_optional: bool) -> dict[str, Any]:
     ai_root = project_root / ".omx" / "ai-research"
     actions: list[dict[str, Any]] = []
@@ -147,7 +186,7 @@ def migrate(project_root: Path, *, write: bool, force: bool, include_optional: b
     for workstream in workstreams:
         for dest_name, src_name in WORKSTREAM_TEMPLATES.items():
             copy_template(workstream / dest_name, src_name, actions, write=write, force=force)
-        write_file(workstream / "STATE.json", state_json(workstream.name), actions, write=write, force=force, detail="legacy state scaffold")
+        ensure_state(workstream / "STATE.json", workstream, actions, write=write, force=force)
         ensure_dir(workstream / "runs", actions, write=write)
         ensure_dir(workstream / "scripts", actions, write=write)
         if include_optional:

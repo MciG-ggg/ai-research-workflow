@@ -19,6 +19,7 @@ from typing import Any
 RUBRICS: dict[str, list[str]] = {
     "RESEARCH.md": ["research question", "hypothesis", "success criteria", "falsification", "out of scope", "claim boundaries"],
     "LITERATURE.md": ["source", "evidence", "gap", "related", "limitation"],
+    "REPRODUCTION.md": ["target paper", "reproduction objective", "available materials", "minimal reproduction plan", "run evidence links", "conclusions and distillation"],
     "EXPERIMENT.md": ["baseline fairness checklist", "same data split", "same evaluation metric", "hyperparameter", "negative / inconclusive result policy"],
     "RUNS.md": ["run ledger", "command", "log", "metrics", "summary", "distilled updates outside `runs/`"],
     "RESULTS.md": ["evidence", "interpretation", "negative and inconclusive results", "evidence-to-claim mapping", "limitations"],
@@ -28,10 +29,25 @@ RUBRICS: dict[str, list[str]] = {
     "PAPER_DRAFT.md": ["abstract", "method", "experiment", "result", "limitation"],
 }
 EXCLUDED_DIRS = {"runs", "logs", "state", "worktrees", "scripts", "docs"}
+VALID_WORKSTREAM_TYPES = {"experiment-campaign", "paper-reproduction"}
 
 
 def read_text(path: Path) -> str:
     return path.read_text(encoding="utf-8") if path.is_file() else ""
+
+
+def load_workstream_type(workstream: Path) -> str:
+    state_path = workstream / "STATE.json"
+    if not state_path.is_file():
+        return "paper-reproduction" if (workstream / "REPRODUCTION.md").is_file() else "unknown"
+    try:
+        state = json.loads(state_path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return "paper-reproduction" if (workstream / "REPRODUCTION.md").is_file() else "unknown"
+    value = state.get("workstream_type") if isinstance(state, dict) else None
+    if value in VALID_WORKSTREAM_TYPES:
+        return value
+    return "paper-reproduction" if (workstream / "REPRODUCTION.md").is_file() else "unknown"
 
 
 def count_todos(text: str) -> int:
@@ -72,12 +88,19 @@ def score_project(project_root: Path) -> dict[str, Any]:
         "RESEARCH.md": score_file(ai_root / "RESEARCH.md", ["central", "hypoth", "claim", "current synthesis", "next priorities"]),
         "INDEX.md": score_file(ai_root / "INDEX.md", ["slug", "status", "subquestion", "gate evidence", "next action"]),
     }
+    if (ai_root / "PAPERS.md").is_file():
+        portfolio["PAPERS.md"] = score_file(ai_root / "PAPERS.md", ["sota", "baseline", "key claim", "benchmark", "reproduction priority", "maintenance log"])
     workstreams: list[dict[str, Any]] = []
     for workstream in find_workstreams(ai_root):
-        artifact_scores = {name: score_file(workstream / name, terms) for name, terms in RUBRICS.items()}
+        workstream_type = load_workstream_type(workstream)
+        artifact_scores = {
+            name: score_file(workstream / name, terms)
+            for name, terms in RUBRICS.items()
+            if name != "REPRODUCTION.md" or workstream_type == "paper-reproduction" or (workstream / name).is_file()
+        }
         avg = round(sum(item["score"] for item in artifact_scores.values()) / len(artifact_scores)) if artifact_scores else 0
         lowest = sorted(((name, item["score"]) for name, item in artifact_scores.items()), key=lambda pair: pair[1])[:3]
-        workstreams.append({"slug": workstream.name, "score": avg, "lowest_artifacts": lowest, "artifacts": artifact_scores})
+        workstreams.append({"slug": workstream.name, "workstream_type": workstream_type, "score": avg, "lowest_artifacts": lowest, "artifacts": artifact_scores})
     all_scores = [item["score"] for item in portfolio.values()] + [item["score"] for item in workstreams]
     overall = round(sum(all_scores) / len(all_scores)) if all_scores else 0
     return {"project_root": str(project_root), "ai_root": str(ai_root), "exists": True, "overall_score": overall, "portfolio": portfolio, "workstreams": workstreams}
@@ -90,9 +113,9 @@ def markdown(result: dict[str, Any]) -> str:
     workstream_rows = []
     for item in result["workstreams"]:
         lowest = "; ".join(f"{name}={score}" for name, score in item["lowest_artifacts"])
-        workstream_rows.append(f"| {item['slug']} | {item['score']} | {lowest or 'none'} |")
+        workstream_rows.append(f"| {item['slug']} | {item['workstream_type']} | {item['score']} | {lowest or 'none'} |")
     if not workstream_rows:
-        workstream_rows = ["| none | 0 | create a gated workstream first |"]
+        workstream_rows = ["| none | n/a | 0 | create a gated workstream first |"]
     return f"""# Research Artifact Quality Score
 
 - Project root: `{result['project_root']}`
@@ -106,8 +129,8 @@ def markdown(result: dict[str, Any]) -> str:
 
 ## Workstreams
 
-| Slug | Average score | Lowest artifacts |
-| --- | ---: | --- |
+| Slug | Type | Average score | Lowest artifacts |
+| --- | --- | ---: | --- |
 {chr(10).join(workstream_rows)}
 """
 

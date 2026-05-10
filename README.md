@@ -52,6 +52,8 @@ Default sequence:
 
 ```text
 optional IDEA_SCOUTING.md when no clear research question exists
+  -> optional PAPERS.md when finding SOTA/baseline papers
+  -> optional paper-reproduction workstream when reproducing a paper to find ideas
   -> $deep-interview --autoresearch
   -> portfolio RESEARCH.md / INDEX.md check
   -> literature and research artifacts
@@ -72,6 +74,9 @@ Use subcommands when you want deterministic routing instead of relying only on n
 
 ```text
 $ai-research-workflow scout
+$ai-research-workflow papers
+$ai-research-workflow reproduce-paper
+$ai-research-workflow experiment
 $ai-research-workflow new-workstream
 $ai-research-workflow handoff
 $ai-research-workflow qa
@@ -95,6 +100,9 @@ python3 skills/ai-research-workflow/scripts/ai_research.py update-check
 If you want X, say Y:
 
 - Candidate idea generation/ranking: `$ai-research-workflow scout`.
+- SOTA/baseline paper discovery and registry maintenance: `$ai-research-workflow papers`.
+- Reproduce one selected paper to find ideas: `$ai-research-workflow reproduce-paper`.
+- Open a hypothesis/ablation/benchmark experiment campaign: `$ai-research-workflow experiment`.
 - A new small direction/workstream: `$ai-research-workflow new-workstream`.
 - Finished experiment/run cleanup: `$ai-research-workflow handoff`.
 - Durable Q&A capture: `$ai-research-workflow qa` with `--qa-capture` or `qa_capture: research`.
@@ -130,12 +138,14 @@ For each research project, the skill asks the agent to create or maintain a proj
 ```text
 .omx/ai-research/
   IDEA_SCOUTING.md # optional before a clear research question exists
+  PAPERS.md        # optional SOTA/baseline paper registry
   RESEARCH.md
   INDEX.md
 .omx/ai-research/<slug>/
   STATE.json
   RESEARCH.md
   LITERATURE.md
+  REPRODUCTION.md  # for one-paper reproduction workstreams
   EXPERIMENT.md
   RUNS.md
   RESULTS.md
@@ -149,9 +159,11 @@ For each research project, the skill asks the agent to create or maintain a proj
   runs/
 ```
 
-The optional root `IDEA_SCOUTING.md` captures idea generation, lightweight evidence, novelty risk, feasibility budget, and user-goal fit before a formal research question exists. The root `RESEARCH.md` captures the overall research program: central question, north-star hypotheses, claim boundaries, current synthesis, active workstreams, and next priorities. The root `INDEX.md` maps each slug to its subquestion, status, artifact links, latest evidence, and next action. Before creating a new slug, the agent should inspect these files and existing workstreams, then reuse an existing workstream unless the new task has a distinct research question or validation boundary.
+The optional root `IDEA_SCOUTING.md` captures idea generation, lightweight evidence, novelty risk, feasibility budget, and user-goal fit before a formal research question exists. The optional root `PAPERS.md` maintains the SOTA/baseline paper list: paper role, key claim, benchmark/metric, code/data/checkpoint availability, reproduction priority, and status. The root `RESEARCH.md` captures the overall research program: central question, north-star hypotheses, claim boundaries, current synthesis, active workstreams, and next priorities. The root `INDEX.md` maps each slug to its subquestion, status, artifact links, latest evidence, and next action. Before creating a new slug, the agent should inspect these files and existing workstreams, then reuse an existing workstream unless the new task has a distinct research question or validation boundary.
 
-Idea scouting is optional. Use it when a user asks to generate candidate ideas, evaluate whether an existing idea is worth doing, or converge a vague area into candidate research questions. A candidate may be recommended for intake only when it has a falsifiable hypothesis, evaluation metric/baseline, lightweight evidence, novelty risk, feasibility budget, and user-goal fit. The agent must ask before creating a workstream.
+Idea scouting is optional. Use it when a user asks to generate candidate ideas, evaluate whether an existing idea is worth doing, or converge a vague area into candidate research questions. Use `$ai-research-workflow papers` when the user wants SOTA/baseline paper discovery and a maintained paper registry. Use `$ai-research-workflow reproduce-paper` when the user wants to open a workstream for reproducing one selected paper; the workstream gets `REPRODUCTION.md` for target claim, available materials, deviations, run evidence links, derived ideas, and final distillation. A candidate may be recommended for intake only when it has a falsifiable hypothesis, evaluation metric/baseline, lightweight evidence, novelty risk, feasibility budget, and user-goal fit. The agent must ask before creating a workstream.
+
+New workstreams declare a `workstream_type` in `STATE.json`. Use `paper-reproduction` for one selected paper/baseline/claim reproduction and `experiment-campaign` for hypothesis, ablation, benchmark, or method-evaluation runs. “Running experiments” is a phase both types can enter; the type records the purpose of the workstream.
 
 New workstream creation is forced through `$deep-interview --autoresearch -> $ralplan -> $autoresearch`. The agent should not create a new slug, implement code, or launch experiments until `INDEX.md` records the deep-interview handoff, ralplan PRD/test spec, and autoresearch state/completion artifact paths.
 

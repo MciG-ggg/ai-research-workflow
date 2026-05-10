@@ -12,6 +12,20 @@
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | TODO | TODO | TODO | TODO | TODO | TODO | TODO | TODO | draft |
 
+## Optional Paper-Reproduction Scouting
+
+Use this section only when the user explicitly asks to find ideas from a paper, reproduce a paper, reproduce a baseline, or open a paper-reproduction workstream.
+
+- Paper registry: `.omx/ai-research/PAPERS.md`
+- Target paper ID: TODO
+- Target claim to inspect or reproduce: TODO
+- Minimal reproduction goal: exact / approximate / baseline-only / mechanism validation
+- Reproduction workstream candidate: TODO
+
+| Paper-derived idea | Evidence from paper or reproduction | Falsifiable hypothesis | Evaluation metric / baseline | Novelty risk | Feasibility budget | Status |
+| --- | --- | --- | --- | --- | --- | --- |
+| TODO | TODO | TODO | TODO | TODO | TODO | draft |
+
 ## Promotion Gate
 
 Promote an idea only when all are explicit:
