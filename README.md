@@ -2,25 +2,19 @@
 
 [中文文档](README.zh-CN.md)
 
-A Codex/OMX framework skill that turns vague AI/ML research ideas into artifact-gated research workflows: optional idea scouting/generation, intake, literature review, falsifiable hypothesis spec, experiment design, implementation, experiment runs, result analysis, reproducibility review, and paper drafting.
+A Codex/OMX skill for AI/ML research work. It helps turn vague ideas, papers, baselines, and experiment plans into evidence-gated research artifacts instead of jumping straight from idea to code.
 
-## Why
+The core principle is simple:
 
-AI research agents are most useful when they do not jump from an idea directly to code. This skill forces separation between:
+- `RESEARCH.md` records the research question, hypothesis, scope, and claim boundaries.
+- `EXPERIMENT.md` records datasets, baselines, metrics, runs, and failure policy.
+- `RUNS.md`, `RESULTS.md`, `CLAIMS.md`, and `REPRODUCIBILITY.md` keep evidence separate from claims.
 
-- `RESEARCH.md`: scientific intent, hypotheses, contribution, success/falsification criteria, non-goals, and claim boundaries.
-- `EXPERIMENT.md`: datasets, baselines, metrics, ablations, seeds, commands, logging, statistical tests, and failure policy.
+This skill is a workflow and artifact framework. It does not ship universal experiment runners; project-specific code, configs, training scripts, and evaluation scripts should live in the target research repository.
 
-The result is a workflow where evidence controls claims.
+## Dependency
 
-## Dependency: oh-my-codex
-
-This skill is designed for Codex sessions running with [oh-my-codex (OMX)](https://github.com/Yeachan-Heo/oh-my-codex), the multi-agent orchestration layer that provides workflow skills such as `$deep-interview --autoresearch`, `$ralplan`, `$autoresearch`, `$ralph`, `$team`, and `$autopilot`.
-
-- GitHub: <https://github.com/Yeachan-Heo/oh-my-codex>
-- Documentation/homepage: <https://yeachan-heo.github.io/oh-my-codex>
-
-Install and initialize OMX before using the OMX handoff paths in this skill:
+This skill is designed for Codex sessions using [oh-my-codex (OMX)](https://github.com/Yeachan-Heo/oh-my-codex).
 
 ```bash
 npm install -g oh-my-codex
@@ -30,341 +24,108 @@ omx doctor
 
 ## Install
 
-Clone the repo and copy the skill folder into your Codex skills directory:
-
 ```bash
 git clone https://github.com/MciG-ggg/ai-research-workflow.git
 mkdir -p ~/.codex/skills
 cp -R ai-research-workflow/skills/ai-research-workflow ~/.codex/skills/
 ```
 
-Then invoke it explicitly:
-
-```text
-$ai-research-workflow turn this paper idea into a research plan and experiment workflow
-```
-
-## Workflow
-
-This skill is a workflow, not just a logging template.
-
-Default sequence:
-
-```text
-optional IDEA_SCOUTING.md when no clear research question exists
-  -> optional PAPERS.md when finding SOTA/baseline papers
-  -> optional paper-reproduction workstream when reproducing a paper to find ideas
-  -> $deep-interview --autoresearch
-  -> portfolio RESEARCH.md / INDEX.md check
-  -> literature and research artifacts
-  -> $ralplan for implementation and validation shape
-  -> task worktree in the target repo
-  -> $autoresearch for a validator-gated loop
-  -> implementation / baseline reproduction / experiments
-  -> run distillation into RUNS.md / RESULTS.md / project-root outputs
-  -> reproducibility review
-  -> paper/report drafting
-```
-
-`.omx/ai-research/RESEARCH.md` and `.omx/ai-research/INDEX.md` are the portfolio control plane for the whole research program. Each `.omx/ai-research/<slug>/` directory is a workstream for one concrete direction. Actual method implementation, baseline reproduction, configs, tests, and project-native experiment code belong in the target repository root or its existing conventions, not under `.omx/ai-research/`.
-
-## Command surface
-
-Use subcommands when you want deterministic routing instead of relying only on natural language:
-
-```text
-$ai-research-workflow scout
-$ai-research-workflow papers
-$ai-research-workflow reproduce-paper
-$ai-research-workflow experiment
-$ai-research-workflow new-workstream
-$ai-research-workflow handoff
-$ai-research-workflow qa
-$ai-research-workflow summarize
-$ai-research-workflow score
-$ai-research-workflow closeout
-$ai-research-workflow negative-result
-$ai-research-workflow draft
-```
-
-Unified local CLI facade:
-
-```bash
-python3 skills/ai-research-workflow/scripts/ai_research.py help
-python3 skills/ai-research-workflow/scripts/ai_research.py resolve <project-root> --prompt "这个实验做完了，整理落盘"
-python3 skills/ai-research-workflow/scripts/ai_research.py schema <project-root>
-python3 skills/ai-research-workflow/scripts/ai_research.py graph <project-root> <slug> --json
-python3 skills/ai-research-workflow/scripts/ai_research.py update-check
-```
-
-If you want X, say Y:
-
-- Candidate idea generation/ranking: `$ai-research-workflow scout`.
-- SOTA/baseline paper discovery and registry maintenance: `$ai-research-workflow papers`.
-- Reproduce one selected paper to find ideas: `$ai-research-workflow reproduce-paper`.
-- Open a hypothesis/ablation/benchmark experiment campaign: `$ai-research-workflow experiment`.
-- A new small direction/workstream: `$ai-research-workflow new-workstream`.
-- Finished experiment/run cleanup: `$ai-research-workflow handoff`.
-- Durable Q&A capture: `$ai-research-workflow qa` with `--qa-capture` or `qa_capture: research`.
-- Preserve a failed/null result: `$ai-research-workflow negative-result`.
-- Check research readiness: `$ai-research-workflow summarize` then `$ai-research-workflow score`.
-
-`resolve_workflow.py` mirrors these commands and emits structured routing fields: `phase`, `workflow_action`, `requires_user_confirmation`, `next_artifacts`, and `guardrail_scripts`.
-
-## Update this skill
-
-If you installed from this repository, use the safe updater:
+Use the updater after pulling repo changes:
 
 ```bash
 cd ai-research-workflow
 ./skills/ai-research-workflow/scripts/update_installed_skill.sh
 ```
 
-The updater runs `git pull --ff-only`, source validation, staged `rsync -a --delete`, and installed-copy validation. For local development, skip pulling with `--no-pull`.
-Use `--dry-run` to validate and preview without replacing the installed skill. Use `--keep-backups N` to control backup retention. Use `check_skill_update.py` or `ai_research.py update-check` for a read-only version/update status surface before syncing.
-
-Developer symlink mode is available when you want repo edits to be picked up immediately:
+For local development without pulling:
 
 ```bash
-./skills/ai-research-workflow/scripts/update_installed_skill.sh --symlink --no-pull
+./skills/ai-research-workflow/scripts/update_installed_skill.sh --no-pull
 ```
 
-If you are maintaining this repository, validate the skill framework before syncing or publishing changes. The task-worktree policy below describes how the skill should operate inside a target AI research project, not an installation requirement for editing this skill repository.
+## Typical workflow
 
-## Framework layout
+```text
+1. Start from an idea, paper, baseline, or experiment question.
+2. Optionally scout ideas or papers:
+   - IDEA_SCOUTING.md for candidate research ideas
+   - PAPERS.md for SOTA/baseline paper lists
+3. Before opening a new workstream, run:
+   $deep-interview --autoresearch -> $ralplan -> $autoresearch
+4. Create or reuse .omx/ai-research/<slug>/ for one concrete direction.
+5. Choose the workstream type:
+   - paper-reproduction: reproduce one paper/baseline/claim; uses REPRODUCTION.md
+   - experiment-campaign: run a hypothesis/ablation/benchmark/method-evaluation campaign
+6. Implement project code in the target repo, not inside .omx/ai-research/.
+7. Record runs, scripts, metrics, summaries, and failures.
+8. Distill evidence into RESULTS.md, CLAIMS.md, and REPRODUCIBILITY.md.
+9. When the workstream is done, prepare a closeout/report-before-merge plan before merge, push, or worktree cleanup.
+```
 
-For each research project, the skill asks the agent to create or maintain a project-local research portfolio plus workstream workspaces:
+## Common commands
+
+Invoke the skill explicitly when you want deterministic routing:
+
+```text
+$ai-research-workflow scout            # candidate idea scouting
+$ai-research-workflow papers           # find/maintain SOTA and baseline paper list
+$ai-research-workflow reproduce-paper  # gate a one-paper reproduction workstream
+$ai-research-workflow experiment       # gate an experiment-campaign workstream
+$ai-research-workflow new-workstream   # create a new gated direction
+$ai-research-workflow handoff          # close out finished runs/scripts/results
+$ai-research-workflow summarize        # summarize portfolio/workstream state
+$ai-research-workflow score            # heuristic artifact quality review
+$ai-research-workflow closeout         # prepare report-before-merge plan
+$ai-research-workflow negative-result  # preserve failed/null/inconclusive results
+$ai-research-workflow draft            # generate a paper/report outline
+```
+
+Local CLI helpers are available through:
+
+```bash
+python3 skills/ai-research-workflow/scripts/ai_research.py help
+python3 skills/ai-research-workflow/scripts/ai_research.py resolve <project-root> --prompt "这个实验做完了，整理落盘"
+python3 skills/ai-research-workflow/scripts/ai_research.py summarize <project-root>
+python3 skills/ai-research-workflow/scripts/ai_research.py score <project-root>
+python3 skills/ai-research-workflow/scripts/ai_research.py schema <project-root>
+```
+
+## Artifact layout
 
 ```text
 .omx/ai-research/
-  IDEA_SCOUTING.md # optional before a clear research question exists
-  PAPERS.md        # optional SOTA/baseline paper registry
-  RESEARCH.md
-  INDEX.md
+  IDEA_SCOUTING.md   # optional candidate idea scouting
+  PAPERS.md          # optional SOTA/baseline paper registry
+  RESEARCH.md        # overall research program summary
+  INDEX.md           # workstream index
+
 .omx/ai-research/<slug>/
   STATE.json
   RESEARCH.md
   LITERATURE.md
-  REPRODUCTION.md  # for one-paper reproduction workstreams
+  REPRODUCTION.md    # required for paper-reproduction workstreams
   EXPERIMENT.md
   RUNS.md
   RESULTS.md
   CLAIMS.md
   REPRODUCIBILITY.md
-  PAPER_DRAFT.md
   SCRIPT_REGISTRY.md
-  CLOSEOUT.md       # optional completion/report-before-merge plan
-  PAPER_OUTLINE.md  # optional generated report outline
+  CLOSEOUT.md
   scripts/
   runs/
 ```
 
-The optional root `IDEA_SCOUTING.md` captures idea generation, lightweight evidence, novelty risk, feasibility budget, and user-goal fit before a formal research question exists. The optional root `PAPERS.md` maintains the SOTA/baseline paper list: paper role, key claim, benchmark/metric, code/data/checkpoint availability, reproduction priority, and status. The root `RESEARCH.md` captures the overall research program: central question, north-star hypotheses, claim boundaries, current synthesis, active workstreams, and next priorities. The root `INDEX.md` maps each slug to its subquestion, status, artifact links, latest evidence, and next action. Before creating a new slug, the agent should inspect these files and existing workstreams, then reuse an existing workstream unless the new task has a distinct research question or validation boundary.
+## Notes
 
-Idea scouting is optional. Use it when a user asks to generate candidate ideas, evaluate whether an existing idea is worth doing, or converge a vague area into candidate research questions. Use `$ai-research-workflow papers` when the user wants SOTA/baseline paper discovery and a maintained paper registry. Use `$ai-research-workflow reproduce-paper` when the user wants to open a workstream for reproducing one selected paper; the workstream gets `REPRODUCTION.md` for target claim, available materials, deviations, run evidence links, derived ideas, and final distillation. A candidate may be recommended for intake only when it has a falsifiable hypothesis, evaluation metric/baseline, lightweight evidence, novelty risk, feasibility budget, and user-goal fit. The agent must ask before creating a workstream.
+- New workstreams should not be created automatically without the gate evidence.
+- Merge, push, worktree removal, and branch deletion require report-before-merge confirmation.
+- `runs/` stores raw evidence; stable conclusions should be distilled into the markdown artifacts.
+- Bundled scripts are framework guardrails only, not user experiment runners.
 
-New workstreams declare a `workstream_type` in `STATE.json`. Use `paper-reproduction` for one selected paper/baseline/claim reproduction and `experiment-campaign` for hypothesis, ablation, benchmark, or method-evaluation runs. “Running experiments” is a phase both types can enter; the type records the purpose of the workstream.
-
-New workstream creation is forced through `$deep-interview --autoresearch -> $ralplan -> $autoresearch`. The agent should not create a new slug, implement code, or launch experiments until `INDEX.md` records the deep-interview handoff, ralplan PRD/test spec, and autoresearch state/completion artifact paths.
-
-Artifact templates live under `skills/ai-research-workflow/assets/templates/`. They are starting points for portfolio, workstream, run, result, reproducibility, paper, and optional feedback files. Replace `TODO` placeholders before treating any artifact as complete.
-
-Each workstream also has `STATE.json` for phase state and `CLAIMS.md` for evidence-to-claim tracking. `EXPERIMENT.md` includes a baseline fairness checklist and negative/inconclusive result policy so failed or null findings stay scientifically useful.
-
-## Optional feedback memory and Q&A capture
-
-Research Feedback Memory, Question Capture, and Researcher Growth Review are disabled by default. Enable them only when a project wants durable learning notes, Q&A capture, or growth review in addition to normal research artifacts:
-
-```text
-$ai-research-workflow --feedback-memory ...
-$ai-research-workflow --qa-capture ...
-$ai-research-workflow --growth-review ...
-$ai-research-workflow --no-feedback ...
-```
-
-Project defaults can be stored in `.omx/ai-research/CONFIG.md`:
-
-```yaml
-workflow_preset: conservative | guided | autonomous
-idea_scouting: auto | off | on
-completion_handoff: auto | off
-worktree_closeout: off | report-before-merge
-feedback_memory: off | lite | full
-qa_capture: off | research | all
-growth_review: off | milestone | always
-```
-
-Use `workflow_preset: guided` to reduce manual workflow naming: broad idea prompts enter scouting, "done/wrap up" prompts enter completion handoff, and worktree closeout produces a report-before-merge plan. Use `conservative` for explicit-only behavior or `autonomous` for more proactive artifact maintenance; per-feature overrides win over the preset.
-
-When enabled, the skill may add root feedback files such as `QUESTIONS.md`, `LEARNINGS.md`, `ISSUES.md`, `DECISIONS.md`, and `SKILL_GROWTH.md`, plus workstream files such as `QUESTIONS.md`, `DESIGN.md`, `NOTES.md`, and `REVIEW.md`. `QUESTIONS.md` records user questions and answer summaries when `--qa-capture` or `qa_capture` is enabled. These files store distilled issues, knowledge, architecture/design decisions, verification gaps, Q&A, and capability reflections; raw logs and run outputs stay under `runs/`.
-
-For deterministic Q&A capture after an answer is written, use `capture_question.py`. For hook wiring, use `question_capture_hook.py`: `--stage submit` only classifies and stores pending state under `.omx/state`, while `--stage answer` appends to `QUESTIONS.md` only after an answer summary exists. See `assets/hooks/question-capture.example.json`. This is safe to call from an OMX hook only when `qa_capture` resolves to `research` or `all`.
-
-The skill intentionally does **not** ship universal experiment runner scripts. Different research projects use different training stacks, config systems, clusters, notebooks, plotting tools, and logging conventions. Instead, it defines where project-local scripts should live and how they should be named and documented.
-
-Run directories are raw evidence. After each terminal run, distill stable conclusions back into `RUNS.md`, `RESULTS.md`, `REPRODUCIBILITY.md`, and then into project-root docs, reports, code, configs, or tests when the result is reusable.
-
-When the user says the current experiment is done, the agent should treat that as an experiment completion handoff: inspect `runs/` and `scripts/`, update `RUNS.md` and `SCRIPT_REGISTRY.md`, persist valuable or user-requested content into `RESULTS.md`, `REPRODUCIBILITY.md`, or project-root docs, then report the paths written. If the workstream used a task worktree, the agent must also produce a report-before-merge closeout plan covering validation, semantic commits, merge/push target, worktree removal, branch deletion, and `.omx/worktrees/REGISTRY.md`; it waits for user confirmation before merging or deleting anything.
-
-Research review helpers add the remaining workflow polish:
-
-- `ai_research.py`: unified CLI facade over common guardrail scripts.
-- `summarize_research_state.py`: current portfolio/workstream state, blockers, missing artifacts, run/script inventory, and next actions.
-- `score_research_artifacts.py`: heuristic artifact quality score for research review; low scores require inspection before stronger claims.
-- `prepare_workstream_closeout.py`: writes `CLOSEOUT.md` for completion handoff without merging or deleting anything.
-- `preserve_negative_result.py`: appends negative/null/inconclusive evidence to `RESULTS.md` and claim downgrades to `CLAIMS.md`.
-- `generate_report_outline.py`: scaffolds paper outlines, workshop reports, internal reports, blog summaries, or rebuttal notes from stable artifacts.
-- `question_capture_hook.py`: hook integration helper for pre-answer classification and post-answer capture.
-- `migrate_research_workspace.py`: dry-run-first migration tool for legacy control-plane workspaces.
-- `validate_research_schema.py`: schema/artifact validator using `assets/schemas/` for CONFIG, STATE, claims, runs, and index rows.
-- `build_evidence_graph.py`: claim/evidence graph helper for review and drafting.
-- `check_skill_update.py`: read-only version/update check surface using `assets/VERSION`.
-- `run_e2e_scenarios.py`: E2E scenario tests for the framework guardrails.
-
-## Maintenance-only bundled scripts
-
-The skill may include bundled scripts under `skills/ai-research-workflow/scripts/`, but those scripts are maintenance and framework-guardrail tools for validating, initializing, routing, closeout planning, and evolving this framework. They remain maintenance-only in the sense that they are not for running user experiments, collecting user metrics, plotting user results, or publishing user research docs.
-
-Useful guardrails:
-
-```bash
-python3 skills/ai-research-workflow/scripts/ai_research.py help
-python3 skills/ai-research-workflow/scripts/init_research_workspace.py <project-root> --preset guided
-python3 skills/ai-research-workflow/scripts/init_workstream.py <project-root> <slug> --title "..." --question "..." --deep-interview <path> --ralplan-prd <path> --ralplan-test-spec <path> --autoresearch-result <path>
-python3 skills/ai-research-workflow/scripts/update_workstream_state.py <project-root> <slug> --phase running --next-action "monitor run"
-python3 skills/ai-research-workflow/scripts/resolve_workflow.py <project-root> --prompt "这个实验做完了，整理落盘"
-python3 skills/ai-research-workflow/scripts/summarize_research_state.py <project-root>
-python3 skills/ai-research-workflow/scripts/score_research_artifacts.py <project-root>
-python3 skills/ai-research-workflow/scripts/capture_question.py <project-root> --question "..." --answer-summary "..."
-python3 skills/ai-research-workflow/scripts/question_capture_hook.py --stage submit --project-root <project-root> --prompt "..."
-python3 skills/ai-research-workflow/scripts/question_capture_hook.py --stage answer --project-root <project-root> --answer-summary "..."
-python3 skills/ai-research-workflow/scripts/prepare_workstream_closeout.py <project-root> <slug> --write
-python3 skills/ai-research-workflow/scripts/preserve_negative_result.py <project-root> <slug> --finding "..." --evidence <path> --interpretation "..." --claim-update "..."
-python3 skills/ai-research-workflow/scripts/generate_report_outline.py <project-root> <slug> --kind paper-outline --write
-python3 skills/ai-research-workflow/scripts/validate_research_workspace.py <project-root> --phase completion-handoff
-python3 skills/ai-research-workflow/scripts/validate_research_schema.py <project-root>
-python3 skills/ai-research-workflow/scripts/build_evidence_graph.py <project-root> <slug> --json
-python3 skills/ai-research-workflow/scripts/migrate_research_workspace.py <project-root> --write
-python3 skills/ai-research-workflow/scripts/check_skill_update.py
-python3 skills/ai-research-workflow/scripts/prepare_worktree_closeout.py <task-worktree> --base main
-python3 skills/ai-research-workflow/scripts/check_regression_fixtures.py
-python3 skills/ai-research-workflow/scripts/run_e2e_scenarios.py
-```
-
-`validate_research_workspace.py` supports phase-aware checks for `idea-scouting`, `new-workstream`, and `completion-handoff`, plus `--error-on-todo` and `--check-paths` for stricter review.
-
-User research scripts belong in the target project workspace:
-
-```text
-.omx/ai-research/<slug>/scripts/
-.omx/ai-research/<slug>/SCRIPT_REGISTRY.md
-```
-
-## Task worktrees
-
-When this skill is used to do substantive AI research work in a target project repository, open an isolated git worktree before editing:
-
-```text
-.omx/worktrees/<scope>/
-.omx/worktrees/REGISTRY.md
-```
-
-Record each worktree's path, branch, purpose, owned files/areas, and status in `REGISTRY.md`. If `.omx/worktrees/` is not writable, use a writable fallback such as `~/omx-worktrees/<repo-name>/<scope>` and record the absolute path.
-
-Before opening a worktree, inspect local git status. If the main worktree has modifications, split them by intent into semantic Lore-format commits first, then create the task worktree from the latest commit. After validation and any required report-before-merge confirmation, push the task branch or merged main branch to the remote.
-
-Conflict policy:
-
-- split work by non-overlapping file/area ownership
-- use one worktree per logical task or lane
-- avoid concurrent edits to shared files unless one worktree is the integrator
-- rebase each worktree on `main` before final validation
-- merge worktrees back serially, validating after each merge
-- enable `git rerere` when repeated conflict patterns are expected
-- rewrite or squash worker auto-checkpoint commits into Lore-format commits before merge-back
-
-Maintenance helpers:
-
-```bash
-python3 skills/ai-research-workflow/scripts/check_worktree_registry.py .
-python3 skills/ai-research-workflow/scripts/prepare_worktree_closeout.py . --base main
-```
-
-See `skills/ai-research-workflow/references/worktree-development.md`.
-
-This applies to target-project code, docs, experiment setup, refactors, and result packaging. Skip only for read-only analysis or tiny safe edits.
-
-## Git tracking policy
-
-This repository tracks the skill framework itself:
-
-- track `README.md`, `README.zh-CN.md`, `skills/ai-research-workflow/**`, and the maintenance scripts that validate this framework
-- keep `.omx/` ignored because it records local runtime state, logs, and temporary worktrees
-- in downstream research projects, selectively track only stable research documents and experiment contracts
-
-Good candidates for downstream git history:
-
-- root `RESEARCH.md`
-- root `INDEX.md`
-- `RESEARCH.md`
-- `LITERATURE.md`
-- `EXPERIMENT.md`
-- `RUNS.md`
-- `RESULTS.md`
-- `REPRODUCIBILITY.md`
-- `PAPER_DRAFT.md`
-- `SCRIPT_REGISTRY.md`
-
-Usually keep local:
-
-- `.omx/**/runs/`
-- `.omx/**/logs/`
-- `.omx/state/`
-- `.omx/worktrees/`
-
-## Experiment run standards
-
-By default, this skill standardizes how experiments are planned, monitored, recorded, and distilled. It does **not** ship universal experiment runner scripts or publish docs automatically; users should not need to request the control-plane logging rules separately:
-
-- long runs should launch in detached tmux when available
-- independent lanes may run via OMX `$team` or native subagents when useful
-- every run gets a dedicated directory under `.omx/ai-research/<slug>/runs/<run-id>/`
-- stdout/stderr are captured in a complete log file
-- metrics and summaries are written to structured files
-- figures are generated for numeric/comparative results when appropriate
-- final reports include tmux/status/log/metrics/summary/figure paths
-- settled results and conclusions may be mirrored into project-root `docs/ai-research/<slug>/` when user/project policy allows; this is project-local documentation, not a bundled publisher
-- multi-seed experiments may run one seed per subagent/team lane, with each lane assigned an explicit idle GPU/device or scheduler slot
-- method implementation and baseline reproduction happen in the target repository root, not inside `.omx/ai-research/`
-
-Project-local scripts should be recorded in:
-
-```text
-.omx/ai-research/<slug>/SCRIPT_REGISTRY.md
-.omx/ai-research/<slug>/scripts/
-```
-
-Typical script names:
-
-```text
-run_<experiment>.sh
-monitor_<experiment>.sh
-collect_metrics_<experiment>.<ext>
-plot_<experiment>.<ext>
-publish_docs_<experiment>.sh
-```
-
-## Local validation
+## Validate
 
 ```bash
 python3 ~/.codex/skills/.system/skill-creator/scripts/quick_validate.py skills/ai-research-workflow
-python3 skills/ai-research-workflow/scripts/validate_framework_contract.py skills/ai-research-workflow
-python3 skills/ai-research-workflow/scripts/check_worktree_registry.py .
-python3 skills/ai-research-workflow/scripts/validate_research_workspace.py <project-root> --require-workstream
-python3 skills/ai-research-workflow/scripts/validate_research_schema.py <project-root>
 python3 skills/ai-research-workflow/scripts/run_e2e_scenarios.py
+python3 skills/ai-research-workflow/scripts/validate_framework_contract.py skills/ai-research-workflow
 ```
-
-## License
-
-MIT

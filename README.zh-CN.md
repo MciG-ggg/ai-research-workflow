@@ -2,25 +2,19 @@
 
 [English README](README.md)
 
-这是一个面向 Codex/OMX 的 AI 科研工作流 skill，用来把模糊的 AI/ML 研究想法推进成有 artifact gate 的研究流程：可选 idea scouting/idea generation、研究 intake、文献综述、可证伪假设、实验设计、方法实现、实验运行、结果分析、可复现性审查和论文/报告草稿。
+这是一个面向 Codex/OMX 的 AI/ML 科研工作流 skill，用来把模糊 idea、论文、baseline 和实验计划推进成有证据约束的研究 artifact，而不是从想法直接跳到代码。
 
-## 为什么需要它
+核心原则很简单：
 
-AI 科研 agent 最大的问题不是不会写代码，而是太容易从一个模糊想法直接跳到实现。这个 skill 强制把科学意图和执行细节拆开：
+- `RESEARCH.md` 记录研究问题、假设、范围和 claim 边界。
+- `EXPERIMENT.md` 记录数据集、baseline、指标、实验运行和失败策略。
+- `RUNS.md`、`RESULTS.md`、`CLAIMS.md`、`REPRODUCIBILITY.md` 把证据和结论分开。
 
-- `RESEARCH.md`：研究问题、假设、贡献类型、成功/证伪标准、非目标和 claim 边界。
-- `EXPERIMENT.md`：数据集、baseline、指标、消融、随机种子、命令、日志、统计检验和失败策略。
+这个 skill 是工作流和 artifact 框架，不内置通用实验 runner。项目里的真实代码、配置、训练脚本、评估脚本应该放在目标研究仓库里。
 
-最终目标是让证据控制结论，而不是让代码产出倒推科研 claim。
+## 依赖
 
-## 依赖：oh-my-codex
-
-这个 skill 设计给运行 [oh-my-codex (OMX)](https://github.com/Yeachan-Heo/oh-my-codex) 的 Codex 会话使用。OMX 提供 `$deep-interview --autoresearch`、`$ralplan`、`$autoresearch`、`$ralph`、`$team`、`$autopilot` 等工作流能力。
-
-- GitHub: <https://github.com/Yeachan-Heo/oh-my-codex>
-- 文档/主页: <https://yeachan-heo.github.io/oh-my-codex>
-
-安装并初始化 OMX：
+这个 skill 设计给使用 [oh-my-codex (OMX)](https://github.com/Yeachan-Heo/oh-my-codex) 的 Codex 会话。
 
 ```bash
 npm install -g oh-my-codex
@@ -30,341 +24,108 @@ omx doctor
 
 ## 安装
 
-克隆仓库并复制 skill 到 Codex skills 目录：
-
 ```bash
 git clone https://github.com/MciG-ggg/ai-research-workflow.git
 mkdir -p ~/.codex/skills
 cp -R ai-research-workflow/skills/ai-research-workflow ~/.codex/skills/
 ```
 
-显式调用：
-
-```text
-$ai-research-workflow turn this paper idea into a research plan and experiment workflow
-```
-
-## 工作流
-
-这个 skill 是一个完整工作流，不只是日志模板。
-
-默认序列：
-
-```text
-没有明确研究问题时先写可选 IDEA_SCOUTING.md
-  -> 需要找 SOTA/baseline 论文时维护可选 PAPERS.md
-  -> 需要通过复现论文找 idea 时开启单篇复现 workstream
-  -> $deep-interview --autoresearch
-  -> 检查总览 RESEARCH.md / INDEX.md
-  -> 文献和研究 artifacts
-  -> $ralplan 规划实现和验证形状
-  -> 目标项目仓库中的 task worktree
-  -> $autoresearch validator-gated loop
-  -> 方法实现 / baseline 复现 / 实验
-  -> 将运行结果蒸馏到 RUNS.md / RESULTS.md / 项目根目录产物
-  -> 可复现性审查
-  -> 论文或报告草稿
-```
-
-`.omx/ai-research/RESEARCH.md` 和 `.omx/ai-research/INDEX.md` 是整个研究工作的 portfolio control plane。每个 `.omx/ai-research/<slug>/` 是一个具体方向的 workstream。真实的方法实现、baseline 复现、配置、测试和项目原生实验代码，应该放在目标项目仓库根目录或该仓库已有约定的位置，而不是放到 `.omx/ai-research/` 下面。
-
-## 命令入口
-
-当你希望路由更确定时，可以使用 subcommand，而不是只靠自然语言：
-
-```text
-$ai-research-workflow scout
-$ai-research-workflow papers
-$ai-research-workflow reproduce-paper
-$ai-research-workflow experiment
-$ai-research-workflow new-workstream
-$ai-research-workflow handoff
-$ai-research-workflow qa
-$ai-research-workflow summarize
-$ai-research-workflow score
-$ai-research-workflow closeout
-$ai-research-workflow negative-result
-$ai-research-workflow draft
-```
-
-统一本地 CLI facade：
-
-```bash
-python3 skills/ai-research-workflow/scripts/ai_research.py help
-python3 skills/ai-research-workflow/scripts/ai_research.py resolve <project-root> --prompt "这个实验做完了，整理落盘"
-python3 skills/ai-research-workflow/scripts/ai_research.py schema <project-root>
-python3 skills/ai-research-workflow/scripts/ai_research.py graph <project-root> <slug> --json
-python3 skills/ai-research-workflow/scripts/ai_research.py update-check
-```
-
-如果你想要 X，可以这么说 Y：
-
-- 生成/排序候选 idea：`$ai-research-workflow scout`。
-- 找 SOTA/baseline 论文并维护文章列表：`$ai-research-workflow papers`。
-- 复现某一篇论文并从中找 idea：`$ai-research-workflow reproduce-paper`。
-- 开一个假设/消融/benchmark 实验 campaign：`$ai-research-workflow experiment`。
-- 新开一个小方向/workstream：`$ai-research-workflow new-workstream`。
-- 当前实验做完并收尾：`$ai-research-workflow handoff`。
-- 记录有价值的问答：开启 `--qa-capture` 或 `qa_capture: research` 后用 `$ai-research-workflow qa`。
-- 保存负结果/无显著结果：`$ai-research-workflow negative-result`。
-- 检查研究状态和质量：`$ai-research-workflow summarize` 然后 `$ai-research-workflow score`。
-
-`resolve_workflow.py` 也识别这些命令，并输出结构化字段：`phase`、`workflow_action`、`requires_user_confirmation`、`next_artifacts` 和 `guardrail_scripts`。
-
-## 更新这个 skill
-
-如果你从本仓库安装，推荐用安全更新脚本：
+仓库更新后同步 skill：
 
 ```bash
 cd ai-research-workflow
 ./skills/ai-research-workflow/scripts/update_installed_skill.sh
 ```
 
-这个脚本会执行 `git pull --ff-only`、源码校验、staged `rsync -a --delete`、安装版校验。维护本地未提交改动时可以加 `--no-pull`。
-使用 `--dry-run` 可以只校验和预览，不替换安装版；使用 `--keep-backups N` 可以控制 backup 保留数量。使用 `check_skill_update.py` 或 `ai_research.py update-check` 可以先做只读版本/更新状态检查。
-
-如果你在开发这个 skill，希望 repo 里的修改立刻生效，可以使用 symlink 模式：
+本地开发时不拉取远端：
 
 ```bash
-./skills/ai-research-workflow/scripts/update_installed_skill.sh --symlink --no-pull
+./skills/ai-research-workflow/scripts/update_installed_skill.sh --no-pull
 ```
 
-如果你维护的是这个 skill 仓库本身，发布或同步前先跑框架校验。下面的 task worktree 策略描述的是 skill 在目标 AI 科研项目仓库中的行为，不是编辑这个 skill 仓库的安装要求。
+## 典型使用流程
 
-## 框架目录
+```text
+1. 从一个 idea、论文、baseline 或实验问题开始。
+2. 可选地先做 idea / paper 调研：
+   - IDEA_SCOUTING.md 记录候选研究想法
+   - PAPERS.md 维护 SOTA/baseline 论文列表
+3. 新开 workstream 前先走：
+   $deep-interview --autoresearch -> $ralplan -> $autoresearch
+4. 为一个具体方向创建或复用 .omx/ai-research/<slug>/。
+5. 选择 workstream 类型：
+   - paper-reproduction：复现一篇论文/baseline/claim，使用 REPRODUCTION.md
+   - experiment-campaign：围绕假设、消融、benchmark 或方法评估跑一组实验
+6. 项目代码写在目标仓库里，不放进 .omx/ai-research/。
+7. 记录 runs、scripts、metrics、summary 和失败情况。
+8. 把稳定证据蒸馏到 RESULTS.md、CLAIMS.md、REPRODUCIBILITY.md。
+9. workstream 完成后，先生成 closeout/report-before-merge plan，再合并、推送或清理 worktree。
+```
 
-每个研究项目会创建或复用一个项目本地研究总览和若干 workstream 工作区：
+## 常用命令
+
+需要确定路由时，显式调用 skill：
+
+```text
+$ai-research-workflow scout            # 候选 idea 调研
+$ai-research-workflow papers           # 查找/维护 SOTA 和 baseline 论文列表
+$ai-research-workflow reproduce-paper  # 准备单篇论文复现 workstream
+$ai-research-workflow experiment       # 准备 experiment-campaign workstream
+$ai-research-workflow new-workstream   # 新建 gated 小方向
+$ai-research-workflow handoff          # 收尾已完成的 runs/scripts/results
+$ai-research-workflow summarize        # 汇总 portfolio/workstream 状态
+$ai-research-workflow score            # 启发式 artifact 质量检查
+$ai-research-workflow closeout         # 生成 report-before-merge plan
+$ai-research-workflow negative-result  # 保存失败/无显著/不确定结果
+$ai-research-workflow draft            # 生成论文或报告 outline
+```
+
+本地 CLI helper：
+
+```bash
+python3 skills/ai-research-workflow/scripts/ai_research.py help
+python3 skills/ai-research-workflow/scripts/ai_research.py resolve <project-root> --prompt "这个实验做完了，整理落盘"
+python3 skills/ai-research-workflow/scripts/ai_research.py summarize <project-root>
+python3 skills/ai-research-workflow/scripts/ai_research.py score <project-root>
+python3 skills/ai-research-workflow/scripts/ai_research.py schema <project-root>
+```
+
+## Artifact 目录
 
 ```text
 .omx/ai-research/
-  IDEA_SCOUTING.md # 没有明确研究问题时可选
-  PAPERS.md        # 可选 SOTA/baseline 论文池
-  RESEARCH.md
-  INDEX.md
+  IDEA_SCOUTING.md   # 可选候选 idea 调研
+  PAPERS.md          # 可选 SOTA/baseline 论文池
+  RESEARCH.md        # 整体研究总览
+  INDEX.md           # workstream 索引
+
 .omx/ai-research/<slug>/
   STATE.json
   RESEARCH.md
   LITERATURE.md
-  REPRODUCTION.md  # 单篇论文复现 workstream 使用
+  REPRODUCTION.md    # paper-reproduction workstream 必需
   EXPERIMENT.md
   RUNS.md
   RESULTS.md
   CLAIMS.md
   REPRODUCIBILITY.md
-  PAPER_DRAFT.md
   SCRIPT_REGISTRY.md
-  CLOSEOUT.md       # 可选 completion/report-before-merge plan
-  PAPER_OUTLINE.md  # 可选报告/论文 outline
+  CLOSEOUT.md
   scripts/
   runs/
 ```
 
-可选根目录 `IDEA_SCOUTING.md` 用来在正式研究问题还不清楚时记录候选 idea、轻量证据、novelty risk、可行性预算和用户目标匹配度。可选根目录 `PAPERS.md` 用来维护 SOTA/baseline 论文池：论文角色、核心 claim、benchmark/metric、code/data/checkpoint 可用性、复现优先级和当前状态。根目录 `RESEARCH.md` 记录整体研究目标、中心问题、north-star hypotheses、claim 边界、当前综合判断、活跃 workstreams 和下一步优先级。根目录 `INDEX.md` 记录每个 slug 的子问题、状态、artifact 链接、最新证据和下一步。创建新 slug 前，agent 应先检查这些文件和已有 workstream；只有当新任务确实有独立研究问题或验证边界时才创建新 slug。
+## 注意事项
 
-Idea scouting 是可选阶段。用户要求生成候选 idea、判断已有 idea 值不值得做，或把宽泛方向收敛成研究问题时才启用。用户要求找 SOTA/baseline 论文并维护文章列表时，用 `$ai-research-workflow papers` 更新 `PAPERS.md`。用户要求复现某篇论文并从复现过程中找 idea 时，用 `$ai-research-workflow reproduce-paper` 准备单篇复现 workstream；该 workstream 使用 `REPRODUCTION.md` 记录目标 claim、可用材料、偏离原文之处、run evidence 链接、复现产生的 idea 和最终整理。候选 idea 只有在具备可证伪假设、可评估指标/baseline、轻量证据、novelty risk、可行性预算和用户目标匹配度后，才能被推荐进入 intake。创建 workstream 前仍必须先问用户。
+- 新 workstream 需要 gate evidence，不应该自动创建。
+- merge、push、删除 worktree、删除 branch 前，需要 report-before-merge 确认。
+- `runs/` 存原始证据，稳定结论要蒸馏回 markdown artifacts。
+- bundled scripts 只做 framework guardrail，不是用户实验 runner。
 
-新建 workstream 会在 `STATE.json` 中声明 `workstream_type`。`paper-reproduction` 表示围绕某篇论文/baseline/claim 的复现；`experiment-campaign` 表示围绕某个假设、消融、benchmark 或方法评估的一组实验。“跑实验”是两个类型都可能进入的阶段，不应该单独作为类型；类型记录的是这个 workstream 为什么存在。
-
-新建 workstream/小方向必须强制经过 `$deep-interview --autoresearch -> $ralplan -> $autoresearch`。在 `INDEX.md` 记录 deep-interview handoff、ralplan PRD/test spec、autoresearch state/completion artifact 路径之前，agent 不应创建新 slug、写实现或启动实验。
-
-Artifact 模板放在 `skills/ai-research-workflow/assets/templates/`。它们用于创建 portfolio、workstream、run、result、reproducibility、paper 和可选 feedback 文件。把 `TODO` 占位符替换成真实项目证据后，才能把 artifact 当作完成。
-
-每个 workstream 还包含 `STATE.json` 作为阶段状态，`CLAIMS.md` 作为 evidence-to-claim ledger。`EXPERIMENT.md` 包含 baseline fairness checklist 和 negative/inconclusive result policy，避免失败或无显著结果被丢掉。
-
-## 可选反馈记忆和 Q&A 捕获
-
-Research Feedback Memory、Question Capture 和 Researcher Growth Review 默认关闭。只有当项目需要把长期学习反馈、Q&A 或能力复盘沉淀下来时再启用：
-
-```text
-$ai-research-workflow --feedback-memory ...
-$ai-research-workflow --qa-capture ...
-$ai-research-workflow --growth-review ...
-$ai-research-workflow --no-feedback ...
-```
-
-项目默认值可以写在 `.omx/ai-research/CONFIG.md`：
-
-```yaml
-workflow_preset: conservative | guided | autonomous
-idea_scouting: auto | off | on
-completion_handoff: auto | off
-worktree_closeout: off | report-before-merge
-feedback_memory: off | lite | full
-qa_capture: off | research | all
-growth_review: off | milestone | always
-```
-
-使用 `workflow_preset: guided` 可以减少手动指定 workflow：宽泛 idea 会进入 scouting，“做完了/整理落盘”会进入 completion handoff，worktree closeout 会生成 report-before-merge plan。`conservative` 表示尽量只执行显式请求，`autonomous` 表示更主动维护 artifact 和下一步计划；单项 override 优先于 preset。
-
-启用后，skill 可以增加根目录反馈文件，例如 `QUESTIONS.md`、`LEARNINGS.md`、`ISSUES.md`、`DECISIONS.md`、`SKILL_GROWTH.md`，以及 workstream 内的 `QUESTIONS.md`、`DESIGN.md`、`NOTES.md`、`REVIEW.md`。当 `--qa-capture` 或 `qa_capture` 启用时，`QUESTIONS.md` 记录用户疑问和回答摘要。这些文件只记录蒸馏后的问题、知识、架构/设计决策、验证缺口、Q&A 和能力复盘；原始日志和运行输出仍然放在 `runs/`。
-
-如果需要确定性 Q&A 记录，可以在回答之后调用 `capture_question.py`。hook 集成使用 `question_capture_hook.py`：`--stage submit` 只分类并在 `.omx/state` 写 pending 状态，`--stage answer` 只有在有 answer summary 后才追加 `QUESTIONS.md`。示例配置见 `assets/hooks/question-capture.example.json`。它只应该在 `qa_capture` 解析为 `research` 或 `all` 时由 agent 或 OMX hook 调用。
-
-这个 skill 不内置通用实验 runner。不同研究项目会使用不同训练栈、配置系统、集群、notebook、绘图工具和日志约定。因此它只规定项目本地脚本应该放在哪里、如何命名、如何登记。
-
-运行目录是原始证据。每次运行终止后，把稳定结论蒸馏回 `RUNS.md`、`RESULTS.md`、`REPRODUCIBILITY.md`，并在结果可复用时同步到项目根目录的 docs、报告、代码、配置或测试。
-
-当用户说“当前实验做完了”“这个实验结束了”或要求收尾时，agent 应进入 experiment completion handoff：先整理 `runs/` 和 `scripts/`，更新 `RUNS.md` 和 `SCRIPT_REGISTRY.md`，再把有价值或用户明确要求保留的内容写入 `RESULTS.md`、`REPRODUCIBILITY.md` 或项目根目录文档，最后报告写入的路径。如果这个 workstream 使用了 task worktree，agent 还必须给出 report-before-merge closeout plan，包含验证、语义 commit、merge/push 目标、worktree 删除、branch 删除和 `.omx/worktrees/REGISTRY.md` 更新；合并或删除前必须等待用户确认。
-
-新增的研究 review 辅助工具：
-
-- `ai_research.py`：统一 CLI facade，包装常用 guardrail 脚本。
-- `summarize_research_state.py`：汇总整体 portfolio/workstream 状态、blocker、缺失 artifact、run/script inventory 和下一步。
-- `score_research_artifacts.py`：给 artifact 做启发式质量评分；低分表示需要先检查再加强 claim。
-- `prepare_workstream_closeout.py`：写入 workstream 级 `CLOSEOUT.md`，只生成计划，不 merge/delete。
-- `preserve_negative_result.py`：把负结果/无显著/失败结果写入 `RESULTS.md`，并把 claim 降级写入 `CLAIMS.md`。
-- `generate_report_outline.py`：从稳定 artifact 生成 paper outline、workshop report、internal report、blog summary 或 rebuttal notes。
-- `question_capture_hook.py`：hook 集成辅助，支持回答前分类和回答后捕获。
-- `migrate_research_workspace.py`：默认 dry-run 的 legacy control-plane 迁移工具。
-- `validate_research_schema.py`：用 `assets/schemas/` 校验 CONFIG、STATE、claims、runs、index rows。
-- `build_evidence_graph.py`：构建 claim/evidence graph，用于 review 和写作。
-- `check_skill_update.py`：基于 `assets/VERSION` 的只读版本/更新检查。
-- `run_e2e_scenarios.py`：框架 guardrail 的 E2E 场景测试。
-
-## bundled scripts 只用于维护
-
-`skills/ai-research-workflow/scripts/` 下的脚本只用于维护和 framework guardrail：校验、初始化、路由判断、closeout plan 和演进这个 framework。它们不能用作用户研究项目的实验 runner、指标收集器、绘图脚本或研究文档发布器。
-
-常用 guardrails：
-
-```bash
-python3 skills/ai-research-workflow/scripts/ai_research.py help
-python3 skills/ai-research-workflow/scripts/init_research_workspace.py <project-root> --preset guided
-python3 skills/ai-research-workflow/scripts/init_workstream.py <project-root> <slug> --title "..." --question "..." --deep-interview <path> --ralplan-prd <path> --ralplan-test-spec <path> --autoresearch-result <path>
-python3 skills/ai-research-workflow/scripts/update_workstream_state.py <project-root> <slug> --phase running --next-action "monitor run"
-python3 skills/ai-research-workflow/scripts/resolve_workflow.py <project-root> --prompt "这个实验做完了，整理落盘"
-python3 skills/ai-research-workflow/scripts/summarize_research_state.py <project-root>
-python3 skills/ai-research-workflow/scripts/score_research_artifacts.py <project-root>
-python3 skills/ai-research-workflow/scripts/capture_question.py <project-root> --question "..." --answer-summary "..."
-python3 skills/ai-research-workflow/scripts/question_capture_hook.py --stage submit --project-root <project-root> --prompt "..."
-python3 skills/ai-research-workflow/scripts/question_capture_hook.py --stage answer --project-root <project-root> --answer-summary "..."
-python3 skills/ai-research-workflow/scripts/prepare_workstream_closeout.py <project-root> <slug> --write
-python3 skills/ai-research-workflow/scripts/preserve_negative_result.py <project-root> <slug> --finding "..." --evidence <path> --interpretation "..." --claim-update "..."
-python3 skills/ai-research-workflow/scripts/generate_report_outline.py <project-root> <slug> --kind paper-outline --write
-python3 skills/ai-research-workflow/scripts/validate_research_workspace.py <project-root> --phase completion-handoff
-python3 skills/ai-research-workflow/scripts/validate_research_schema.py <project-root>
-python3 skills/ai-research-workflow/scripts/build_evidence_graph.py <project-root> <slug> --json
-python3 skills/ai-research-workflow/scripts/migrate_research_workspace.py <project-root> --write
-python3 skills/ai-research-workflow/scripts/check_skill_update.py
-python3 skills/ai-research-workflow/scripts/prepare_worktree_closeout.py <task-worktree> --base main
-python3 skills/ai-research-workflow/scripts/check_regression_fixtures.py
-python3 skills/ai-research-workflow/scripts/run_e2e_scenarios.py
-```
-
-`validate_research_workspace.py` 支持 `idea-scouting`、`new-workstream`、`completion-handoff` 三种 phase-aware checks，也支持 `--error-on-todo` 和 `--check-paths` 做更严格审查。
-
-用户研究脚本应放在目标项目工作区：
-
-```text
-.omx/ai-research/<slug>/scripts/
-.omx/ai-research/<slug>/SCRIPT_REGISTRY.md
-```
-
-## Task worktrees
-
-当这个 skill 被用于目标 AI 科研项目仓库中的实质性工作时，编辑前先开隔离 git worktree：
-
-```text
-.omx/worktrees/<scope>/
-.omx/worktrees/REGISTRY.md
-```
-
-在 `REGISTRY.md` 记录每个 worktree 的路径、分支、用途、负责的文件/区域和状态。如果 `.omx/worktrees/` 不可写，使用 `~/omx-worktrees/<repo-name>/<scope>` 这类可写 fallback，并记录绝对路径。
-
-开 worktree 之前，先检查本地 git 状态。如果主 worktree 有修改，先按语义拆分成 Lore-format commit，再基于最新 commit 创建 task worktree。验证通过并完成必要的 report-before-merge 确认后，把 task 分支或合并后的 main 分支推送到远端。
-
-冲突策略：
-
-- 按不重叠的文件/区域拆分任务
-- 每个逻辑任务或 lane 使用一个 worktree
-- 除非某个 worktree 是明确的 integrator，否则避免并发编辑同一文件
-- 最终验证前，把每个 worktree rebase 到 `main`
-- 串行合并 worktree，每合并一次就验证一次
-- 重复冲突模式较多时启用 `git rerere`
-- merge-back 前，把 worker 自动 checkpoint commit 改写或 squash 成 Lore-format commit
-
-维护辅助命令：
-
-```bash
-python3 skills/ai-research-workflow/scripts/check_worktree_registry.py .
-python3 skills/ai-research-workflow/scripts/prepare_worktree_closeout.py . --base main
-```
-
-详情见 `skills/ai-research-workflow/references/worktree-development.md`。
-
-该规则适用于目标项目的代码、文档、实验设置、重构和结果包装。只读分析或非常小的安全修改可以跳过。
-
-## Git 跟踪策略
-
-本仓库跟踪 skill framework 本身：
-
-- 跟踪 `README.md`、`README.zh-CN.md`、`skills/ai-research-workflow/**` 和维护脚本
-- 保持 `.omx/` ignored，因为它记录本地 runtime 状态、日志和临时 worktree 数据
-- 在下游研究项目中，只选择性版本化稳定研究文档和实验 contract
-
-下游项目中适合进入 git 历史的文件：
-
-- 根目录 `RESEARCH.md`
-- 根目录 `INDEX.md`
-- `RESEARCH.md`
-- `LITERATURE.md`
-- `EXPERIMENT.md`
-- `RUNS.md`
-- `RESULTS.md`
-- `REPRODUCIBILITY.md`
-- `PAPER_DRAFT.md`
-- `SCRIPT_REGISTRY.md`
-
-通常保持本地：
-
-- `.omx/**/runs/`
-- `.omx/**/logs/`
-- `.omx/state/`
-- `.omx/worktrees/`
-
-## 实验运行标准
-
-默认情况下，这个 skill 会规范实验如何规划、监控、记录和蒸馏。它不内置通用实验 runner，也不会自动发布文档；用户不需要额外要求的是 control-plane 日志/证据规则。
-
-- 长实验默认使用 detached tmux
-- 独立 lane 可在有收益时通过 OMX `$team` 或 native subagents 并行
-- 每次运行都有独立目录 `.omx/ai-research/<slug>/runs/<run-id>/`
-- stdout/stderr 必须捕获到完整日志
-- metrics 和 summary 写入结构化文件
-- 数值/对比结果需要合适的 figures
-- 最终报告包含 tmux/status/log/metrics/summary/figure 路径
-- 稳定结果和结论可以在项目策略允许时同步到项目根目录 `docs/ai-research/<slug>/`；这是项目本地文档，不是 bundled publisher
-- 多 seed 实验可以每个 seed 一个 subagent/team lane，并给每个 lane 分配明确的空闲 GPU/device 或 scheduler slot
-- 方法实现和 baseline 复现发生在目标项目根目录，不放在 `.omx/ai-research/`
-
-项目本地脚本应登记在：
-
-```text
-.omx/ai-research/<slug>/SCRIPT_REGISTRY.md
-.omx/ai-research/<slug>/scripts/
-```
-
-常见脚本名：
-
-```text
-run_<experiment>.sh
-monitor_<experiment>.sh
-collect_metrics_<experiment>.<ext>
-plot_<experiment>.<ext>
-publish_docs_<experiment>.sh
-```
-
-## 本地验证
+## 验证
 
 ```bash
 python3 ~/.codex/skills/.system/skill-creator/scripts/quick_validate.py skills/ai-research-workflow
-python3 skills/ai-research-workflow/scripts/validate_framework_contract.py skills/ai-research-workflow
-python3 skills/ai-research-workflow/scripts/check_worktree_registry.py .
-python3 skills/ai-research-workflow/scripts/validate_research_workspace.py <project-root> --require-workstream
-python3 skills/ai-research-workflow/scripts/validate_research_schema.py <project-root>
 python3 skills/ai-research-workflow/scripts/run_e2e_scenarios.py
+python3 skills/ai-research-workflow/scripts/validate_framework_contract.py skills/ai-research-workflow
 ```
-
-## License
-
-MIT
