@@ -1,0 +1,52 @@
+---
+name: ai-research-workflow-omc
+description: "OMC-flavored AI research workflow for Claude Code. Use when the user asks Claude to scout, develop, implement, evaluate, reproduce, or write up an AI/ML research idea, benchmark, method, baseline, ablation, paper plan, experiment pipeline, or research report with clear hypotheses, baselines, metrics, validation, and claim boundaries. Routes the new-workstream gate through /oh-my-claudecode:deep-interview, /oh-my-claudecode:ralplan, and /oh-my-claudecode:autoresearch; routes long-running execution through /oh-my-claudecode:ralph, /oh-my-claudecode:autopilot, /oh-my-claudecode:ultrawork, and /oh-my-claudecode:team; keeps the portfolio/workstream control plane under .omc/ai-research/. This is the Claude Code/OMC sibling of the Codex/OMX ai-research-workflow skill and shares the same artifact contract, scripts, and quality gates."
+---
+
+# AI Research Workflow (OMC)
+
+## Purpose
+
+Turn an AI/ML research idea into artifact-gated research work under Claude Code/oh-my-claudecode. Keep scientific intent, implementation work, run evidence, and claims separated so evidence controls conclusions.
+
+This skill is the OMC-flavored sibling of the Codex/OMX `ai-research-workflow` skill. It shares the artifact contract and Python guardrail scripts but routes workflow gates through OMC slash commands and keeps the portfolio/workstream control plane under `.omc/ai-research/`.
+
+## OMC integration
+
+| OMX (Codex) command | OMC (Claude Code) command |
+| --- | --- |
+| `$deep-interview --autoresearch` | `/oh-my-claudecode:deep-interview --autoresearch` |
+| `$ralplan` | `/oh-my-claudecode:ralplan` |
+| `$autoresearch` | `/oh-my-claudecode:autoresearch` |
+| `$ralph` | `/oh-my-claudecode:ralph` |
+| `$autopilot` | `/oh-my-claudecode:autopilot` |
+| `$ultrawork` | `/oh-my-claudecode:ultrawork` |
+| `$team` | `/oh-my-claudecode:team` |
+
+## Control plane
+
+- Portfolio: `.omc/ai-research/RESEARCH.md`, `.omc/ai-research/INDEX.md` (and optional `IDEA_SCOUTING.md`, `PAPERS.md`, `CONFIG.md`).
+- Workstream: `.omc/ai-research/<slug>/{STATE.json,RESEARCH.md,LITERATURE.md,REPRODUCTION.md,EXPERIMENT.md,RUNS.md,RESULTS.md,CLAIMS.md,REPRODUCIBILITY.md,SCRIPT_REGISTRY.md,CLOSEOUT.md}` plus `scripts/` and `runs/`.
+- Worktree registry: `.omc/worktrees/REGISTRY.md` in the target repo.
+- OMC plan/spec outputs: `.omc/plans/prd-<slug>.md`, `.omc/plans/test-spec-<slug>.md`, `.omc/specs/autoresearch-<slug>/{mission.md,sandbox.md,result.json}`.
+
+## Install
+
+```bash
+git clone https://github.com/MciG-ggg/ai-research-workflow.git
+mkdir -p ~/.claude/skills
+cp -R ai-research-workflow/skills/ai-research-workflow-omc ~/.claude/skills/
+```
+
+Use the updater after pulling repo changes:
+
+```bash
+./skills/ai-research-workflow-omc/scripts/update_installed_skill.sh
+```
+
+## See also
+
+- `references/workflow-orchestration.md` — full OMC workflow sequence and routing.
+- `references/artifact-contracts.md` — control-plane artifact shapes.
+- `references/research-quality-gates.md` — phase gates and confirmation boundaries.
+- `SKILL.md` — full skill body and command surface.

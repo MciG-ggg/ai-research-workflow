@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AI Research Workstream State",
+  "type": "object",
+  "required": ["schema_version", "workstream_slug", "workstream_type", "phase", "last_updated", "active_artifacts", "gate_evidence", "current_blockers", "next_action", "confirmation_required_before"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "workstream_slug": {"type": "string", "pattern": "^[a-z0-9][a-z0-9_-]{1,80}$"},
+    "workstream_type": {"enum": ["experiment-campaign", "paper-reproduction"]},
+    "allowed_workstream_types": {"type": "array", "items": {"type": "string"}},
+    "phase": {"enum": ["idea-scouting", "intake", "literature", "experiment-design", "implementation", "running", "completion-handoff", "report-before-merge", "reproducibility-review", "paper-draft", "archived"]},
+    "phase_status": {"type": "string"},
+    "allowed_phases": {"type": "array", "items": {"type": "string"}},
+    "last_updated": {"type": "string"},
+    "owner": {"type": "string"},
+    "active_artifacts": {"type": "array", "items": {"type": "string"}},
+    "gate_evidence": {
+      "type": "object",
+      "required": ["deep_interview_autoresearch", "ralplan_prd", "ralplan_test_spec", "autoresearch_result"],
+      "properties": {
+        "deep_interview_autoresearch": {"type": "string"},
+        "ralplan_prd": {"type": "string"},
+        "ralplan_test_spec": {"type": "string"},
+        "autoresearch_result": {"type": "string"}
+      }
+    },
+    "current_blockers": {"type": "array", "items": {"type": "string"}},
+    "next_action": {"type": "string"},
+    "confirmation_required_before": {"type": "array", "items": {"type": "string"}}
+  }
+}

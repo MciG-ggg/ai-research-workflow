@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AI Research Portfolio Index Row",
+  "type": "object",
+  "required": ["slug", "status", "subquestion", "artifact_links", "gate_evidence", "next_action"],
+  "properties": {
+    "slug": {"type": "string", "pattern": "^[a-z0-9][a-z0-9_-]{1,80}$"},
+    "status": {"type": "string"},
+    "subquestion": {"type": "string"},
+    "relationship": {"type": "string"},
+    "artifact_links": {"type": "array", "items": {"type": "string"}},
+    "latest_evidence": {"type": "string"},
+    "gate_evidence": {"type": "string"},
+    "next_action": {"type": "string"}
+  }
+}

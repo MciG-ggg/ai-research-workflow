@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AI Research Claim Ledger Row",
+  "type": "object",
+  "required": ["claim_id", "claim", "status", "evidence_paths", "scope", "allowed_wording", "forbidden_wording"],
+  "properties": {
+    "claim_id": {"type": "string"},
+    "claim": {"type": "string"},
+    "status": {"enum": ["draft", "supported", "contradicted", "inconclusive", "retracted"]},
+    "evidence_paths": {"type": "array", "items": {"type": "string"}},
+    "scope": {"type": "string"},
+    "allowed_wording": {"type": "string"},
+    "forbidden_wording": {"type": "string"},
+    "last_checked": {"type": "string"}
+  }
+}

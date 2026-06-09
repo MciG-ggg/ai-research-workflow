@@ -1,0 +1,269 @@
+[
+  {
+    "name": "valid-guided-portfolio",
+    "expect_exit": 0,
+    "args": [],
+    "dirs": [],
+    "files": {
+      ".omc/ai-research/CONFIG.md": "# Config\n\n```yaml\nworkflow_preset: guided\nidea_scouting: auto\ncompletion_handoff: auto\nworktree_closeout: report-before-merge\nfeedback_memory: off\nqa_capture: off\ngrowth_review: off\n```\n",
+      ".omc/ai-research/RESEARCH.md": "# Research Portfolio\n\nOverall objective: improve reproducible AI research workflow quality.\n",
+      ".omc/ai-research/INDEX.md": "# Research Workstream Index\n\nNo active workstreams yet.\n"
+    }
+  },
+  {
+    "name": "invalid-preset",
+    "expect_exit": 1,
+    "args": [],
+    "dirs": [],
+    "files": {
+      ".omc/ai-research/CONFIG.md": "# Config\n\n```yaml\nworkflow_preset: reckless\nidea_scouting: auto\ncompletion_handoff: auto\nworktree_closeout: report-before-merge\nfeedback_memory: off\nqa_capture: off\ngrowth_review: off\n```\n",
+      ".omc/ai-research/RESEARCH.md": "# Research Portfolio\n",
+      ".omc/ai-research/INDEX.md": "# Research Workstream Index\n"
+    }
+  },
+  {
+    "name": "idea-scouting-missing-artifact",
+    "expect_exit": 1,
+    "args": [],
+    "dirs": [],
+    "files": {
+      ".omc/ai-research/CONFIG.md": "# Config\n\n```yaml\nworkflow_preset: guided\nidea_scouting: on\ncompletion_handoff: auto\nworktree_closeout: report-before-merge\nfeedback_memory: off\nqa_capture: off\ngrowth_review: off\n```\n",
+      ".omc/ai-research/RESEARCH.md": "# Research Portfolio\n",
+      ".omc/ai-research/INDEX.md": "# Research Workstream Index\n"
+    }
+  },
+  {
+    "name": "valid-idea-scouting-phase",
+    "expect_exit": 0,
+    "args": [
+      "--phase",
+      "idea-scouting",
+      "--error-on-todo"
+    ],
+    "dirs": [],
+    "files": {
+      ".omc/ai-research/CONFIG.md": "# Config\n\n```yaml\nworkflow_preset: guided\nidea_scouting: on\ncompletion_handoff: auto\nworktree_closeout: report-before-merge\nfeedback_memory: off\nqa_capture: off\ngrowth_review: off\n```\n",
+      ".omc/ai-research/RESEARCH.md": "# Research Portfolio\n\nOverall objective: choose a feasible benchmark direction.\n",
+      ".omc/ai-research/INDEX.md": "# Research Workstream Index\n\nNo promoted workstream yet.\n",
+      ".omc/ai-research/IDEA_SCOUTING.md": "# Idea Scouting\n\n## Scouting Objective\n\nUser goal: find low-compute evaluation ideas.\n\n## Candidate Ideas\n\n| ID | Candidate idea | Falsifiable hypothesis | Evaluation metric / baseline | Lightweight evidence | Novelty risk | Feasibility budget | User-goal fit | Status |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| A | stress-test small rerankers | reranker calibration fails under paraphrase shift | nDCG against BM25 baseline | local benchmark gaps observed | adjacent robustness work exists | one day CPU eval | matches thesis scope | recommend |\n\n## Promotion Gate\n\n- Falsifiable hypothesis: reranker calibration degrades under paraphrase shift.\n- Evaluation metric / baseline / benchmark: nDCG versus BM25.\n- Lightweight evidence: existing local benchmark gap.\n- Novelty-risk note: adjacent robustness work must be checked.\n- Feasibility budget: one day CPU evaluation.\n- User-goal fit: high.\n"
+    }
+  },
+  {
+    "name": "invalid-new-workstream-gate",
+    "expect_exit": 1,
+    "args": [
+      "--phase",
+      "new-workstream",
+      "--workstream",
+      "demo"
+    ],
+    "dirs": [
+      ".omc/ai-research/demo/runs",
+      ".omc/ai-research/demo/scripts"
+    ],
+    "files": {
+      ".omc/ai-research/CONFIG.md": "# Config\n\n```yaml\nworkflow_preset: guided\nidea_scouting: auto\ncompletion_handoff: auto\nworktree_closeout: report-before-merge\nfeedback_memory: off\nqa_capture: off\ngrowth_review: off\n```\n",
+      ".omc/ai-research/RESEARCH.md": "# Research Portfolio\n",
+      ".omc/ai-research/INDEX.md": "# Research Workstream Index\n\n| Slug | Gate evidence |\n| --- | --- |\n| demo | missing gate evidence |\n",
+      ".omc/ai-research/demo/RESEARCH.md": "# Workstream\n\nResearch question exists but no deep / ralplan / autoresearch evidence paths are recorded.\n",
+      ".omc/ai-research/demo/LITERATURE.md": "# Literature\n",
+      ".omc/ai-research/demo/EXPERIMENT.md": "# Experiment\n",
+      ".omc/ai-research/demo/RUNS.md": "# Runs\n",
+      ".omc/ai-research/demo/RESULTS.md": "# Results\n",
+      ".omc/ai-research/demo/REPRODUCIBILITY.md": "# Reproducibility\n",
+      ".omc/ai-research/demo/PAPER_DRAFT.md": "# Paper Draft\n",
+      ".omc/ai-research/demo/SCRIPT_REGISTRY.md": "# Script Registry\n"
+    }
+  },
+  {
+    "name": "valid-completion-handoff-phase",
+    "expect_exit": 0,
+    "args": [
+      "--phase",
+      "completion-handoff",
+      "--workstream",
+      "demo"
+    ],
+    "dirs": [
+      ".omc/ai-research/demo/runs/run-001",
+      ".omc/ai-research/demo/scripts"
+    ],
+    "files": {
+      ".omc/ai-research/CONFIG.md": "# Config\n\n```yaml\nworkflow_preset: guided\nidea_scouting: auto\ncompletion_handoff: auto\nworktree_closeout: report-before-merge\nfeedback_memory: off\nqa_capture: off\ngrowth_review: off\n```\n",
+      ".omc/ai-research/RESEARCH.md": "# Research Portfolio\n\nCurrent synthesis: demo complete.\n",
+      ".omc/ai-research/INDEX.md": "# Research Workstream Index\n\n| Slug | Gate evidence |\n| --- | --- |\n| demo | deep mission, ralplan prd, autoresearch result |\n",
+      ".omc/ai-research/demo/RESEARCH.md": "# Workstream\n\nGate evidence: deep mission, ralplan prd, autoresearch result.\n",
+      ".omc/ai-research/demo/LITERATURE.md": "# Literature\n\nEvidence reviewed.\n",
+      ".omc/ai-research/demo/EXPERIMENT.md": "# Experiment\n\nMetric and baseline recorded.\n\n## Baseline Fairness Checklist\n\n- Same data split / preprocessing: yes\n- Same evaluation metric and aggregation: yes\n- Comparable training, tuning, and inference budget: yes\n- Hyperparameter search budget: fixed\n- Implementation source and version: fixture\n- Known baseline limitations or reproduction gaps: none\n\n## Negative / Inconclusive Result Policy\n\nPreserve negative and inconclusive result policy with stop/rerun criteria.\n",
+      ".omc/ai-research/demo/RUNS.md": "# Runs\n\n## Run Ledger\n\nlog path recorded, metrics path recorded, summary path recorded.\n\n## Distilled Updates Outside `runs/`\n\nReusable command and result summary persisted.\n\n## Worktree Closeout Plan\n\nWorktree closeout plan recorded. User confirmation required before merge/delete.\n",
+      ".omc/ai-research/demo/RESULTS.md": "# Results\n\nConclusion remains bounded by evidence.\n\n## Negative and Inconclusive Results\n\n| Result | Evidence path | Failure category | Interpretation | Preserved claim update |\n| --- | --- | --- | --- | --- |\n| inconclusive fixture | .omc/ai-research/demo/RUNS.md | underpowered | cannot claim win | CLAIMS.md updated |\n\n## Evidence-to-claim Mapping\n\nSee CLAIMS.md.\n",
+      ".omc/ai-research/demo/REPRODUCIBILITY.md": "# Reproducibility\n\nRerun command recorded.\n",
+      ".omc/ai-research/demo/PAPER_DRAFT.md": "# Paper Draft\n\nDraft deferred until more evidence.\n",
+      ".omc/ai-research/demo/SCRIPT_REGISTRY.md": "# Script Registry\n\n## Completion Handoff Notes\n\nNative command remained valid.\n",
+      ".omc/ai-research/demo/STATE.json": "{\n  \"schema_version\": 1,\n  \"workstream_slug\": \"demo\",\n  \"phase\": \"completion-handoff\",\n  \"phase_status\": \"draft\",\n  \"last_updated\": \"2026-05-09\",\n  \"active_artifacts\": [\"RUNS.md\", \"RESULTS.md\", \"CLAIMS.md\"],\n  \"gate_evidence\": {\"deep_interview_autoresearch\": \"deep mission\", \"ralplan_prd\": \"ralplan prd\", \"ralplan_test_spec\": \"ralplan test spec\", \"autoresearch_result\": \"autoresearch result\"},\n  \"current_blockers\": [],\n  \"next_action\": \"prepare report-before-merge plan\",\n  \"confirmation_required_before\": [\"merge\", \"push\", \"worktree removal\", \"branch deletion\"]\n}\n",
+      ".omc/ai-research/demo/CLAIMS.md": "# Claims Ledger\n\n## Claim Ledger\n\n| Claim ID | Claim | Status | Evidence paths | Scope / population | Allowed wording | Forbidden wording | Last checked |\n| --- | --- | --- | --- | --- | --- | --- | --- |\n| C1 | demo claim | inconclusive | .omc/ai-research/demo/RESULTS.md | demo fixture | inconclusive on fixture | general improvement | 2026-05-09 |\n\n## Evidence Requirements\n\nEvery claim has evidence paths.\n\n## Negative or Inconclusive Results\n\n| Finding | Evidence path | Likely cause | Scientific value | Follow-up / stop condition |\n| --- | --- | --- | --- | --- |\n| inconclusive fixture | .omc/ai-research/demo/RESULTS.md | underpowered | tests preservation | stop |\n\n## Retired or Downgraded Claims\n\n| Claim ID | Previous wording | New wording/status | Reason | Evidence |\n| --- | --- | --- | --- | --- |\n| C0 | strong claim | inconclusive | fixture evidence | .omc/ai-research/demo/RESULTS.md |\n"
+    }
+  },
+  {
+    "name": "legacy-workstream-warns-not-fails",
+    "expect_exit": 0,
+    "args": [],
+    "dirs": [
+      ".omc/ai-research/legacy/runs",
+      ".omc/ai-research/legacy/scripts"
+    ],
+    "files": {
+      ".omc/ai-research/CONFIG.md": "# Config\n\n```yaml\nschema_version: 1\nworkflow_preset: guided\nidea_scouting: auto\ncompletion_handoff: auto\nworktree_closeout: report-before-merge\nfeedback_memory: off\nqa_capture: off\ngrowth_review: off\n```\n",
+      ".omc/ai-research/RESEARCH.md": "# Research Portfolio\n\nLegacy project.\n",
+      ".omc/ai-research/INDEX.md": "# Research Workstream Index\n\n| Slug | Gate evidence |\n| --- | --- |\n| legacy | deep mission, ralplan prd, autoresearch result |\n",
+      ".omc/ai-research/legacy/RESEARCH.md": "# Legacy Workstream\n\nGate evidence: deep mission, ralplan prd, autoresearch result.\n",
+      ".omc/ai-research/legacy/LITERATURE.md": "# Literature\n",
+      ".omc/ai-research/legacy/EXPERIMENT.md": "# Experiment\n",
+      ".omc/ai-research/legacy/RUNS.md": "# Runs\n",
+      ".omc/ai-research/legacy/RESULTS.md": "# Results\n",
+      ".omc/ai-research/legacy/REPRODUCIBILITY.md": "# Reproducibility\n",
+      ".omc/ai-research/legacy/PAPER_DRAFT.md": "# Paper Draft\n",
+      ".omc/ai-research/legacy/SCRIPT_REGISTRY.md": "# Script Registry\n"
+    }
+  },
+  {
+    "name": "targeted-completion-allows-legacy-sibling",
+    "expect_exit": 0,
+    "args": [
+      "--phase",
+      "completion-handoff",
+      "--workstream",
+      "demo"
+    ],
+    "dirs": [
+      ".omc/ai-research/demo/runs/run-001",
+      ".omc/ai-research/demo/scripts",
+      ".omc/ai-research/legacy/runs",
+      ".omc/ai-research/legacy/scripts"
+    ],
+    "files": {
+      ".omc/ai-research/CONFIG.md": "# Config\n\n```yaml\nworkflow_preset: guided\nidea_scouting: auto\ncompletion_handoff: auto\nworktree_closeout: report-before-merge\nfeedback_memory: off\nqa_capture: off\ngrowth_review: off\n```\n",
+      ".omc/ai-research/RESEARCH.md": "# Research Portfolio\n\nCurrent synthesis: demo complete.\n",
+      ".omc/ai-research/INDEX.md": "# Research Workstream Index\n\n| Slug | Gate evidence |\n| --- | --- |\n| demo | deep mission, ralplan prd, autoresearch result |\n| legacy | deep mission, ralplan prd, autoresearch result |\n",
+      ".omc/ai-research/demo/RESEARCH.md": "# Workstream\n\nGate evidence: deep mission, ralplan prd, autoresearch result.\n",
+      ".omc/ai-research/demo/LITERATURE.md": "# Literature\n\nEvidence reviewed.\n",
+      ".omc/ai-research/demo/EXPERIMENT.md": "# Experiment\n\nMetric and baseline recorded.\n\n## Baseline Fairness Checklist\n\n- Same data split / preprocessing: yes\n- Same evaluation metric and aggregation: yes\n- Comparable training, tuning, and inference budget: yes\n- Hyperparameter search budget: fixed\n- Implementation source and version: fixture\n- Known baseline limitations or reproduction gaps: none\n\n## Negative / Inconclusive Result Policy\n\nPreserve negative and inconclusive result policy with stop/rerun criteria.\n",
+      ".omc/ai-research/demo/RUNS.md": "# Runs\n\n## Run Ledger\n\nlog path recorded, metrics path recorded, summary path recorded.\n\n## Distilled Updates Outside `runs/`\n\nReusable command and result summary persisted.\n\n## Worktree Closeout Plan\n\nWorktree closeout plan recorded. User confirmation required before merge/delete.\n",
+      ".omc/ai-research/demo/RESULTS.md": "# Results\n\nConclusion remains bounded by evidence.\n\n## Negative and Inconclusive Results\n\n| Result | Evidence path | Failure category | Interpretation | Preserved claim update |\n| --- | --- | --- | --- | --- |\n| inconclusive fixture | .omc/ai-research/demo/RUNS.md | underpowered | cannot claim win | CLAIMS.md updated |\n\n## Evidence-to-claim Mapping\n\nSee CLAIMS.md.\n",
+      ".omc/ai-research/demo/REPRODUCIBILITY.md": "# Reproducibility\n\nRerun command recorded.\n",
+      ".omc/ai-research/demo/PAPER_DRAFT.md": "# Paper Draft\n\nDraft deferred until more evidence.\n",
+      ".omc/ai-research/demo/SCRIPT_REGISTRY.md": "# Script Registry\n\n## Completion Handoff Notes\n\nNative command remained valid.\n",
+      ".omc/ai-research/demo/STATE.json": "{\n  \"schema_version\": 1,\n  \"workstream_slug\": \"demo\",\n  \"phase\": \"completion-handoff\",\n  \"phase_status\": \"draft\",\n  \"last_updated\": \"2026-05-09\",\n  \"active_artifacts\": [\"RUNS.md\", \"RESULTS.md\", \"CLAIMS.md\"],\n  \"gate_evidence\": {\"deep_interview_autoresearch\": \"deep mission\", \"ralplan_prd\": \"ralplan prd\", \"ralplan_test_spec\": \"ralplan test spec\", \"autoresearch_result\": \"autoresearch result\"},\n  \"current_blockers\": [],\n  \"next_action\": \"prepare report-before-merge plan\",\n  \"confirmation_required_before\": [\"merge\", \"push\", \"worktree removal\", \"branch deletion\"]\n}\n",
+      ".omc/ai-research/demo/CLAIMS.md": "# Claims Ledger\n\n## Claim Ledger\n\n| Claim ID | Claim | Status | Evidence paths | Scope / population | Allowed wording | Forbidden wording | Last checked |\n| --- | --- | --- | --- | --- | --- | --- | --- |\n| C1 | demo claim | inconclusive | .omc/ai-research/demo/RESULTS.md | demo fixture | inconclusive on fixture | general improvement | 2026-05-09 |\n\n## Evidence Requirements\n\nEvery claim has evidence paths.\n\n## Negative or Inconclusive Results\n\n| Finding | Evidence path | Likely cause | Scientific value | Follow-up / stop condition |\n| --- | --- | --- | --- | --- |\n| inconclusive fixture | .omc/ai-research/demo/RESULTS.md | underpowered | tests preservation | stop |\n\n## Retired or Downgraded Claims\n\n| Claim ID | Previous wording | New wording/status | Reason | Evidence |\n| --- | --- | --- | --- | --- |\n| C0 | strong claim | inconclusive | fixture evidence | .omc/ai-research/demo/RESULTS.md |\n",
+      ".omc/ai-research/legacy/RESEARCH.md": "# Legacy Workstream\n\nGate evidence: deep mission, ralplan prd, autoresearch result.\n",
+      ".omc/ai-research/legacy/LITERATURE.md": "# Literature\n",
+      ".omc/ai-research/legacy/EXPERIMENT.md": "# Experiment\n",
+      ".omc/ai-research/legacy/RUNS.md": "# Runs\n",
+      ".omc/ai-research/legacy/RESULTS.md": "# Results\n",
+      ".omc/ai-research/legacy/REPRODUCIBILITY.md": "# Reproducibility\n",
+      ".omc/ai-research/legacy/PAPER_DRAFT.md": "# Paper Draft\n",
+      ".omc/ai-research/legacy/SCRIPT_REGISTRY.md": "# Script Registry\n"
+    }
+  },
+  {
+    "name": "new-workstream-index-evidence-is-slug-specific",
+    "expect_exit": 1,
+    "args": [
+      "--phase",
+      "new-workstream",
+      "--workstream",
+      "demo"
+    ],
+    "dirs": [
+      ".omc/ai-research/demo/runs",
+      ".omc/ai-research/demo/scripts"
+    ],
+    "files": {
+      ".omc/ai-research/CONFIG.md": "# Config\n\n```yaml\nworkflow_preset: guided\nidea_scouting: auto\ncompletion_handoff: auto\nworktree_closeout: report-before-merge\nfeedback_memory: off\nqa_capture: off\ngrowth_review: off\n```\n",
+      ".omc/ai-research/RESEARCH.md": "# Research Portfolio\n",
+      ".omc/ai-research/INDEX.md": "# Research Workstream Index\n\n| Slug | Gate evidence |\n| --- | --- |\n| demo | proposed but gate evidence missing |\n| other | deep mission, ralplan prd, autoresearch result |\n",
+      ".omc/ai-research/demo/RESEARCH.md": "# Workstream\n\nGate evidence: deep mission, ralplan prd, autoresearch result.\n",
+      ".omc/ai-research/demo/LITERATURE.md": "# Literature\n",
+      ".omc/ai-research/demo/EXPERIMENT.md": "# Experiment\n\n## Baseline Fairness Checklist\n\n- Same data split / preprocessing: yes\n- Same evaluation metric and aggregation: yes\n- Comparable training, tuning, and inference budget: yes\n- Hyperparameter search budget: fixed\n- Implementation source and version: fixture\n\n## Negative / Inconclusive Result Policy\n\nPreserve negative and inconclusive result policy.\n",
+      ".omc/ai-research/demo/RUNS.md": "# Runs\n",
+      ".omc/ai-research/demo/RESULTS.md": "# Results\n",
+      ".omc/ai-research/demo/REPRODUCIBILITY.md": "# Reproducibility\n",
+      ".omc/ai-research/demo/PAPER_DRAFT.md": "# Paper Draft\n",
+      ".omc/ai-research/demo/SCRIPT_REGISTRY.md": "# Script Registry\n",
+      ".omc/ai-research/demo/STATE.json": "{\n  \"schema_version\": 1,\n  \"workstream_slug\": \"demo\",\n  \"phase\": \"intake\",\n  \"phase_status\": \"draft\",\n  \"last_updated\": \"2026-05-09\",\n  \"active_artifacts\": [\"RESEARCH.md\"],\n  \"gate_evidence\": {\"deep_interview_autoresearch\": \"deep mission\", \"ralplan_prd\": \"ralplan prd\", \"ralplan_test_spec\": \"ralplan test spec\", \"autoresearch_result\": \"autoresearch result\"},\n  \"current_blockers\": [],\n  \"next_action\": \"continue intake\",\n  \"confirmation_required_before\": [\"merge\", \"push\", \"worktree removal\", \"branch deletion\"]\n}\n",
+      ".omc/ai-research/demo/CLAIMS.md": "# Claims Ledger\n\n## Claim Ledger\n\n| Claim ID | Claim | Status | Evidence paths | Scope / population | Allowed wording | Forbidden wording | Last checked |\n| --- | --- | --- | --- | --- | --- | --- | --- |\n| C1 | demo | draft | RESULTS.md | fixture | draft | unsupported | 2026-05-09 |\n\n## Evidence Requirements\n\nEvery claim has evidence paths.\n\n## Negative or Inconclusive Results\n\nNone yet.\n\n## Retired or Downgraded Claims\n\nNone yet.\n"
+    }
+  },
+  {
+    "name": "invalid-state-slug-mismatch",
+    "expect_exit": 1,
+    "args": [],
+    "dirs": [
+      ".omc/ai-research/demo/runs",
+      ".omc/ai-research/demo/scripts"
+    ],
+    "files": {
+      ".omc/ai-research/CONFIG.md": "# Config\n\n```yaml\nworkflow_preset: guided\nidea_scouting: auto\ncompletion_handoff: auto\nworktree_closeout: report-before-merge\nfeedback_memory: off\nqa_capture: off\ngrowth_review: off\n```\n",
+      ".omc/ai-research/RESEARCH.md": "# Research Portfolio\n",
+      ".omc/ai-research/INDEX.md": "# Research Workstream Index\n\n| Slug | Gate evidence |\n| --- | --- |\n| demo | deep mission, ralplan prd, autoresearch result |\n",
+      ".omc/ai-research/demo/RESEARCH.md": "# Workstream\n\nGate evidence: deep mission, ralplan prd, autoresearch result.\n",
+      ".omc/ai-research/demo/LITERATURE.md": "# Literature\n",
+      ".omc/ai-research/demo/EXPERIMENT.md": "# Experiment\n",
+      ".omc/ai-research/demo/RUNS.md": "# Runs\n",
+      ".omc/ai-research/demo/RESULTS.md": "# Results\n",
+      ".omc/ai-research/demo/REPRODUCIBILITY.md": "# Reproducibility\n",
+      ".omc/ai-research/demo/PAPER_DRAFT.md": "# Paper Draft\n",
+      ".omc/ai-research/demo/SCRIPT_REGISTRY.md": "# Script Registry\n",
+      ".omc/ai-research/demo/CLAIMS.md": "# Claims Ledger\n\n## Claim Ledger\n\n## Evidence Requirements\n\n## Negative or Inconclusive Results\n\n## Retired or Downgraded Claims\n",
+      ".omc/ai-research/demo/STATE.json": "{\n  \"schema_version\": 1,\n  \"workstream_slug\": \"wrong\",\n  \"phase\": \"intake\",\n  \"next_action\": \"continue\"\n}\n"
+    }
+  },
+  {
+    "name": "valid-paper-scouting-phase",
+    "expect_exit": 0,
+    "args": [
+      "--phase",
+      "paper-scouting",
+      "--error-on-todo"
+    ],
+    "dirs": [],
+    "files": {
+      ".omc/ai-research/CONFIG.md": "# Config\n\n```yaml\nworkflow_preset: guided\nidea_scouting: auto\ncompletion_handoff: auto\nworktree_closeout: report-before-merge\nfeedback_memory: off\nqa_capture: off\ngrowth_review: off\n```\n",
+      ".omc/ai-research/RESEARCH.md": "# Research Portfolio\n\nOverall objective: identify reproducible efficient evaluation baselines.\n",
+      ".omc/ai-research/INDEX.md": "# Research Workstream Index\n\nNo paper reproduction workstream yet.\n",
+      ".omc/ai-research/PAPERS.md": "# Paper Registry\n\n## Registry Objective\n\nResearch area: efficient evaluation. Search date: 2026-05-10.\n\n## Search Strategy\n\nQueries: SOTA efficient evaluation baseline. Sources: arXiv and benchmark leaderboards.\n\n## SOTA and Baseline Paper List\n\n| ID | Title | Role | Venue/date | Link | Code/data/checkpoints | Key claim | Benchmark / metric | Reproduction priority | Status | Notes |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| P1 | Efficient Eval Baseline | baseline | 2026 | https://example.com | code available | faster evaluation | accuracy / latency | high | selected | candidate |\n\n## Baseline Map\n\n| Task / benchmark | Common baseline | Strong SOTA comparator | Why it matters | Known fairness or reproduction risks |\n| --- | --- | --- | --- | --- |\n| efficient eval | baseline A | SOTA B | comparison anchor | compute mismatch |\n\n## Reproduction Candidates\n\n| Paper ID | Target claim to reproduce | Minimal reproduction goal | Required data/code/checkpoints | Compute budget | Expected tolerance | Candidate workstream |\n| --- | --- | --- | --- | --- | --- | --- |\n| P1 | latency claim | approximate | public code and data | one GPU day | within 5 percent | paper-p1 |\n\n## Maintenance Log\n\n| Date | Change | Evidence / source | Impact on research direction |\n| --- | --- | --- | --- |\n| 2026-05-10 | added P1 | benchmark search | selected reproduction candidate |\n"
+    }
+  },
+  {
+    "name": "valid-paper-reproduction-phase",
+    "expect_exit": 0,
+    "args": [
+      "--phase",
+      "paper-reproduction",
+      "--workstream",
+      "paper-p1",
+      "--error-on-todo"
+    ],
+    "dirs": [
+      ".omc/ai-research/paper-p1/runs",
+      ".omc/ai-research/paper-p1/scripts"
+    ],
+    "files": {
+      ".omc/ai-research/CONFIG.md": "# Config\n\n```yaml\nworkflow_preset: guided\nidea_scouting: auto\ncompletion_handoff: auto\nworktree_closeout: report-before-merge\nfeedback_memory: off\nqa_capture: off\ngrowth_review: off\n```\n",
+      ".omc/ai-research/RESEARCH.md": "# Research Portfolio\n\nOverall objective: reproduce selected baseline papers to find robust ideas.\n",
+      ".omc/ai-research/INDEX.md": "# Research Workstream Index\n\n| Slug | Gate evidence |\n| --- | --- |\n| paper-p1 | deep mission, ralplan prd, autoresearch result |\n",
+      ".omc/ai-research/PAPERS.md": "# Paper Registry\n\n## Registry Objective\n\nResearch area: efficient evaluation. Search date: 2026-05-10.\n\n## Search Strategy\n\nQueries: SOTA efficient evaluation baseline. Sources: arXiv and benchmark leaderboards.\n\n## SOTA and Baseline Paper List\n\n| ID | Title | Role | Venue/date | Link | Code/data/checkpoints | Key claim | Benchmark / metric | Reproduction priority | Status | Notes |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| P1 | Efficient Eval Baseline | baseline | 2026 | https://example.com | code available | faster evaluation | accuracy / latency | high | selected | workstream paper-p1 |\n\n## Baseline Map\n\n| Task / benchmark | Common baseline | Strong SOTA comparator | Why it matters | Known fairness or reproduction risks |\n| --- | --- | --- | --- | --- |\n| efficient eval | baseline A | SOTA B | comparison anchor | compute mismatch |\n\n## Reproduction Candidates\n\n| Paper ID | Target claim to reproduce | Minimal reproduction goal | Required data/code/checkpoints | Compute budget | Expected tolerance | Candidate workstream |\n| --- | --- | --- | --- | --- | --- | --- |\n| P1 | latency claim | approximate | public code and data | one GPU day | within 5 percent | paper-p1 |\n\n## Maintenance Log\n\n| Date | Change | Evidence / source | Impact on research direction |\n| --- | --- | --- | --- |\n| 2026-05-10 | selected P1 | benchmark search | opened reproduction workstream |\n",
+      ".omc/ai-research/paper-p1/RESEARCH.md": "# Workstream\n\nGate evidence: deep mission, ralplan prd, autoresearch result.\n",
+      ".omc/ai-research/paper-p1/LITERATURE.md": "# Literature\n\nEvidence reviewed.\n",
+      ".omc/ai-research/paper-p1/EXPERIMENT.md": "# Experiment\n\nMetric and baseline recorded.\n\n## Baseline Fairness Checklist\n\n- Same data split / preprocessing: yes\n- Same evaluation metric and aggregation: yes\n- Comparable training, tuning, and inference budget: yes\n- Hyperparameter search budget: fixed\n- Implementation source and version: fixture\n- Known baseline limitations or reproduction gaps: compute mismatch\n\n## Negative / Inconclusive Result Policy\n\nPreserve negative and inconclusive result policy.\n",
+      ".omc/ai-research/paper-p1/REPRODUCTION.md": "# Paper Reproduction\n\n## Target Paper\n\nPaper ID in portfolio PAPERS.md: P1.\n\n## Reproduction Objective\n\nTarget claim: latency improvement. Reproduction type: approximate. Metric/tolerance: within 5 percent. Non-goals: full leaderboard sweep.\n\n## Available Materials\n\nOfficial code available; public data; no checkpoint blocker.\n\n## Minimal Reproduction Plan\n\n| Step | Purpose | Command or project-local script | Expected output | Evidence path |\n| --- | --- | --- | --- | --- |\n| 1 | smoke | bash scripts/run_fixture.sh | metrics | RUNS.md |\n\n## Data and Environment Notes\n\nDataset split recorded.\n\n## Run Evidence Links\n\n| Run ID | Status | Log path | Metrics path | Summary path | Notes |\n| --- | --- | --- | --- | --- | --- |\n| run-001 | complete | log.txt | metrics.json | summary.md | fixture |\n\n## Deviations from Paper\n\n| Deviation | Reason | Expected impact | Claim boundary |\n| --- | --- | --- | --- |\n| smaller budget | fixture | less power | no broad claim |\n\n## Reproduction-Derived Ideas\n\n| Idea | Evidence from reproduction | Falsifiable hypothesis | Evaluation metric / baseline | Novelty risk | Feasibility budget | Status |\n| --- | --- | --- | --- | --- | --- | --- |\n| budget-robust eval | fixture run | effect varies by budget | latency baseline | adjacent work | one day | draft |\n\n## Conclusions and Distillation\n\nReproduction verdict: partial. What is supported: bounded claim. What is not supported: broad SOTA. Impact on PAPERS.md: update status. Impact on IDEA_SCOUTING.md: add idea. Impact on portfolio RESEARCH.md / INDEX.md: update priority. Next action: rerun.\n",
+      ".omc/ai-research/paper-p1/RUNS.md": "# Runs\n",
+      ".omc/ai-research/paper-p1/RESULTS.md": "# Results\n",
+      ".omc/ai-research/paper-p1/REPRODUCIBILITY.md": "# Reproducibility\n",
+      ".omc/ai-research/paper-p1/PAPER_DRAFT.md": "# Paper Draft\n",
+      ".omc/ai-research/paper-p1/SCRIPT_REGISTRY.md": "# Script Registry\n",
+      ".omc/ai-research/paper-p1/CLAIMS.md": "# Claims Ledger\n\n## Claim Ledger\n\n## Evidence Requirements\n\n## Negative or Inconclusive Results\n\n## Retired or Downgraded Claims\n",
+      ".omc/ai-research/paper-p1/STATE.json": "{\n  \"schema_version\": 1,\n  \"workstream_slug\": \"paper-p1\",\n  \"workstream_type\": \"paper-reproduction\",\n  \"phase\": \"experiment-design\",\n  \"last_updated\": \"2026-05-10\",\n  \"active_artifacts\": [\"REPRODUCTION.md\", \"EXPERIMENT.md\"],\n  \"gate_evidence\": {\"deep_interview_autoresearch\": \"deep mission\", \"ralplan_prd\": \"ralplan prd\", \"ralplan_test_spec\": \"ralplan test spec\", \"autoresearch_result\": \"autoresearch result\"},\n  \"current_blockers\": [],\n  \"next_action\": \"run reproduction smoke\",\n  \"confirmation_required_before\": [\"merge\", \"push\", \"worktree removal\", \"branch deletion\"]\n}\n"
+    }
+  }
+]
