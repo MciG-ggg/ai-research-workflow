@@ -1,0 +1,121 @@
+runs:
+- result: pass
+  compliance: 4.5
+  execution_quality: 3.42
+  overall: 3.96
+  hard_checks_total: 10
+  hard_checks_passed: 9
+  candidate: python3 -m harness_eval.candidates.draft_experiment_md
+  workflow_rev: 4ce5064
+  item_id: 001_experiment_design
+  run_id: /Users/mcig/Projects/ai-research-workflow/harness_eval/runs/20260619_144646_001_experiment_design
+  batch_tag: demo_v0
+  recorded_at: 2026-06-19T14:46:46+0800
+- result: pass
+  compliance: 5.0
+  execution_quality: 3.9
+  overall: 4.45
+  hard_checks_total: 9
+  hard_checks_passed: 9
+  candidate: python3 -m harness_eval.candidates.distill_run_to_results
+  workflow_rev: 4ce5064
+  item_id: 002_run_distillation
+  run_id: /Users/mcig/Projects/ai-research-workflow/harness_eval/runs/20260619_144646_002_run_distillation
+  batch_tag: demo_v0
+  recorded_at: 2026-06-19T14:46:46+0800
+- result: pass
+  compliance: 4.5
+  execution_quality: 3.6
+  overall: 4.05
+  hard_checks_total: 10
+  hard_checks_passed: 9
+  candidate: python3 -m harness_eval.candidates.draft_experiment_md
+  workflow_rev: 4ce5064
+  item_id: 001_experiment_design
+  run_id: /Users/mcig/Projects/ai-research-workflow/harness_eval/runs/20260619_181116_001_experiment_design
+  batch_tag: demo_v1
+  recorded_at: 2026-06-19T18:14:25+0800
+- result: pass
+  compliance: 5.0
+  execution_quality: 4.8
+  overall: 4.9
+  hard_checks_total: 9
+  hard_checks_passed: 9
+  candidate: python3 -m harness_eval.candidates.distill_run_to_results
+  workflow_rev: 4ce5064
+  item_id: 002_run_distillation
+  run_id: /Users/mcig/Projects/ai-research-workflow/harness_eval/runs/20260619_181425_002_run_distillation
+  batch_tag: demo_v1
+  recorded_at: 2026-06-19T18:15:52+0800
+- result: pass
+  compliance: 5.0
+  execution_quality: 4.6
+  overall: 4.8
+  hard_checks_total: 11
+  hard_checks_passed: 11
+  candidate: python3 -m harness_eval.candidates.scope_lock
+  workflow_rev: 4ce5064
+  item_id: 003_scope_locking
+  run_id: /Users/mcig/Projects/ai-research-workflow/harness_eval/runs/20260619_181552_003_scope_locking
+  batch_tag: demo_v1
+  recorded_at: 2026-06-19T18:17:05+0800
+- result: pass
+  compliance: 5.0
+  execution_quality: 4.4
+  overall: 4.7
+  hard_checks_total: 11
+  hard_checks_passed: 11
+  candidate: python3 -m harness_eval.candidates.plan_branch
+  workflow_rev: 4ce5064
+  item_id: 004_branch_confirmation
+  run_id: /Users/mcig/Projects/ai-research-workflow/harness_eval/runs/20260619_181705_004_branch_confirmation
+  batch_tag: demo_v1
+  recorded_at: 2026-06-19T18:19:19+0800
+- result: pass
+  compliance: 4.5
+  execution_quality: 3.4
+  overall: 3.95
+  hard_checks_total: 10
+  hard_checks_passed: 9
+  candidate: python3 -m candidates.draft_experiment_md
+  workflow_rev: 4ce5064
+  item_id: 001_experiment_design
+  run_id: /Users/mcig/Projects/ai-research-workflow/harness_eval/runs/20260619_205204_001_experiment_design
+  batch_tag: demo_v1_pypackage_v2
+  recorded_at: 2026-06-19T20:55:36+0800
+- result: pass
+  compliance: 5.0
+  execution_quality: 4.8
+  overall: 4.9
+  hard_checks_total: 9
+  hard_checks_passed: 9
+  candidate: python3 -m candidates.distill_run_to_results
+  workflow_rev: 4ce5064
+  item_id: 002_run_distillation
+  run_id: /Users/mcig/Projects/ai-research-workflow/harness_eval/runs/20260619_205536_002_run_distillation
+  batch_tag: demo_v1_pypackage_v2
+  recorded_at: 2026-06-19T20:57:45+0800
+- result: pass
+  compliance: 5.0
+  execution_quality: 5.0
+  overall: 5.0
+  hard_checks_total: 11
+  hard_checks_passed: 11
+  candidate: python3 -m candidates.scope_lock
+  workflow_rev: 4ce5064
+  item_id: 003_scope_locking
+  run_id: /Users/mcig/Projects/ai-research-workflow/harness_eval/runs/20260619_205745_003_scope_locking
+  batch_tag: demo_v1_pypackage_v2
+  recorded_at: 2026-06-19T20:59:13+0800
+- result: pass
+  compliance: 5.0
+  execution_quality: 4.4
+  overall: 4.7
+  hard_checks_total: 11
+  hard_checks_passed: 11
+  candidate: python3 -m candidates.plan_branch
+  workflow_rev: 4ce5064
+  item_id: 004_branch_confirmation
+  run_id: /Users/mcig/Projects/ai-research-workflow/harness_eval/runs/20260619_205913_004_branch_confirmation
+  batch_tag: demo_v1_pypackage_v2
+  recorded_at: 2026-06-19T21:00:31+0800

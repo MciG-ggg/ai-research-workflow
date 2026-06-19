@@ -1,0 +1,22 @@
+{
+  "run_id": "run_004",
+  "kind": "ablation",
+  "model": "codestral-mamba-2-7b",
+  "dataset": "humaneval",
+  "split": "test",
+  "metrics": {
+    "pass@1": 0.488,
+    "pass@10": 0.711,
+    "avg_latency_ms": 162.8,
+    "context_length_used": 1024
+  },
+  "config": {
+    "temperature": 0.2,
+    "top_p": 0.95,
+    "max_new_tokens": 512
+  },
+  "seed": 42,
+  "started_at": "2026-06-16T14:00:00Z",
+  "finished_at": "2026-06-16T14:39:11Z",
+  "status": "completed"
+}

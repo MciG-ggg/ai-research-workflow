@@ -1,0 +1,11 @@
+result: pass
+compliance: 5.0
+execution_quality: 5.0
+overall: 5.0
+hard_checks_total: 11
+hard_checks_passed: 11
+candidate: python3 -m candidates.scope_lock
+workflow_rev: 4ce5064
+item_id: 003_scope_locking
+run_id: 20260619_205745_003_scope_locking
+batch_tag: demo_v1_pypackage_v2

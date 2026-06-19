@@ -5,3 +5,11 @@ __pycache__/
 .omc/
 .env
 .venv/
+
+# Claude Code personal config (per-user, not for repo)
+.claude/
+
+# harness-eval: runs/ 下面只跟踪 score.yaml + review.md（不跟踪 transcript 和 artifacts）
+harness_eval/runs/*/sandbox/
+harness_eval/runs/*/transcript.jsonl
+harness_eval/runs/*/artifacts/

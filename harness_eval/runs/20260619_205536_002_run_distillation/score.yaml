@@ -1,0 +1,11 @@
+result: pass
+compliance: 5.0
+execution_quality: 4.8
+overall: 4.9
+hard_checks_total: 9
+hard_checks_passed: 9
+candidate: python3 -m candidates.distill_run_to_results
+workflow_rev: 4ce5064
+item_id: 002_run_distillation
+run_id: 20260619_205536_002_run_distillation
+batch_tag: demo_v1_pypackage_v2

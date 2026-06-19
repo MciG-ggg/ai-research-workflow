@@ -1,0 +1,5 @@
+Run 001: codestral-mamba-7b on HumanEval
+- pass@1 = 0.471, pass@10 = 0.692
+- 推理延迟 187.3ms / sample
+- 上下文用了 ~1024 tokens
+- 全程无异常，status=completed

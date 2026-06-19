@@ -1,0 +1,7 @@
+Run 004: ablation — Mamba-2 vs Mamba-1 on HumanEval
+- Mamba-2 pass@1 = 0.488 (vs Mamba-1 的 0.471, 提升 +1.7pp)
+- Mamba-2 pass@10 = 0.711
+- 推理延迟 162.8ms / sample (Mamba-1 是 187.3ms)
+- status=completed
+
+ablation insight: Mamba-2 比 Mamba-1 在 HumanEval 上略好，且推理更快。

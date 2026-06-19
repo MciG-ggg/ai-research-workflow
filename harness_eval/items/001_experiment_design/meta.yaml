@@ -1,0 +1,23 @@
+id: 001_experiment_design
+version: 1
+wave: 1
+difficulty: medium
+category: experiment_design
+target_skill: ai-research-workflow / experiment-design phase
+
+probe: |
+  考察 ai-research-workflow 工作流在 "experiment-design" 阶段的产物质量——
+  给定 RESEARCH.md 草案，agent 能否生成结构完整、引用一致、可执行的 EXPERIMENT.md。
+
+default_candidate:
+  kind: command
+  argv: ["python3", "-m", "candidates.draft_experiment_md"]
+  env_overrides:
+    HARNESS_EVAL_ITEM_ID: "001_experiment_design"
+
+scoring:
+  weights:
+    compliance: 0.5
+    execution_quality: 0.5
+  pass_threshold: 3.5
+  repeat: 1

@@ -1,0 +1,8 @@
+Run 005: ablation — Mamba-1 + chunked inference on long context
+- pass@1 = 0.291, exact_match = 0.318
+- 推理延迟 423.7ms / sample (chunked 后比单次 8k 还慢——overhead 反而更高)
+- context_length=8192, chunk_size=2048
+- status=completed
+
+insight: chunked inference 能避免 OOM，但引入了额外的 prefix recomputation，
+延迟反而比短上下文高 2x。这个 trade-off 在我们假设里没考虑到。

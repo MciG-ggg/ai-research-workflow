@@ -1,0 +1,7 @@
+Run 003: codestral-mamba-7b on RepoBench long-context (8k)
+- 失败：CUDA OOM at context_length=8192
+- 错误原因：recurrent state memory 超出 24G GPU 显存
+- status=failed, error.type=oom
+
+这是关键失败——长上下文正是我们假设 Mamba 应该擅长的场景，
+但实现层面有显存问题。需要要么换 Mamba-2，要么做 chunked inference。

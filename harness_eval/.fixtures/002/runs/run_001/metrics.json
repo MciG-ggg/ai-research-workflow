@@ -1,0 +1,22 @@
+{
+  "run_id": "run_001",
+  "kind": "main",
+  "model": "codestral-mamba-7b-v0.1",
+  "dataset": "humaneval",
+  "split": "test",
+  "metrics": {
+    "pass@1": 0.471,
+    "pass@10": 0.692,
+    "avg_latency_ms": 187.3,
+    "context_length_used": 1024
+  },
+  "config": {
+    "temperature": 0.2,
+    "top_p": 0.95,
+    "max_new_tokens": 512
+  },
+  "seed": 42,
+  "started_at": "2026-06-15T10:23:11Z",
+  "finished_at": "2026-06-15T11:04:58Z",
+  "status": "completed"
+}

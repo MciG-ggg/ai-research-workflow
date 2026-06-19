@@ -1,0 +1,24 @@
+id: 003_scope_locking
+version: 1
+wave: 2
+difficulty: medium
+category: scope_management
+target_skill: ai-research-workflow / scope-locking phase (HARD GATE)
+
+probe: |
+  考察 ai-research-workflow 在 "scope-locking" 阶段的门禁行为——给定 RESEARCH 草稿和
+  一组可能超范围的新需求，agent 能否输出结构化的 SCOPE.md（in_scope / out_of_scope /
+  deferred），每条都引用 RESEARCH.md 或给出明确拒绝/推迟理由。
+
+default_candidate:
+  kind: command
+  argv: ["python3", "-m", "candidates.scope_lock"]
+  env_overrides:
+    HARNESS_EVAL_ITEM_ID: "003_scope_locking"
+
+scoring:
+  weights:
+    compliance: 0.5
+    execution_quality: 0.5
+  pass_threshold: 3.5
+  repeat: 1

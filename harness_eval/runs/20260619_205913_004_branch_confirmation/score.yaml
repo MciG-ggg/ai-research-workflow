@@ -1,0 +1,11 @@
+result: pass
+compliance: 5.0
+execution_quality: 4.4
+overall: 4.7
+hard_checks_total: 11
+hard_checks_passed: 11
+candidate: python3 -m candidates.plan_branch
+workflow_rev: 4ce5064
+item_id: 004_branch_confirmation
+run_id: 20260619_205913_004_branch_confirmation
+batch_tag: demo_v1_pypackage_v2

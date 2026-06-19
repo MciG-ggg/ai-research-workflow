@@ -1,0 +1,7 @@
+Run 002: codellama-7b-instruct on HumanEval (baseline)
+- pass@1 = 0.502, pass@10 = 0.748
+- 推理延迟 211.6ms / sample
+- status=completed
+
+注：Mamba (0.471 pass@1) 比 CodeLlama baseline 低 3.1pp。
+短上下文场景下未观察到 Mamba 优势。

@@ -1,0 +1,23 @@
+{
+  "run_id": "run_005",
+  "kind": "ablation",
+  "model": "codestral-mamba-7b-v0.1-chunked",
+  "dataset": "repobench",
+  "split": "test_long_8k",
+  "metrics": {
+    "pass@1": 0.291,
+    "exact_match": 0.318,
+    "avg_latency_ms": 423.7,
+    "context_length_used": 8192
+  },
+  "config": {
+    "temperature": 0.2,
+    "top_p": 0.95,
+    "max_new_tokens": 512,
+    "chunk_size": 2048
+  },
+  "seed": 42,
+  "started_at": "2026-06-16T16:00:00Z",
+  "finished_at": "2026-06-16T16:51:09Z",
+  "status": "completed"
+}

@@ -1,0 +1,11 @@
+result: pass
+compliance: 4.5
+execution_quality: 3.4
+overall: 3.95
+hard_checks_total: 10
+hard_checks_passed: 9
+candidate: python3 -m candidates.draft_experiment_md
+workflow_rev: 4ce5064
+item_id: 001_experiment_design
+run_id: 20260619_205204_001_experiment_design
+batch_tag: demo_v1_pypackage_v2

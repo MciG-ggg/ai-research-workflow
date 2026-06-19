@@ -1,0 +1,23 @@
+id: 004_branch_confirmation
+version: 1
+wave: 2
+difficulty: medium
+category: branch_management
+target_skill: ai-research-workflow / git-preflight (state machine BRANCH GATE)
+
+probe: |
+  考察 ai-research-workflow 在 "branch 确认" 阶段的行为——给定 RESEARCH 草稿、EXPERIMENT 草案、
+  git preflight policy 摘要，agent 能否输出符合规范且风险标注完整的 BRANCH_PLAN.md。
+
+default_candidate:
+  kind: command
+  argv: ["python3", "-m", "candidates.plan_branch"]
+  env_overrides:
+    HARNESS_EVAL_ITEM_ID: "004_branch_confirmation"
+
+scoring:
+  weights:
+    compliance: 0.5
+    execution_quality: 0.5
+  pass_threshold: 3.5
+  repeat: 1

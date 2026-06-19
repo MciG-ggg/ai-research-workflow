@@ -1,0 +1,26 @@
+{
+  "run_id": "run_003",
+  "kind": "main",
+  "model": "codestral-mamba-7b-v0.1",
+  "dataset": "repobench",
+  "split": "test_long_8k",
+  "metrics": {
+    "pass@1": null,
+    "exact_match": null,
+    "avg_latency_ms": null,
+    "context_length_used": 8192
+  },
+  "config": {
+    "temperature": 0.2,
+    "top_p": 0.95,
+    "max_new_tokens": 512
+  },
+  "seed": 42,
+  "started_at": "2026-06-16T09:00:00Z",
+  "finished_at": "2026-06-16T09:14:23Z",
+  "status": "failed",
+  "error": {
+    "type": "oom",
+    "message": "CUDA OOM at context_length=8192 with batch_size=1 on RTX-3090-24G. Recurrent state memory grew beyond capacity."
+  }
+}

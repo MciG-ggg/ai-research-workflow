@@ -1,0 +1,25 @@
+id: <NNN>_<slug>             # 必须唯一，建议 3 位序号 + snake_case slug
+version: 1                   # 题目自身的版本；rubric 改了记得 +1
+wave: 1                      # 1=主干闭环 / 2=状态机门禁 / 3=知识库闭环 / 4=周边 skill / 5=韧性
+difficulty: easy|medium|hard # 期望通过率参考
+category: <one-word lane>    # experiment_design / run_distillation / paper_draft ...
+target_skill: <skill name>   # 考察的 ai-research-workflow 子能力
+
+# 题目想考察什么（一句白话）
+probe: |
+  <说明本道题想暴露的工作流哪个环节的缺陷>
+
+# 默认考生（可被 CLI --candidate 覆盖）
+# 在 v0 里，"考生"是任意可执行命令；后续会接 Cursor/Codebuddy CLI
+default_candidate:
+  kind: command
+  argv: ["python3", "-m", "harness_eval.candidates.draft_experiment_md"]
+  # 或者 kind: skill，由 runner 解析 ai-research-workflow skill 子命令
+
+# 跑分配置
+scoring:
+  weights:                   # 三个细粒度分数如何加权得 overall
+    compliance: 0.5
+    execution_quality: 0.5
+  pass_threshold: 3.5        # overall >= 此值算 pass
+  repeat: 1                  # 跑几次取分布（v0 默认 1）

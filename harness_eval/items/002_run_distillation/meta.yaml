@@ -1,0 +1,24 @@
+id: 002_run_distillation
+version: 1
+wave: 1
+difficulty: medium
+category: run_distillation
+target_skill: ai-research-workflow / run-distillation phase
+
+probe: |
+  考察 ai-research-workflow 工作流在 "run-distillation" 阶段的产物质量——
+  给定一组真实跑分数据，agent 能否从 raw run logs 蒸馏出结构完整、
+  claim-aligned、保留 negative results 的 RESULTS.md。
+
+default_candidate:
+  kind: command
+  argv: ["python3", "-m", "candidates.distill_run_to_results"]
+  env_overrides:
+    HARNESS_EVAL_ITEM_ID: "002_run_distillation"
+
+scoring:
+  weights:
+    compliance: 0.5
+    execution_quality: 0.5
+  pass_threshold: 3.5
+  repeat: 1

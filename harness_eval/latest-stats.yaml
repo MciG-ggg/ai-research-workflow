@@ -1,0 +1,25 @@
+batch_tag: demo_v1_pypackage_v2
+n_total: 4
+n_pass: 4
+n_fail: 0
+pass_rate: 1.0
+avg_overall: 4.64
+avg_compliance: 4.88
+avg_execution_quality: 4.4
+by_item:
+  001_experiment_design:
+    n: 1
+    pass_rate: 1.0
+    avg_overall: 3.95
+  002_run_distillation:
+    n: 1
+    pass_rate: 1.0
+    avg_overall: 4.9
+  003_scope_locking:
+    n: 1
+    pass_rate: 1.0
+    avg_overall: 5.0
+  004_branch_confirmation:
+    n: 1
+    pass_rate: 1.0
+    avg_overall: 4.7

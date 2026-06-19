@@ -1,0 +1,22 @@
+{
+  "run_id": "run_002",
+  "kind": "main",
+  "model": "codellama-7b-instruct",
+  "dataset": "humaneval",
+  "split": "test",
+  "metrics": {
+    "pass@1": 0.502,
+    "pass@10": 0.748,
+    "avg_latency_ms": 211.6,
+    "context_length_used": 1024
+  },
+  "config": {
+    "temperature": 0.2,
+    "top_p": 0.95,
+    "max_new_tokens": 512
+  },
+  "seed": 42,
+  "started_at": "2026-06-15T11:30:02Z",
+  "finished_at": "2026-06-15T12:18:41Z",
+  "status": "completed"
+}
