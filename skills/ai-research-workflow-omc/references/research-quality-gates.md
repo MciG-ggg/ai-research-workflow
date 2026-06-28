@@ -35,8 +35,8 @@ python3 scripts/validate_research_workspace.py <project-root> --phase completion
 ## Intake gate
 
 Pass only if:
-- Portfolio `.omc/ai-research/RESEARCH.md` exists or is created with the overall research program before opening a new workstream.
-- Portfolio `.omc/ai-research/INDEX.md` exists or is created with a workstream registry before opening a new workstream.
+- Portfolio `.ai-research-workflow/RESEARCH.md` exists or is created with the overall research program before opening a new workstream.
+- Portfolio `.ai-research-workflow/INDEX.md` exists or is created with a workstream registry before opening a new workstream.
 - Existing workstreams were checked before a new slug was created.
 - The research question is specific enough to design an experiment.
 - The hypothesis is falsifiable.
@@ -46,10 +46,10 @@ Pass only if:
 
 ## Idea scouting gate
 
-This gate is active only when the user asks for idea generation, idea triage, broad-direction scouting, `.omc/ai-research/CONFIG.md` sets `idea_scouting: on`, or `idea_scouting: auto` applies under a guided/autonomous preset. Skip it for already-clear research questions.
+This gate is active only when the user asks for idea generation, idea triage, broad-direction scouting, `.ai-research-workflow/CONFIG.md` sets `idea_scouting: on`, or `idea_scouting: auto` applies under a guided/autonomous preset. Skip it for already-clear research questions.
 
 Pass only if:
-- `.omc/ai-research/IDEA_SCOUTING.md` exists and records the scouting objective.
+- `.ai-research-workflow/IDEA_SCOUTING.md` exists and records the scouting objective.
 - Candidate ideas include falsifiable hypothesis, evaluation metric/baseline, lightweight evidence, novelty risk, feasibility budget, and user-goal fit.
 - Weak ideas are parked or rejected with evidence and revisit triggers instead of silently discarded.
 - The recommended candidate passes all six promotion gate fields before formal intake is suggested.
@@ -63,7 +63,7 @@ When paper reproduction is used to generate ideas, `IDEA_SCOUTING.md` also links
 This gate is active only when the user asks to find SOTA/baseline papers, maintain a paper list, compare paper candidates, or prepare a paper-reproduction scouting pass.
 
 Pass only if:
-- `.omc/ai-research/PAPERS.md` exists and records the research area, search date, search strategy, and sources.
+- `.ai-research-workflow/PAPERS.md` exists and records the research area, search date, search strategy, and sources.
 - The paper list distinguishes SOTA, baseline, survey, dataset, benchmark, and method-paper roles when relevant.
 - Each prioritized paper records key claim, benchmark/metric, code/data/checkpoint availability, reproduction priority, status, and notes.
 - The baseline map records comparable baselines and known fairness or reproduction risks.
@@ -91,12 +91,12 @@ Pass only if:
 - New workstreams declare `workstream_type`: `paper-reproduction` for one selected paper/baseline/claim reproduction, or `experiment-campaign` for hypothesis/ablation/benchmark/method evaluation campaigns.
 - The chosen OMC handoff path is appropriate for the current ambiguity and risk.
 - Workstream `STATE.json` records the current phase, next action, blockers, and confirmation boundaries.
-- Portfolio artifacts in `.omc/ai-research/` describe the overall research program, while workstream artifacts in `.omc/ai-research/<slug>/` describe one concrete direction.
+- Portfolio artifacts in `.ai-research-workflow/` describe the overall research program, while workstream artifacts in `.ai-research-workflow/<slug>/` describe one concrete direction.
 - Control-plane artifacts are clearly separated from project-root code/config/test/docs work.
 
 ## New workstream gate
 
-Pass only if, before a new `.omc/ai-research/<slug>/` workstream is created:
+Pass only if, before a new `.ai-research-workflow/<slug>/` workstream is created:
 - Portfolio `RESEARCH.md` and `INDEX.md` were inspected.
 - Existing workstreams were checked and reuse was rejected with a recorded reason.
 - `/oh-my-claudecode:deep-interview --autoresearch` completed and produced a validator-ready mission/intake artifact.
@@ -131,7 +131,7 @@ Pass only if:
 ## Implementation gate
 
 Pass only if:
-- The method, baseline, or evaluation implementation lives in the target repository's normal source/config/test layout, not under `.omc/ai-research/`.
+- The method, baseline, or evaluation implementation lives in the target repository's normal source/config/test layout, not under `.ai-research-workflow/`.
 - Project-root code/config/test changes are recorded alongside the research plan when they are part of the task.
 - Baseline reproduction is either completed or explicitly blocked with reasons.
 
@@ -175,7 +175,7 @@ Pass only if:
 
 ## Optional feedback memory gate
 
-This gate is active only when `--feedback-memory` is present or `.omc/ai-research/CONFIG.md` sets `feedback_memory: lite` or `feedback_memory: full`. When Research Feedback Memory is disabled by default or by `--no-feedback`, skip this gate.
+This gate is active only when `--feedback-memory` is present or `.ai-research-workflow/CONFIG.md` sets `feedback_memory: lite` or `feedback_memory: full`. When Research Feedback Memory is disabled by default or by `--no-feedback`, skip this gate.
 
 Pass only if enabled feedback artifacts contain concise, reusable entries:
 - `LEARNINGS.md` records concepts, papers, methods, domain knowledge, or verification lessons with evidence links.
@@ -188,7 +188,7 @@ Fail only on enabled modes when valuable durable knowledge was discovered but le
 
 ## Optional question capture gate
 
-This gate is active only when `--qa-capture` is present or `.omc/ai-research/CONFIG.md` sets `qa_capture: research` or `qa_capture: all`. When Question Capture is disabled by default or by `--no-feedback`, skip this gate.
+This gate is active only when `--qa-capture` is present or `.ai-research-workflow/CONFIG.md` sets `qa_capture: research` or `qa_capture: all`. When Question Capture is disabled by default or by `--no-feedback`, skip this gate.
 
 Pass only if enabled Q&A artifacts contain concise, durable entries:
 - Root `QUESTIONS.md` records cross-workstream or portfolio-level user questions and answer summaries.
@@ -200,7 +200,7 @@ Do not fail when no question-like prompt occurred. Fail only when a durable answ
 
 ## Optional growth review gate
 
-This gate is active only when `--growth-review` is present or `.omc/ai-research/CONFIG.md` sets `growth_review: milestone` or `growth_review: always`. When Researcher Growth Review is disabled by default or by `--no-feedback`, skip this gate.
+This gate is active only when `--growth-review` is present or `.ai-research-workflow/CONFIG.md` sets `growth_review: milestone` or `growth_review: always`. When Researcher Growth Review is disabled by default or by `--no-feedback`, skip this gate.
 
 Pass only if enabled growth artifacts link capability lessons to concrete evidence:
 - `SKILL_GROWTH.md` records lessons across problem definition, research taste, experiment design, verification, systems engineering, expression/collaboration, or risk awareness.

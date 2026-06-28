@@ -5,7 +5,7 @@
 ## 你的任务
 
 我手头有一个研究方向的早期草稿 `RESEARCH.md`（在 fixtures 里），写了点想法但很粗。
-请你基于它起草一份 **`EXPERIMENT.md`**，放到 `{{project_root}}/.omx/ai-research/{{slug}}/EXPERIMENT.md`。
+请你基于它起草一份 **`EXPERIMENT.md`**，放到 `{{project_root}}/.ai-research-workflow/{{slug}}/EXPERIMENT.md`。
 
 这份 EXPERIMENT 必须满足：
 
@@ -24,7 +24,7 @@
 
 必须产出：
 
-1. `{{project_root}}/.omx/ai-research/{{slug}}/EXPERIMENT.md`
+1. `{{project_root}}/.ai-research-workflow/{{slug}}/EXPERIMENT.md`
 
 ## 约束
 

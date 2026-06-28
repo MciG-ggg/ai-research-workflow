@@ -9,12 +9,12 @@ Question capture is opt-in. It is disabled by default.
 Enable it with:
 
 - `--qa-capture`: enable question capture for this invocation.
-- `.omc/ai-research/CONFIG.md` with `qa_capture: research` or `qa_capture: all`.
+- `.ai-research-workflow/CONFIG.md` with `qa_capture: research` or `qa_capture: all`.
 
 Disable it with:
 
 - `--no-feedback`: disables feedback memory, growth review, and question capture for this invocation.
-- `.omc/ai-research/CONFIG.md` with `qa_capture: off`.
+- `.ai-research-workflow/CONFIG.md` with `qa_capture: off`.
 
 Config values:
 
@@ -43,13 +43,13 @@ Use `assets/templates/QUESTIONS.md` when creating a new ledger.
 Write global or cross-workstream Q&A to:
 
 ```text
-.omc/ai-research/QUESTIONS.md
+.ai-research-workflow/QUESTIONS.md
 ```
 
 Write workstream-specific Q&A to:
 
 ```text
-.omc/ai-research/<slug>/QUESTIONS.md
+.ai-research-workflow/<slug>/QUESTIONS.md
 ```
 
 Then route durable content to other feedback artifacts when useful:
@@ -101,17 +101,17 @@ python3 scripts/question_capture_hook.py --stage answer --project-root <project-
 Submit stage behavior:
 
 - reads the prompt from `--prompt`, `--prompt-file`, supported hook environment variables, or stdin
-- parses `.omc/ai-research/CONFIG.md`
+- parses `.ai-research-workflow/CONFIG.md`
 - checks whether `qa_capture: research | all` enables capture for the inferred scope
 - refuses likely secret/credential text
-- writes only pending state to `.omc/state/ai-research-question-capture-pending.json` unless `--no-pending-write` is used
+- writes only pending state to `.ai-research-workflow/state/ai-research-question-capture-pending.json` unless `--no-pending-write` is used
 - never writes the final Q&A ledger because the answer does not exist yet
 
 Answer stage behavior:
 
 - requires `--answer-summary` or `--answer-file`
 - uses the pending prompt unless `--prompt` is supplied again
-- appends to `.omc/ai-research/QUESTIONS.md` or `.omc/ai-research/<slug>/QUESTIONS.md`
+- appends to `.ai-research-workflow/QUESTIONS.md` or `.ai-research-workflow/<slug>/QUESTIONS.md`
 - removes the pending marker after successful capture unless `--keep-pending` is used
 
 `assets/hooks/question-capture.example.json` shows example hook wiring. Adapt paths to the local Claude Code/OMC hook runner; the skill does not install global hooks automatically.

@@ -203,7 +203,7 @@ def append_index(ai_root: Path, args: argparse.Namespace, *, dry_run: bool, acti
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Initialize a gated .omc/ai-research/<slug> workstream.")
+    parser = argparse.ArgumentParser(description="Initialize a gated .ai-research-workflow/<slug> workstream.")
     parser.add_argument("project_root", type=Path, help="Target project root.")
     parser.add_argument("slug", help="Workstream slug, lowercase hyphen/underscore style.")
     parser.add_argument("--title", required=True, help="Workstream title.")
@@ -235,7 +235,7 @@ def main() -> int:
     if args.paper_reproduction:
         args.workstream_type = "paper-reproduction"
     project_root = args.project_root.resolve()
-    ai_root = project_root / ".omc" / "ai-research"
+    ai_root = project_root / ".ai-research-workflow"
     workstream = ai_root / args.slug
     actions: list[str] = []
 

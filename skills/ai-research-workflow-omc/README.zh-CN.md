@@ -12,7 +12,7 @@
 
 这个 skill 是工作流和 artifact 框架，**不**内置通用实验 runner。项目里的真实代码、配置、训练脚本、评估脚本应该放在目标 AI research project 里。bundled 的脚本只做 framework guardrail，**不**用于跑用户实验。
 
-这个 skill 是 Codex/OMX `ai-research-workflow` 的 OMC 版本，artifact contract 和 Python guardrail 脚本共用，但 workflow gate 走 [oh-my-claudecode (OMC)](https://github.com/MciG-ggg/oh-my-claudecode) slash 命令（`/oh-my-claudecode:deep-interview`、`/oh-my-claudecode:ralplan`、`/oh-my-claudecode:autoresearch`、`/oh-my-claudecode:ralph`、`/oh-my-claudecode:autopilot`、`/oh-my-claudecode:ultrawork`、`/oh-my-claudecode:team`），portfolio/workstream control plane 放在 `.omc/ai-research/`。
+这个 skill 是 Codex/OMX `ai-research-workflow` 的 OMC 版本，artifact contract 和 Python guardrail 脚本共用，但 workflow gate 走 [oh-my-claudecode (OMC)](https://github.com/MciG-ggg/oh-my-claudecode) slash 命令（`/oh-my-claudecode:deep-interview`、`/oh-my-claudecode:ralplan`、`/oh-my-claudecode:autoresearch`、`/oh-my-claudecode:ralph`、`/oh-my-claudecode:autopilot`、`/oh-my-claudecode:ultrawork`、`/oh-my-claudecode:team`），portfolio/workstream control plane 放在 `.ai-research-workflow/`。
 
 ## 依赖
 
@@ -66,7 +66,7 @@ optional idea scouting when no clear research question exists
   -> paper/report drafting
 ```
 
-Method implementation 和 baseline reproduction 写在目标 AI research project 的代码目录里，不放进 `.omc/ai-research/`。
+Method implementation 和 baseline reproduction 写在目标 AI research project 的代码目录里，不放进 `.ai-research-workflow/`。
 
 ```text
 1. 从一个 idea、论文、baseline 或实验问题开始。
@@ -75,11 +75,11 @@ Method implementation 和 baseline reproduction 写在目标 AI research project
    - PAPERS.md 维护 SOTA/baseline 论文列表
 3. 新开 workstream 前先走：
    /oh-my-claudecode:deep-interview --autoresearch -> /oh-my-claudecode:ralplan -> /oh-my-claudecode:autoresearch
-4. 为一个具体方向创建或复用 .omc/ai-research/<slug>/。
+4. 为一个具体方向创建或复用 .ai-research-workflow/<slug>/。
 5. 选择 workstream 类型：
    - paper-reproduction：复现一篇论文/baseline/claim，使用 REPRODUCTION.md
    - experiment-campaign：围绕假设、消融、benchmark 或方法评估跑一组实验
-6. 项目代码写在目标 AI research project 里，不放进 .omc/ai-research/。
+6. 项目代码写在目标 AI research project 里，不放进 .ai-research-workflow/。
 7. 记录 runs、scripts、metrics、summary 和失败情况。
 8. 把稳定证据蒸馏到 RESULTS.md、CLAIMS.md、REPRODUCIBILITY.md。
 9. workstream 完成后，先生成 closeout/report-before-merge plan，再合并、推送或清理 worktree。
@@ -131,7 +131,7 @@ python3 skills/ai-research-workflow-omc/scripts/ai_research.py schema <project-r
 promotion gate 提升 candidate 到正式 intake 时需要：falsifiable hypothesis、evaluation metric/baseline、lightweight evidence、novelty risk、feasibility budget、user-goal fit。
 
 ```text
-.omc/ai-research/
+.ai-research-workflow/
   IDEA_SCOUTING.md   # 可选候选 idea 调研
   PAPERS.md          # 可选 SOTA/baseline 论文池
   RESEARCH.md        # 整体研究总览
@@ -139,7 +139,7 @@ promotion gate 提升 candidate 到正式 intake 时需要：falsifiable hypothe
   CONFIG.md          # 可选 workflow preset / mode flags
   QUESTIONS.md       # 启用 qa_capture 时可选
 
-.omc/ai-research/<slug>/
+.ai-research-workflow/<slug>/
   STATE.json
   RESEARCH.md
   LITERATURE.md
@@ -169,7 +169,7 @@ Research Feedback Memory、Question Capture 和 Researcher Growth Review 默认�
 - `/oh-my-claudecode:ai-research-workflow --growth-review`：本次启用 Researcher Growth Review。
 - `/oh-my-claudecode:ai-research-workflow --no-feedback`：本次强制关闭 feedback memory、Q&A capture、growth review。
 
-可选项目配置在 `.omc/ai-research/CONFIG.md`：
+可选项目配置在 `.ai-research-workflow/CONFIG.md`：
 
 ```yaml
 schema_version: 1
@@ -182,7 +182,7 @@ qa_capture: off | research | all
 growth_review: off | milestone | always
 ```
 
-Resolution precedence：`--no-feedback`、显式 enable flag、`.omc/ai-research/CONFIG.md`、默认 off。仅在对应模式启用时才使用 `assets/templates/CONFIG.md`、`QUESTIONS.md`、`LEARNINGS.md`、`ISSUES.md`、`DECISIONS.md`、`SKILL_GROWTH.md`、`DESIGN.md`、`NOTES.md` 和 `REVIEW.md`。
+Resolution precedence：`--no-feedback`、显式 enable flag、`.ai-research-workflow/CONFIG.md`、默认 off。仅在对应模式启用时才使用 `assets/templates/CONFIG.md`、`QUESTIONS.md`、`LEARNINGS.md`、`ISSUES.md`、`DECISIONS.md`、`SKILL_GROWTH.md`、`DESIGN.md`、`NOTES.md` 和 `REVIEW.md`。
 
 Feedback memory 记录蒸馏后的知识，不存原始日志。raw logs and run outputs stay under `runs/`，只链入或总结它们。
 
@@ -190,7 +190,7 @@ Feedback memory 记录蒸馏后的知识，不存原始日志。raw logs and run
 
 Before creating a new slug，先看 portfolio `RESEARCH.md`、root `INDEX.md` 和现有 workstream 目录。如果任务在同一个子问题上延续，reuse 或更新现有 workstream。
 
-新 workstream 创建是 gated transition。`.omc/ai-research/<slug>/`、implementation、experiment launch、docs publishing 在下面三个 gate 全部完成、`INDEX.md` 记录了对应的 evidence 路径前都不能执行：
+新 workstream 创建是 gated transition。`.ai-research-workflow/<slug>/`、implementation、experiment launch、docs publishing 在下面三个 gate 全部完成、`INDEX.md` 记录了对应的 evidence 路径前都不能执行：
 
 ```text
 /oh-my-claudecode:deep-interview --autoresearch
@@ -303,7 +303,7 @@ python3 skills/ai-research-workflow-omc/scripts/validate_framework_contract.py s
 - merge、push、删除 worktree、删除 branch 前，需要 report-before-merge 确认。
 - `runs/` 存原始证据，稳定结论要蒸馏回 markdown artifacts。
 - bundled scripts 只做 framework guardrail，不是用户实验 runner。
-- framework 的 portfolio control plane 在 `.omc/ai-research/`，`INDEX.md`（root `INDEX.md`）是 workstream registry。
+- framework 的 portfolio control plane 在 `.ai-research-workflow/`，`INDEX.md`（root `INDEX.md`）是 workstream registry。
 - `assets/templates/`、`assets/schemas/`、`assets/VERSION`、`assets/hooks/question-capture.example.json` 是 skill 自带的初始 scaffold。
 
 ## 验证

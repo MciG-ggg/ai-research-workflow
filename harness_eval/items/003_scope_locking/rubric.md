@@ -4,7 +4,7 @@
 
 ## 一、硬性通过项
 
-- [ ] **H1**：工件 `{{project_root}}/.omx/ai-research/{{slug}}/SCOPE.md` 存在
+- [ ] **H1**：工件 `{{project_root}}/.ai-research-workflow/{{slug}}/SCOPE.md` 存在
 - [ ] **H2**：文件大小 ≥ 500 字节
 - [ ] **H3**：包含 `in_scope` 小节
 - [ ] **H4**：包含 `out_of_scope` 小节

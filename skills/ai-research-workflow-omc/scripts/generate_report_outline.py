@@ -70,7 +70,7 @@ def main() -> int:
     parser.add_argument("--force", action="store_true", help="Overwrite output if it already exists.")
     args = parser.parse_args()
 
-    workstream = args.project_root.resolve() / ".omc" / "ai-research" / args.slug
+    workstream = args.project_root.resolve() / ".ai-research-workflow" / args.slug
     if not workstream.is_dir():
         raise SystemExit(f"missing workstream: {workstream}")
     text = outline(args.kind, workstream)

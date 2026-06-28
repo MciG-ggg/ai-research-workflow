@@ -175,7 +175,7 @@ If the user explicitly confirms the closeout plan, merge back serially, validate
 
 Worktree closeout and workstream closeout are related but distinct:
 
-- `scripts/prepare_workstream_closeout.py <project-root> <slug> --write` writes `.omc/ai-research/<slug>/CLOSEOUT.md` with completion-handoff artifacts, validation evidence, run/script inventory, blockers, and confirmation boundaries.
+- `scripts/prepare_workstream_closeout.py <project-root> <slug> --write` writes `.ai-research-workflow/<slug>/CLOSEOUT.md` with completion-handoff artifacts, validation evidence, run/script inventory, blockers, and confirmation boundaries.
 - `scripts/prepare_worktree_closeout.py <task-worktree> --base <branch>` inspects git worktree state and prints merge/push/remove/delete commands that remain pending user confirmation.
 
 Run the workstream closeout first to ensure research evidence is distilled. Then run the worktree closeout to plan git lifecycle cleanup. Neither script should execute merge, push, worktree removal, or branch deletion.

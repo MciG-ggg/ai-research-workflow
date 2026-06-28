@@ -34,7 +34,7 @@ def todo_count(path: Path) -> int:
 
 
 def inspect_workstream(project_root: Path, slug: str, validation: list[str], worktree: str | None) -> dict[str, Any]:
-    workstream = project_root / ".omc" / "ai-research" / slug
+    workstream = project_root / ".ai-research-workflow" / slug
     if not workstream.is_dir():
         raise SystemExit(f"missing workstream: {workstream}")
     state: dict[str, Any] = {}
@@ -147,7 +147,7 @@ def main() -> int:
     parser.add_argument("--validation", action="append", default=[], help="Validation evidence path. Repeatable.")
     parser.add_argument("--worktree", help="Task worktree path if this workstream used one.")
     parser.add_argument("--json", action="store_true", help="Print JSON instead of Markdown.")
-    parser.add_argument("--write", action="store_true", help="Write .omc/ai-research/<slug>/CLOSEOUT.md instead of stdout.")
+    parser.add_argument("--write", action="store_true", help="Write .ai-research-workflow/<slug>/CLOSEOUT.md instead of stdout.")
     parser.add_argument("--output", type=Path, help="Explicit output path.")
     args = parser.parse_args()
 
@@ -156,7 +156,7 @@ def main() -> int:
     text = json.dumps(plan, ensure_ascii=False, indent=2, sort_keys=True) + "\n" if args.json else markdown(plan)
     output = args.output
     if args.write and output is None:
-        output = project_root / ".omc" / "ai-research" / args.slug / "CLOSEOUT.md"
+        output = project_root / ".ai-research-workflow" / args.slug / "CLOSEOUT.md"
     if output:
         output.parent.mkdir(parents=True, exist_ok=True)
         output.write_text(text, encoding="utf-8")

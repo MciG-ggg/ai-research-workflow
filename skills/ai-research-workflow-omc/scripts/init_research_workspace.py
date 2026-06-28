@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Initialize a downstream .omc/ai-research portfolio workspace.
+"""Initialize a downstream .ai-research-workflow portfolio workspace.
 
 Script: init_research_workspace.py.
 
@@ -65,7 +65,7 @@ Allowed values and mode descriptions are documented in the skill template `asset
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Initialize .omc/ai-research portfolio files.")
+    parser = argparse.ArgumentParser(description="Initialize .ai-research-workflow portfolio files.")
     parser.add_argument("project_root", nargs="?", default=".", type=Path, help="Target project root. Defaults to cwd.")
     parser.add_argument("--preset", choices=sorted(VALID_WORKFLOW_PRESET), default="guided")
     parser.add_argument("--idea-scouting", choices=sorted(VALID_IDEA_SCOUTING), default="auto")
@@ -79,7 +79,7 @@ def main() -> int:
     args = parser.parse_args()
 
     root = args.project_root.resolve()
-    ai_root = root / ".omc" / "ai-research"
+    ai_root = root / ".ai-research-workflow"
     actions: list[str] = []
     if not args.dry_run:
         ai_root.mkdir(parents=True, exist_ok=True)

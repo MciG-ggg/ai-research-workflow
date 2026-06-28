@@ -17,7 +17,7 @@ ai-research-workflow 的分支确认阶段是一个 **BRANCH GATE**：
 - `git_preflight_policy.md`：本项目的 worktree / branch 规则摘要（含 §1-§6 章节）
 
 请你基于这三份材料，输出一份 **`BRANCH_PLAN.md`** 到
-`{{project_root}}/.omx/ai-research/{{slug}}/BRANCH_PLAN.md`。
+`{{project_root}}/.ai-research-workflow/{{slug}}/BRANCH_PLAN.md`。
 
 ## BRANCH_PLAN.md 必须包含 6 个结构化字段
 
@@ -38,7 +38,7 @@ ai-research-workflow 的分支确认阶段是一个 **BRANCH GATE**：
 
 ## 输出要求
 
-1. `{{project_root}}/.omx/ai-research/{{slug}}/BRANCH_PLAN.md`
+1. `{{project_root}}/.ai-research-workflow/{{slug}}/BRANCH_PLAN.md`
 
 ## 约束
 

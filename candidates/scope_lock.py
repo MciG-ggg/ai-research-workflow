@@ -56,7 +56,7 @@ def main() -> int:
     project_root = Path(os.environ["HARNESS_EVAL_PROJECT_ROOT"])
     slug = os.environ.get("HARNESS_EVAL_SLUG", "eval_demo")
 
-    out_dir = project_root / ".omx" / "ai-research" / slug
+    out_dir = project_root / ".ai-research-workflow" / slug
     out_dir.mkdir(parents=True, exist_ok=True)
     out_path = out_dir / "SCOPE.md"
 
@@ -160,7 +160,7 @@ def main() -> int:
 1. 把 in_scope 第 2 条（baseline 复现）作为 P0 启动
 2. 启动 EXPERIMENT.md 起草（in_scope 第 1 条对应的实验）
 3. 同步在 README.md 标注 "out_of_scope: 视觉 / 训练加速 / 100B" 防止后续再被提起
-4. 把 deferred 的 3 条触发条件做成 watch list，写到 .omx/ai-research/{slug}/watchlist.md
+4. 把 deferred 的 3 条触发条件做成 watch list，写到 .ai-research-workflow/{slug}/watchlist.md
 """
 
     out_path.write_text(body, encoding="utf-8")

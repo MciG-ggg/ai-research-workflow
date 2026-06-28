@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate a downstream .omc/ai-research workspace.
+"""Validate a downstream .ai-research-workflow workspace.
 
 This script is framework guardrail tooling for checking artifact contracts. It
 does not run experiments, collect metrics, plot results, publish research docs,
@@ -531,7 +531,7 @@ def validate(
     check_paths: bool,
 ) -> list[Finding]:
     findings: list[Finding] = []
-    ai_root = project_root / ".omc" / "ai-research"
+    ai_root = project_root / ".ai-research-workflow"
     if not ai_root.is_dir():
         return [Finding("error", f"missing ai-research root: {ai_root}")]
 
@@ -575,7 +575,7 @@ def validate(
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Validate a downstream .omc/ai-research workspace.")
+    parser = argparse.ArgumentParser(description="Validate a downstream .ai-research-workflow workspace.")
     parser.add_argument("project_root", type=Path, help="Target project root to validate.")
     parser.add_argument(
         "--require-workstream",

@@ -4,7 +4,7 @@
 
 ## 一、硬性通过项
 
-- [ ] **H1**：工件 `{{project_root}}/.omx/ai-research/{{slug}}/BRANCH_PLAN.md` 存在
+- [ ] **H1**：工件 `{{project_root}}/.ai-research-workflow/{{slug}}/BRANCH_PLAN.md` 存在
 - [ ] **H2**：文件大小 ≥ 500 字节
 - [ ] **H3**：包含 `branch_name` 字段
 - [ ] **H4**：包含 `base_branch` 字段

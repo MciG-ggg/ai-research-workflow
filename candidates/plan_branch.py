@@ -26,7 +26,7 @@ def main() -> int:
     project_root = Path(os.environ["HARNESS_EVAL_PROJECT_ROOT"])
     slug = os.environ.get("HARNESS_EVAL_SLUG", "eval_demo")
 
-    out_dir = project_root / ".omx" / "ai-research" / slug
+    out_dir = project_root / ".ai-research-workflow" / slug
     out_dir.mkdir(parents=True, exist_ok=True)
     out_path = out_dir / "BRANCH_PLAN.md"
 

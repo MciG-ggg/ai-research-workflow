@@ -12,7 +12,7 @@ The core principle is simple:
 
 This skill is a workflow and artifact framework. It does **not** ship universal experiment runner scripts; project-specific code, configs, training scripts, and evaluation scripts should live in the target AI research project. The bundled scripts are maintenance-only helpers for the framework itself and are not for running user experiments.
 
-This skill is the OMC-flavored sibling of the Codex/OMX `ai-research-workflow` skill. It shares the artifact contract and Python guardrail scripts but routes workflow gates through [oh-my-claudecode (OMC)](https://github.com/MciG-ggg/oh-my-claudecode) skills (`/oh-my-claudecode:deep-interview`, `/oh-my-claudecode:ralplan`, `/oh-my-claudecode:autoresearch`, `/oh-my-claudecode:ralph`, `/oh-my-claudecode:autopilot`, `/oh-my-claudecode:ultrawork`, `/oh-my-claudecode:team`) and keeps the portfolio/workstream control plane under `.omc/ai-research/`.
+This skill is the OMC-flavored sibling of the Codex/OMX `ai-research-workflow` skill. It shares the artifact contract and Python guardrail scripts but routes workflow gates through [oh-my-claudecode (OMC)](https://github.com/MciG-ggg/oh-my-claudecode) skills (`/oh-my-claudecode:deep-interview`, `/oh-my-claudecode:ralplan`, `/oh-my-claudecode:autoresearch`, `/oh-my-claudecode:ralph`, `/oh-my-claudecode:autopilot`, `/oh-my-claudecode:ultrawork`, `/oh-my-claudecode:team`) and keeps the portfolio/workstream control plane under `.ai-research-workflow/`.
 
 ## Dependency
 
@@ -66,7 +66,7 @@ optional idea scouting when no clear research question exists
   -> paper/report drafting
 ```
 
-Method implementation and baseline reproduction (method implementation, baseline reproduction) live in the target AI research project, never under `.omc/ai-research/`.
+Method implementation and baseline reproduction (method implementation, baseline reproduction) live in the target AI research project, never under `.ai-research-workflow/`.
 
 ```text
 1. Start from an idea, paper, baseline, or experiment question.
@@ -75,11 +75,11 @@ Method implementation and baseline reproduction (method implementation, baseline
    - PAPERS.md for SOTA/baseline paper lists
 3. Before opening a new workstream, run:
    /oh-my-claudecode:deep-interview --autoresearch -> /oh-my-claudecode:ralplan -> /oh-my-claudecode:autoresearch
-4. Create or reuse .omc/ai-research/<slug>/ for one concrete direction.
+4. Create or reuse .ai-research-workflow/<slug>/ for one concrete direction.
 5. Choose the workstream type:
    - paper-reproduction: reproduce one paper/baseline/claim; uses REPRODUCTION.md
    - experiment-campaign: run a hypothesis/ablation/benchmark/method-evaluation campaign
-6. Implement project code in the target AI research project, not inside .omc/ai-research/.
+6. Implement project code in the target AI research project, not inside .ai-research-workflow/.
 7. Record runs, scripts, metrics, summaries, and failures.
 8. Distill evidence into RESULTS.md, CLAIMS.md, and REPRODUCIBILITY.md.
 9. When the workstream is done, prepare a closeout/report-before-merge plan before merge, push, or worktree cleanup.
@@ -131,7 +131,7 @@ python3 skills/ai-research-workflow-omc/scripts/ai_research.py schema <project-r
 The promotion gate for promoting a candidate into formal intake requires: falsifiable hypothesis, evaluation metric/baseline, lightweight evidence, novelty risk, feasibility budget, and user-goal fit.
 
 ```text
-.omc/ai-research/
+.ai-research-workflow/
   IDEA_SCOUTING.md   # optional candidate idea scouting
   PAPERS.md          # optional SOTA/baseline paper registry
   RESEARCH.md        # overall research program summary
@@ -139,7 +139,7 @@ The promotion gate for promoting a candidate into formal intake requires: falsif
   CONFIG.md          # optional workflow preset / mode flags
   QUESTIONS.md       # optional when qa_capture is enabled
 
-.omc/ai-research/<slug>/
+.ai-research-workflow/<slug>/
   STATE.json
   RESEARCH.md
   LITERATURE.md
@@ -169,7 +169,7 @@ Invocation flags:
 - `/oh-my-claudecode:ai-research-workflow --growth-review`: enable Researcher Growth Review for this invocation.
 - `/oh-my-claudecode:ai-research-workflow --no-feedback`: force feedback memory, Q&A capture, and growth review off for this invocation.
 
-Optional project config lives at `.omc/ai-research/CONFIG.md`:
+Optional project config lives at `.ai-research-workflow/CONFIG.md`:
 
 ```yaml
 schema_version: 1
@@ -182,17 +182,17 @@ qa_capture: off | research | all
 growth_review: off | milestone | always
 ```
 
-Resolution precedence: `--no-feedback`, explicit enable flags, `.omc/ai-research/CONFIG.md`, then default off. Use `assets/templates/CONFIG.md`, `QUESTIONS.md`, `LEARNINGS.md`, `ISSUES.md`, `DECISIONS.md`, `SKILL_GROWTH.md`, `DESIGN.md`, `NOTES.md`, and `REVIEW.md` only when the resolved mode enables them.
+Resolution precedence: `--no-feedback`, explicit enable flags, `.ai-research-workflow/CONFIG.md`, then default off. Use `assets/templates/CONFIG.md`, `QUESTIONS.md`, `LEARNINGS.md`, `ISSUES.md`, `DECISIONS.md`, `SKILL_GROWTH.md`, `DESIGN.md`, `NOTES.md`, and `REVIEW.md` only when the resolved mode enables them.
 
 Feedback memory records distilled knowledge, not raw logs. Keep raw logs and run outputs stay under `runs/` and link or summarize them.
 
-When Q&A capture is enabled and the user asks a research/design question rather than issuing a command, answer first, then append the question and answer summary to `.omc/ai-research/QUESTIONS.md` or `.omc/ai-research/<slug>/QUESTIONS.md`.
+When Q&A capture is enabled and the user asks a research/design question rather than issuing a command, answer first, then append the question and answer summary to `.ai-research-workflow/QUESTIONS.md` or `.ai-research-workflow/<slug>/QUESTIONS.md`.
 
 ## New workstream gate
 
 Before creating a new `<slug>`, inspect the portfolio `RESEARCH.md`, root `INDEX.md`, and existing workstream directories. Reuse or update an existing workstream when the task continues the same subquestion. Before creating a new slug, the portfolio `RESEARCH.md` and root `INDEX.md` must already exist; if they don't, run the workspace initializer first.
 
-New workstream creation has a mandatory workflow gate. The gate blocks creating `.omc/ai-research/<slug>/`, implementation, experiment launch, or docs publishing until this sequence has completed and its artifact paths are recorded in `INDEX.md`:
+New workstream creation has a mandatory workflow gate. The gate blocks creating `.ai-research-workflow/<slug>/`, implementation, experiment launch, or docs publishing until this sequence has completed and its artifact paths are recorded in `INDEX.md`:
 
 ```text
 /oh-my-claudecode:deep-interview --autoresearch
@@ -305,7 +305,7 @@ python3 skills/ai-research-workflow-omc/scripts/validate_framework_contract.py s
 - Merge, push, worktree removal, and branch deletion require report-before-merge confirmation.
 - `runs/` stores raw evidence; stable conclusions should be distilled into the markdown artifacts.
 - Bundled scripts are framework guardrails only, not user experiment runners.
-- The framework's portfolio control plane lives at `.omc/ai-research/`, and `INDEX.md` (root `INDEX.md`) is the workstream registry.
+- The framework's portfolio control plane lives at `.ai-research-workflow/`, and `INDEX.md` (root `INDEX.md`) is the workstream registry.
 - `assets/templates/`, `assets/schemas/`, `assets/VERSION`, and `assets/hooks/question-capture.example.json` ship with the skill as starting scaffolds.
 
 ## Validate

@@ -16,7 +16,7 @@
 
 Use this section only when the user explicitly asks to find ideas from a paper, reproduce a paper, reproduce a baseline, or open a paper-reproduction workstream.
 
-- Paper registry: `.omc/ai-research/PAPERS.md`
+- Paper registry: `.ai-research-workflow/PAPERS.md`
 - Target paper ID: TODO
 - Target claim to inspect or reproduce: TODO
 - Minimal reproduction goal: exact / approximate / baseline-only / mechanism validation

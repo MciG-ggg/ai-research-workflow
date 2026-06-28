@@ -4,7 +4,7 @@
 
 ## 一、硬性通过项
 
-- [ ] **H1**：工件 `{{project_root}}/.omx/ai-research/{{slug}}/EXPERIMENT.md` 存在
+- [ ] **H1**：工件 `{{project_root}}/.ai-research-workflow/{{slug}}/EXPERIMENT.md` 存在
 - [ ] **H2**：文件大小 ≥ 500 字节（说明不是空壳）
 - [ ] **H3**：包含 "## Hypothesis" 或 "## 假设" 小节
 - [ ] **H4**：包含 "## Baselines" 或 "## 基线" 小节

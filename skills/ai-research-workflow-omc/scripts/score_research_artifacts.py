@@ -81,7 +81,7 @@ def find_workstreams(ai_root: Path) -> list[Path]:
 
 
 def score_project(project_root: Path) -> dict[str, Any]:
-    ai_root = project_root / ".omc" / "ai-research"
+    ai_root = project_root / ".ai-research-workflow"
     if not ai_root.is_dir():
         return {"project_root": str(project_root), "ai_root": str(ai_root), "exists": False, "error": "missing ai-research root"}
     portfolio = {
@@ -136,7 +136,7 @@ def markdown(result: dict[str, Any]) -> str:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Score .omc/ai-research artifact quality heuristics.")
+    parser = argparse.ArgumentParser(description="Score .ai-research-workflow artifact quality heuristics.")
     parser.add_argument("project_root", nargs="?", default=".", type=Path, help="Target project root. Defaults to cwd.")
     parser.add_argument("--json", action="store_true", help="Print JSON instead of Markdown.")
     parser.add_argument("--min-score", type=int, help="Return non-zero if overall score is below this threshold.")

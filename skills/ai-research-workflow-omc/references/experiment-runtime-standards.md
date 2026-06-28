@@ -21,7 +21,7 @@ This document defines contracts, not universal scripts. Use project-native tooli
 Every experiment run must write to one distinct run directory:
 
 ```text
-.omc/ai-research/<slug>/runs/<UTC_TIMESTAMP>-<run-name>/
+.ai-research-workflow/<slug>/runs/<UTC_TIMESTAMP>-<run-name>/
   run_manifest.json
   run_command.sh               # or equivalent command record
   tmux_status.json             # when tmux is used
@@ -43,15 +43,15 @@ Every experiment run must write to one distinct run directory:
 
 The run directory is raw evidence, not the final research memory. After each run becomes terminal:
 
-- Update `.omc/ai-research/<slug>/RUNS.md` with status, command, seed/device/resource, log path, metrics path, summary path, and failure notes.
-- Update `.omc/ai-research/<slug>/SCRIPT_REGISTRY.md` with scripts or native commands that were used, changed, validated, deprecated, or requested by the user.
-- Update `.omc/ai-research/<slug>/RESULTS.md` when the run changes tables, figures, comparisons, hypothesis verdicts, or threats to validity.
-- Update `.omc/ai-research/<slug>/CLAIMS.md` whenever a run supports, contradicts, downgrades, retires, or leaves a claim inconclusive.
-- Update `.omc/ai-research/<slug>/REPRODUCIBILITY.md` when the run reveals environment requirements, nondeterminism, missing data, missing compute, or rerun steps.
+- Update `.ai-research-workflow/<slug>/RUNS.md` with status, command, seed/device/resource, log path, metrics path, summary path, and failure notes.
+- Update `.ai-research-workflow/<slug>/SCRIPT_REGISTRY.md` with scripts or native commands that were used, changed, validated, deprecated, or requested by the user.
+- Update `.ai-research-workflow/<slug>/RESULTS.md` when the run changes tables, figures, comparisons, hypothesis verdicts, or threats to validity.
+- Update `.ai-research-workflow/<slug>/CLAIMS.md` whenever a run supports, contradicts, downgrades, retires, or leaves a claim inconclusive.
+- Update `.ai-research-workflow/<slug>/REPRODUCIBILITY.md` when the run reveals environment requirements, nondeterminism, missing data, missing compute, or rerun steps.
 - Promote stable conclusions to project-root `docs/`, `reports/`, benchmark cards, README sections, or MkDocs pages when useful.
-- Promote reusable method, baseline, config, or test changes to project-root files; do not bury them in `.omc/ai-research/`.
+- Promote reusable method, baseline, config, or test changes to project-root files; do not bury them in `.ai-research-workflow/`.
 - When a task worktree was used, write a report-before-merge closeout plan before merge-back or cleanup.
-- Update portfolio `.omc/ai-research/RESEARCH.md` and `.omc/ai-research/INDEX.md` when the run changes the overall synthesis, workstream status, or next priority.
+- Update portfolio `.ai-research-workflow/RESEARCH.md` and `.ai-research-workflow/INDEX.md` when the run changes the overall synthesis, workstream status, or next priority.
 - If Research Feedback Memory is enabled, update `LEARNINGS.md`, `ISSUES.md`, `DECISIONS.md`, and workstream `NOTES.md`/`DESIGN.md` with distilled run lessons, failed assumptions, decisions, reusable commands, and design rationale.
 - If Researcher Growth Review is enabled, update `SKILL_GROWTH.md` and workstream `REVIEW.md` with capability lessons tied to the completed run and evidence quality.
 - Keep raw logs, checkpoints, private data, and large temporary outputs in run storage; link or summarize them instead of copying them into project-root docs.

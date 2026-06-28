@@ -9,7 +9,7 @@ Distinguish project scripts from skill maintenance scripts. Scripts shipped in t
 For each research workspace, maintain project-local scripts and script metadata here:
 
 ```text
-.omc/ai-research/<slug>/
+.ai-research-workflow/<slug>/
   SCRIPT_REGISTRY.md
   scripts/
     run_<name>.sh
@@ -44,7 +44,7 @@ Add one entry per script in `SCRIPT_REGISTRY.md`:
 - Owner phase: run-experiments
 - Inputs: config path, dataset version, seed
 - Outputs: run directory, combined.log, metrics.jsonl, summary.json, figures/
-- Command: `bash .omc/ai-research/<slug>/scripts/run_baseline.sh`
+- Command: `bash .ai-research-workflow/<slug>/scripts/run_baseline.sh`
 - Safe to rerun: yes/no; explain idempotency
 - Dependencies: project tools, environment variables, credentials
 - Status: draft|validated|deprecated
@@ -55,7 +55,7 @@ Add one entry per script in `SCRIPT_REGISTRY.md`:
 
 - Create scripts only when the current project needs them.
 - Keep scripts thin: wrap existing project commands, logging, tmux launch, metrics extraction, plotting, or docs sync.
-- Keep method code, baseline code, configs, tests, and durable documentation in project-root locations; record their paths in research artifacts instead of moving them under `.omc/ai-research/`.
+- Keep method code, baseline code, configs, tests, and durable documentation in project-root locations; record their paths in research artifacts instead of moving them under `.ai-research-workflow/`.
 - Do not introduce new dependencies unless the project already uses them or the user explicitly approves.
 - Every script must write outputs into the current research workspace or a project-defined artifact directory recorded in `RUNS.md`.
 - Every script must be referenced from `SCRIPT_REGISTRY.md` before relying on it as part of the workflow.
@@ -63,7 +63,7 @@ Add one entry per script in `SCRIPT_REGISTRY.md`:
 
 ## Completion handoff updates
 
-When the user says the current experiment is done, inspect `.omc/ai-research/<slug>/scripts/` and the native commands recorded by the run. Update `SCRIPT_REGISTRY.md` before final response:
+When the user says the current experiment is done, inspect `.ai-research-workflow/<slug>/scripts/` and the native commands recorded by the run. Update `SCRIPT_REGISTRY.md` before final response:
 
 - add missing entries for scripts or native commands that produced the completed run
 - mark scripts as `validated` when the completed run proves they worked, including the command/log path

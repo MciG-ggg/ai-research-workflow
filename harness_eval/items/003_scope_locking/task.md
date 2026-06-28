@@ -13,7 +13,7 @@ ai-research-workflow 的 scope-locking 阶段是一个 **HARD GATE**：
 
 我手头有一个研究方向草稿 `RESEARCH.md` 和一份**产品方新需求清单** `NEW_REQUEST.md`。
 请你基于 RESEARCH.md 的"范围"小节和"我目前的状态"小节，对 NEW_REQUEST.md 里的每条新需求做
-**scope 判定**，输出一份 `SCOPE.md` 到 `{{project_root}}/.omx/ai-research/{{slug}}/SCOPE.md`。
+**scope 判定**，输出一份 `SCOPE.md` 到 `{{project_root}}/.ai-research-workflow/{{slug}}/SCOPE.md`。
 
 ## SCOPE.md 必须包含三个小节
 
@@ -42,7 +42,7 @@ ai-research-workflow 的 scope-locking 阶段是一个 **HARD GATE**：
 
 ## 输出要求
 
-1. `{{project_root}}/.omx/ai-research/{{slug}}/SCOPE.md`
+1. `{{project_root}}/.ai-research-workflow/{{slug}}/SCOPE.md`
 
 ## 约束
 

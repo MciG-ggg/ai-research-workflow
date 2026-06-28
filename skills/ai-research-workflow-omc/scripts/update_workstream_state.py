@@ -58,7 +58,7 @@ def load_state(path: Path) -> dict[str, object]:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Update .omc/ai-research/<slug>/STATE.json.")
+    parser = argparse.ArgumentParser(description="Update .ai-research-workflow/<slug>/STATE.json.")
     parser.add_argument("project_root", type=Path, help="Target project root.")
     parser.add_argument("slug", help="Workstream slug.")
     parser.add_argument("--phase", choices=VALID_PHASES, help="New workflow phase.")
@@ -72,7 +72,7 @@ def main() -> int:
     args = parser.parse_args()
     args.slug = validate_slug(args.slug)
 
-    state_path = args.project_root.resolve() / ".omc" / "ai-research" / args.slug / "STATE.json"
+    state_path = args.project_root.resolve() / ".ai-research-workflow" / args.slug / "STATE.json"
     state = load_state(state_path)
     before_phase = state.get("phase")
 

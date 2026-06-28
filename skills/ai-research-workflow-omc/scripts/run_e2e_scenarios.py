@@ -60,7 +60,7 @@ def write_gate_files(project: Path) -> dict[str, Path]:
 
 
 def add_concrete_evidence(project: Path, slug: str) -> None:
-    workstream = project / ".omc" / "ai-research" / slug
+    workstream = project / ".ai-research-workflow" / slug
     run_dir = workstream / "runs" / "run-001"
     run_dir.mkdir(parents=True, exist_ok=True)
     for name, content in {
@@ -74,18 +74,18 @@ def add_concrete_evidence(project: Path, slug: str) -> None:
     replace_first(
         workstream / "RUNS.md",
         "| TODO | TODO | TODO | TODO | TODO | TODO | TODO | TODO | TODO | TODO |",
-        "| run-001 | complete | `bash scripts/run_demo.sh` | seed=1/cpu | `.omc/ai-research/demo-lane/runs/run-001` | `.omc/ai-research/demo-lane/runs/run-001/log.txt` | `.omc/ai-research/demo-lane/runs/run-001/metrics.json` | `.omc/ai-research/demo-lane/runs/run-001/summary.md` | none | control-plane fixture |",
+        "| run-001 | complete | `bash scripts/run_demo.sh` | seed=1/cpu | `.ai-research-workflow/demo-lane/runs/run-001` | `.ai-research-workflow/demo-lane/runs/run-001/log.txt` | `.ai-research-workflow/demo-lane/runs/run-001/metrics.json` | `.ai-research-workflow/demo-lane/runs/run-001/summary.md` | none | control-plane fixture |",
     )
     replace_first(workstream / "RUNS.md", "- Git commit: TODO", "- Git commit: fixture-commit")
     replace_first(
         workstream / "CLAIMS.md",
         "| TODO | TODO | draft / supported / contradicted / inconclusive / retracted | TODO | TODO | TODO | TODO | TODO |",
-        "| C1 | Demo method improves the metric | inconclusive | `.omc/ai-research/demo-lane/runs/run-001/summary.md` | fixture scope | say inconclusive in fixture | say proven | 2026-05-09 |",
+        "| C1 | Demo method improves the metric | inconclusive | `.ai-research-workflow/demo-lane/runs/run-001/summary.md` | fixture scope | say inconclusive in fixture | say proven | 2026-05-09 |",
     )
     replace_first(
         workstream / "SCRIPT_REGISTRY.md",
         "| TODO | TODO | TODO | TODO | TODO | TODO |",
-        "| `bash .omc/ai-research/demo-lane/scripts/run_demo.sh` | fixture command only | none | `.omc/ai-research/demo-lane/runs/run-001/summary.md` | dry-run validated | 2026-05-09 |",
+        "| `bash .ai-research-workflow/demo-lane/scripts/run_demo.sh` | fixture command only | none | `.ai-research-workflow/demo-lane/runs/run-001/summary.md` | dry-run validated | 2026-05-09 |",
     )
 
 
@@ -168,7 +168,7 @@ def scenario_main_workspace(tmp: Path) -> None:
         "--answer-summary",
         "It constrains the claim boundary and prevents overclaiming.",
         "--evidence",
-        ".omc/ai-research/demo-lane/runs/run-001/summary.md",
+        ".ai-research-workflow/demo-lane/runs/run-001/summary.md",
     )
     assert json.loads(answer.stdout)["captured"] is True
 
@@ -179,7 +179,7 @@ def scenario_main_workspace(tmp: Path) -> None:
         "--finding",
         "No improvement over baseline in fixture evidence",
         "--evidence",
-        ".omc/ai-research/demo-lane/runs/run-001/summary.md",
+        ".ai-research-workflow/demo-lane/runs/run-001/summary.md",
         "--interpretation",
         "Treat the method as inconclusive for this fixture scope.",
         "--claim-id",
@@ -209,13 +209,13 @@ def scenario_main_workspace(tmp: Path) -> None:
 
 def scenario_migration(tmp: Path) -> None:
     legacy = tmp / "legacy"
-    lane = legacy / ".omc" / "ai-research" / "old-lane"
+    lane = legacy / ".ai-research-workflow" / "old-lane"
     lane.mkdir(parents=True)
     (lane / "RESULTS.md").write_text("# Legacy Results\n", encoding="utf-8")
     py("migrate_research_workspace.py", legacy)
     py("migrate_research_workspace.py", legacy, "--write")
     assert (lane / "STATE.json").is_file()
-    assert (legacy / ".omc" / "ai-research" / "RESEARCH.md").is_file()
+    assert (legacy / ".ai-research-workflow" / "RESEARCH.md").is_file()
 
 
 def main() -> int:

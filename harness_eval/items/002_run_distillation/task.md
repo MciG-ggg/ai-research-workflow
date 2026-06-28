@@ -7,7 +7,7 @@
 我跑完了一组实验，raw 数据在 `fixtures/runs/` 下面：包含 5 次实验（3 个主跑 + 2 个消融），
 每次实验有 `metrics.json` 和一段 `summary.txt`。
 
-请基于这些 raw 数据起草一份 **`RESULTS.md`**，放到 `{{project_root}}/.omx/ai-research/{{slug}}/RESULTS.md`。
+请基于这些 raw 数据起草一份 **`RESULTS.md`**，放到 `{{project_root}}/.ai-research-workflow/{{slug}}/RESULTS.md`。
 
 这份 RESULTS.md 必须满足：
 
@@ -28,7 +28,7 @@
 
 ## 输出要求
 
-1. `{{project_root}}/.omx/ai-research/{{slug}}/RESULTS.md`
+1. `{{project_root}}/.ai-research-workflow/{{slug}}/RESULTS.md`
 
 ## 约束
 

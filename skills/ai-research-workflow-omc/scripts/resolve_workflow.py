@@ -28,24 +28,24 @@ VALID_SUBCOMMANDS = {
     "scout": {
         "phase": "idea-scouting",
         "action": "generate_or_rank_candidate_research_ideas",
-        "artifacts": [".omc/ai-research/IDEA_SCOUTING.md"],
+        "artifacts": [".ai-research-workflow/IDEA_SCOUTING.md"],
         "scripts": ["resolve_workflow.py", "validate_research_workspace.py --phase idea-scouting"],
     },
     "papers": {
         "phase": "paper-scouting",
         "action": "find_and_maintain_sota_baseline_papers",
-        "artifacts": [".omc/ai-research/PAPERS.md"],
+        "artifacts": [".ai-research-workflow/PAPERS.md"],
         "scripts": ["resolve_workflow.py", "validate_research_workspace.py --phase paper-scouting"],
     },
     "reproduce-paper": {
         "phase": "paper-reproduction",
         "action": "gate_one_paper_reproduction_workstream",
         "artifacts": [
-            ".omc/ai-research/PAPERS.md",
-            ".omc/ai-research/<slug>/REPRODUCTION.md",
-            ".omc/ai-research/<slug>/EXPERIMENT.md",
-            ".omc/ai-research/<slug>/RUNS.md",
-            ".omc/ai-research/<slug>/RESULTS.md",
+            ".ai-research-workflow/PAPERS.md",
+            ".ai-research-workflow/<slug>/REPRODUCTION.md",
+            ".ai-research-workflow/<slug>/EXPERIMENT.md",
+            ".ai-research-workflow/<slug>/RUNS.md",
+            ".ai-research-workflow/<slug>/RESULTS.md",
         ],
         "scripts": [
             "resolve_workflow.py",
@@ -57,11 +57,11 @@ VALID_SUBCOMMANDS = {
         "phase": "new-workstream",
         "action": "gate_experiment_campaign_workstream",
         "artifacts": [
-            ".omc/ai-research/INDEX.md",
-            ".omc/ai-research/<slug>/STATE.json",
-            ".omc/ai-research/<slug>/EXPERIMENT.md",
-            ".omc/ai-research/<slug>/RUNS.md",
-            ".omc/ai-research/<slug>/RESULTS.md",
+            ".ai-research-workflow/INDEX.md",
+            ".ai-research-workflow/<slug>/STATE.json",
+            ".ai-research-workflow/<slug>/EXPERIMENT.md",
+            ".ai-research-workflow/<slug>/RUNS.md",
+            ".ai-research-workflow/<slug>/RESULTS.md",
         ],
         "scripts": [
             "init_workstream.py --workstream-type experiment-campaign",
@@ -71,55 +71,55 @@ VALID_SUBCOMMANDS = {
     "new-workstream": {
         "phase": "new-workstream",
         "action": "gate_and_initialize_new_workstream",
-        "artifacts": [".omc/ai-research/INDEX.md", ".omc/ai-research/<slug>/RESEARCH.md", ".omc/ai-research/<slug>/STATE.json"],
+        "artifacts": [".ai-research-workflow/INDEX.md", ".ai-research-workflow/<slug>/RESEARCH.md", ".ai-research-workflow/<slug>/STATE.json"],
         "scripts": ["init_workstream.py", "validate_research_workspace.py --phase new-workstream --workstream <slug>"],
     },
     "handoff": {
         "phase": "completion-handoff",
         "action": "distill_completed_runs_and_scripts",
-        "artifacts": [".omc/ai-research/<slug>/RUNS.md", ".omc/ai-research/<slug>/RESULTS.md", ".omc/ai-research/<slug>/CLAIMS.md"],
+        "artifacts": [".ai-research-workflow/<slug>/RUNS.md", ".ai-research-workflow/<slug>/RESULTS.md", ".ai-research-workflow/<slug>/CLAIMS.md"],
         "scripts": ["prepare_workstream_closeout.py", "validate_research_workspace.py --phase completion-handoff --workstream <slug>"],
     },
     "qa": {
         "phase": "question-capture",
         "action": "answer_then_capture_question_summary",
-        "artifacts": [".omc/ai-research/QUESTIONS.md", ".omc/ai-research/<slug>/QUESTIONS.md"],
+        "artifacts": [".ai-research-workflow/QUESTIONS.md", ".ai-research-workflow/<slug>/QUESTIONS.md"],
         "scripts": ["capture_question.py"],
     },
     "review": {
         "phase": "research-review",
         "action": "score_and_review_artifact_quality",
-        "artifacts": [".omc/ai-research/<slug>/CLAIMS.md", ".omc/ai-research/<slug>/REPRODUCIBILITY.md"],
+        "artifacts": [".ai-research-workflow/<slug>/CLAIMS.md", ".ai-research-workflow/<slug>/REPRODUCIBILITY.md"],
         "scripts": ["score_research_artifacts.py", "validate_research_workspace.py"],
     },
     "summarize": {
         "phase": "portfolio-summary",
         "action": "summarize_research_portfolio_state",
-        "artifacts": [".omc/ai-research/RESEARCH.md", ".omc/ai-research/INDEX.md"],
+        "artifacts": [".ai-research-workflow/RESEARCH.md", ".ai-research-workflow/INDEX.md"],
         "scripts": ["summarize_research_state.py"],
     },
     "closeout": {
         "phase": "report-before-merge",
         "action": "prepare_workstream_and_worktree_closeout_plan",
-        "artifacts": [".omc/ai-research/<slug>/CLOSEOUT.md", ".omc/worktrees/REGISTRY.md"],
+        "artifacts": [".ai-research-workflow/<slug>/CLOSEOUT.md", ".omc/worktrees/REGISTRY.md"],
         "scripts": ["prepare_workstream_closeout.py", "prepare_worktree_closeout.py"],
     },
     "draft": {
         "phase": "paper-draft",
         "action": "generate_report_or_paper_outline",
-        "artifacts": [".omc/ai-research/<slug>/PAPER_DRAFT.md", ".omc/ai-research/<slug>/PAPER_OUTLINE.md"],
+        "artifacts": [".ai-research-workflow/<slug>/PAPER_DRAFT.md", ".ai-research-workflow/<slug>/PAPER_OUTLINE.md"],
         "scripts": ["generate_report_outline.py"],
     },
     "score": {
         "phase": "research-review",
         "action": "score_research_artifacts",
-        "artifacts": [".omc/ai-research/<slug>/*.md"],
+        "artifacts": [".ai-research-workflow/<slug>/*.md"],
         "scripts": ["score_research_artifacts.py"],
     },
     "negative-result": {
         "phase": "result-analysis",
         "action": "preserve_negative_or_inconclusive_result",
-        "artifacts": [".omc/ai-research/<slug>/RESULTS.md", ".omc/ai-research/<slug>/CLAIMS.md"],
+        "artifacts": [".ai-research-workflow/<slug>/RESULTS.md", ".ai-research-workflow/<slug>/CLAIMS.md"],
         "scripts": ["preserve_negative_result.py"],
     },
 }
@@ -140,7 +140,7 @@ class Config:
 def parse_config(project_root: Path) -> tuple[Config, list[str], str | None]:
     cfg = Config()
     warnings: list[str] = []
-    config_path = project_root / ".omc" / "ai-research" / "CONFIG.md"
+    config_path = project_root / ".ai-research-workflow" / "CONFIG.md"
     if not config_path.is_file():
         return cfg, warnings, None
 
@@ -423,7 +423,7 @@ def resolve(
     ask_before: list[str] = []
     if idea_scouting:
         ask_before.append("promoting final topic from IDEA_SCOUTING.md")
-        ask_before.append("creating .omc/ai-research/<slug>")
+        ask_before.append("creating .ai-research-workflow/<slug>")
     if paper_reproduction:
         ask_before.append("selecting a paper for reproduction workstream")
     if new_workstream_gate:
@@ -435,17 +435,17 @@ def resolve(
 
     recommended_steps: list[str] = []
     if config_warnings:
-        recommended_steps.append("fix invalid .omc/ai-research/CONFIG.md fields before relying on automatic routing")
+        recommended_steps.append("fix invalid .ai-research-workflow/CONFIG.md fields before relying on automatic routing")
     if command_spec:
         recommended_steps.append(f"execute subcommand {subcommand}: {command_spec['action']}")
     if paper_scouting:
-        recommended_steps.append("write/update .omc/ai-research/PAPERS.md with SOTA/baseline paper candidates and reproduction priority")
+        recommended_steps.append("write/update .ai-research-workflow/PAPERS.md with SOTA/baseline paper candidates and reproduction priority")
     if paper_reproduction:
         recommended_steps.append("select one paper only after confirmation, then prepare a gated paper-reproduction workstream with REPRODUCTION.md")
     if experiment_campaign:
         recommended_steps.append("prepare a gated experiment-campaign workstream with EXPERIMENT.md as the primary design artifact")
     if idea_scouting:
-        recommended_steps.append("write/update .omc/ai-research/IDEA_SCOUTING.md and apply the six-field promotion gate")
+        recommended_steps.append("write/update .ai-research-workflow/IDEA_SCOUTING.md and apply the six-field promotion gate")
     if new_workstream_gate:
         recommended_steps.append("run /oh-my-claudecode:deep-interview --autoresearch -> /oh-my-claudecode:ralplan -> /oh-my-claudecode:autoresearch before creating the new workstream")
     if completion_handoff:
@@ -465,7 +465,7 @@ def resolve(
     elif paper_reproduction:
         workflow_phase = "paper-reproduction"
         workflow_action = "gate_one_paper_reproduction_workstream"
-        next_artifacts = [".omc/ai-research/PAPERS.md", ".omc/ai-research/<slug>/REPRODUCTION.md"]
+        next_artifacts = [".ai-research-workflow/PAPERS.md", ".ai-research-workflow/<slug>/REPRODUCTION.md"]
         guardrail_scripts = [
             "init_workstream.py --paper-reproduction",
             "validate_research_workspace.py --phase paper-reproduction --workstream <slug>",
@@ -473,15 +473,15 @@ def resolve(
     elif paper_scouting:
         workflow_phase = "paper-scouting"
         workflow_action = "find_and_maintain_sota_baseline_papers"
-        next_artifacts = [".omc/ai-research/PAPERS.md"]
+        next_artifacts = [".ai-research-workflow/PAPERS.md"]
         guardrail_scripts = ["validate_research_workspace.py --phase paper-scouting"]
     elif new_workstream_gate:
         workflow_phase = "new-workstream"
         workflow_action = "gate_experiment_campaign_workstream" if experiment_campaign else "complete_mandatory_workstream_gate"
         next_artifacts = [
-            ".omc/ai-research/INDEX.md",
-            ".omc/ai-research/<slug>/STATE.json",
-            *([] if not experiment_campaign else [".omc/ai-research/<slug>/EXPERIMENT.md"]),
+            ".ai-research-workflow/INDEX.md",
+            ".ai-research-workflow/<slug>/STATE.json",
+            *([] if not experiment_campaign else [".ai-research-workflow/<slug>/EXPERIMENT.md"]),
         ]
         guardrail_scripts = [
             "init_workstream.py --workstream-type experiment-campaign" if experiment_campaign else "init_workstream.py",
@@ -490,22 +490,22 @@ def resolve(
     elif completion_handoff:
         workflow_phase = "completion-handoff"
         workflow_action = "distill_completed_runs"
-        next_artifacts = [".omc/ai-research/<slug>/RUNS.md", ".omc/ai-research/<slug>/RESULTS.md"]
+        next_artifacts = [".ai-research-workflow/<slug>/RUNS.md", ".ai-research-workflow/<slug>/RESULTS.md"]
         guardrail_scripts = ["prepare_workstream_closeout.py", "validate_research_workspace.py --phase completion-handoff --workstream <slug>"]
     elif idea_scouting:
         workflow_phase = "idea-scouting"
         workflow_action = "scout_candidate_research_ideas"
-        next_artifacts = [".omc/ai-research/IDEA_SCOUTING.md"]
+        next_artifacts = [".ai-research-workflow/IDEA_SCOUTING.md"]
         guardrail_scripts = ["validate_research_workspace.py --phase idea-scouting"]
     elif question_capture and cfg.qa_capture != "off":
         workflow_phase = "question-capture"
         workflow_action = "answer_then_capture_question"
-        next_artifacts = [".omc/ai-research/QUESTIONS.md"]
+        next_artifacts = [".ai-research-workflow/QUESTIONS.md"]
         guardrail_scripts = ["capture_question.py"]
     else:
         workflow_phase = "normal-research"
         workflow_action = "resume_earliest_failing_artifact_gate"
-        next_artifacts = [".omc/ai-research/RESEARCH.md", ".omc/ai-research/INDEX.md"]
+        next_artifacts = [".ai-research-workflow/RESEARCH.md", ".ai-research-workflow/INDEX.md"]
         guardrail_scripts = ["summarize_research_state.py", "score_research_artifacts.py"]
 
     return {

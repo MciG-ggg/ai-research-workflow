@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Summarize a downstream .omx/ai-research portfolio.
+"""Summarize a downstream .ai-research-workflow portfolio.
 
 Script: summarize_research_state.py.
 
@@ -124,7 +124,7 @@ def summarize_workstream(workstream: Path) -> dict[str, Any]:
 
 
 def summarize(project_root: Path) -> dict[str, Any]:
-    ai_root = project_root / ".omx" / "ai-research"
+    ai_root = project_root / ".ai-research-workflow"
     if not ai_root.is_dir():
         return {"project_root": str(project_root), "ai_root": str(ai_root), "exists": False, "error": "missing ai-research root"}
     portfolio_research = read_text(ai_root / "RESEARCH.md")
@@ -193,7 +193,7 @@ def markdown(summary: dict[str, Any]) -> str:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Summarize .omx/ai-research portfolio and workstream state.")
+    parser = argparse.ArgumentParser(description="Summarize .ai-research-workflow portfolio and workstream state.")
     parser.add_argument("project_root", nargs="?", default=".", type=Path, help="Target project root. Defaults to cwd.")
     parser.add_argument("--json", action="store_true", help="Print JSON instead of Markdown.")
     parser.add_argument("--output", type=Path, help="Optional file to write the summary.")
