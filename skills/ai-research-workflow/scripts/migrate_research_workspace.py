@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Safely migrate legacy .omx/ai-research workspaces to current guardrails.
+"""Safely migrate legacy .ai-research-workflow workspaces to current guardrails.
 
 Script: migrate_research_workspace.py.
 
@@ -176,7 +176,7 @@ def ensure_state(path: Path, workstream: Path, actions: list[dict[str, Any]], *,
 
 
 def migrate(project_root: Path, *, write: bool, force: bool, include_optional: bool) -> dict[str, Any]:
-    ai_root = project_root / ".omx" / "ai-research"
+    ai_root = project_root / ".ai-research-workflow"
     actions: list[dict[str, Any]] = []
     ensure_dir(ai_root, actions, write=write)
     for dest_name, src_name in PORTFOLIO_TEMPLATES.items():
@@ -222,7 +222,7 @@ Default migration is dry-run. Rerun with `--write` to create only missing contro
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Migrate legacy .omx/ai-research control-plane workspaces safely.")
+    parser = argparse.ArgumentParser(description="Migrate legacy .ai-research-workflow control-plane workspaces safely.")
     parser.add_argument("project_root", nargs="?", default=".", type=Path, help="Target project root. Defaults to cwd.")
     parser.add_argument("--write", action="store_true", help="Apply the migration. Default is dry-run.")
     parser.add_argument("--force", action="store_true", help="Overwrite existing control-plane files. Default: never overwrite.")

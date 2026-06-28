@@ -85,7 +85,7 @@ def add_edge(edges: list[dict[str, str]], source: str, target: str, relation: st
 
 
 def build(project_root: Path, slug: str) -> dict[str, Any]:
-    workstream = project_root / ".omx" / "ai-research" / slug
+    workstream = project_root / ".ai-research-workflow" / slug
     if not workstream.is_dir():
         raise SystemExit(f"missing workstream: {workstream}")
     nodes: dict[str, dict[str, Any]] = {}

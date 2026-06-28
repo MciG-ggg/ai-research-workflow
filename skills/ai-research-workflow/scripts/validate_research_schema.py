@@ -210,7 +210,7 @@ def table_with_header(path: Path, required: set[str]) -> tuple[list[str], list[l
 
 def validate_project(project_root: Path, schema_dir: Path) -> list[Finding]:
     findings: list[Finding] = []
-    ai_root = project_root / ".omx" / "ai-research"
+    ai_root = project_root / ".ai-research-workflow"
     if not ai_root.is_dir():
         return [Finding("error", str(ai_root), "missing ai-research root")]
 
@@ -292,7 +292,7 @@ def validate_project(project_root: Path, schema_dir: Path) -> list[Finding]:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Validate .omx/ai-research schemas and artifact table contracts.")
+    parser = argparse.ArgumentParser(description="Validate .ai-research-workflow schemas and artifact table contracts.")
     parser.add_argument("project_root", nargs="?", default=".", type=Path, help="Target project root. Defaults to cwd.")
     parser.add_argument("--schema-dir", type=Path, default=SCHEMA_DIR, help="Schema directory. Defaults to skill assets/schemas.")
     parser.add_argument("--strict", action="store_true", help="Treat warnings as errors.")

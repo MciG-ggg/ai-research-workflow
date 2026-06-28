@@ -14,7 +14,7 @@ Run it when:
 - the user asks the agent to find SOTA or baseline papers and maintain a paper list;
 - the user explicitly asks to reproduce a paper or baseline as an idea-discovery path;
 - the current invocation includes `--idea-scouting`;
-- `.omx/ai-research/CONFIG.md` sets `idea_scouting: on`, or sets `idea_scouting: auto` under a `guided` or `autonomous` workflow preset and the prompt is broad/vague.
+- `.ai-research-workflow/CONFIG.md` sets `idea_scouting: on`, or sets `idea_scouting: auto` under a `guided` or `autonomous` workflow preset and the prompt is broad/vague.
 
 Skip it when a concrete research question, hypothesis, metric, and baseline already exist; continue directly to research intake and the new-workstream gate.
 
@@ -27,7 +27,7 @@ Idea Scouting must not:
 - replace full `LITERATURE.md` literature review;
 - implement code or launch experiments;
 - download papers, data, code, checkpoints, or run paper reproduction automatically;
-- create a new `.omx/ai-research/<slug>/` workstream without user confirmation.
+- create a new `.ai-research-workflow/<slug>/` workstream without user confirmation.
 
 ## Agent Decision Boundaries
 
@@ -35,17 +35,17 @@ The agent may autonomously:
 
 - choose search queries and scouting sources;
 - find SOTA and baseline candidate papers from allowed sources;
-- maintain `.omx/ai-research/PAPERS.md`;
+- maintain `.ai-research-workflow/PAPERS.md`;
 - generate candidate ideas;
 - rank and filter candidates;
-- write `.omx/ai-research/IDEA_SCOUTING.md`;
+- write `.ai-research-workflow/IDEA_SCOUTING.md`;
 - mark weak candidates as `parked` or `rejected`.
 
 The agent must ask before:
 
 - promoting an idea into a new workstream;
 - selecting one paper for reproduction when multiple plausible papers remain;
-- creating `.omx/ai-research/<slug>/`;
+- creating `.ai-research-workflow/<slug>/`;
 - starting `$deep-interview --autoresearch` for a promoted candidate when multiple candidates remain plausible.
 
 ## Artifact
@@ -53,7 +53,7 @@ The agent must ask before:
 Write the portfolio-level scouting ledger to:
 
 ```text
-.omx/ai-research/IDEA_SCOUTING.md
+.ai-research-workflow/IDEA_SCOUTING.md
 ```
 
 Use `assets/templates/IDEA_SCOUTING.md` when creating it.
@@ -61,7 +61,7 @@ Use `assets/templates/IDEA_SCOUTING.md` when creating it.
 When the user asks to find SOTA or baseline papers, also write or update:
 
 ```text
-.omx/ai-research/PAPERS.md
+.ai-research-workflow/PAPERS.md
 ```
 
 Use `assets/templates/PAPERS.md` when creating it.

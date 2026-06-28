@@ -1,6 +1,6 @@
 # AI Research Artifact Contracts
 
-Use these contracts to keep scientific goals separate from execution details and to keep `.omx/ai-research` metadata separate from project-root implementation work.
+Use these contracts to keep scientific goals separate from execution details and to keep `.ai-research-workflow` metadata separate from project-root implementation work.
 
 ## Contents
 
@@ -26,12 +26,12 @@ Use these contracts to keep scientific goals separate from execution details and
 
 ## Control plane vs project-root outputs
 
-`.omx/ai-research/` has a portfolio control plane and one or more workstream control planes.
+`.ai-research-workflow/` has a portfolio control plane and one or more workstream control planes.
 
 Portfolio control plane:
 
 ```text
-.omx/ai-research/
+.ai-research-workflow/
   IDEA_SCOUTING.md # optional before a clear research question exists
   PAPERS.md        # optional SOTA/baseline registry when paper scouting is requested
   RESEARCH.md
@@ -41,29 +41,29 @@ Portfolio control plane:
 Optional feedback memory, question capture, and growth review artifacts, created only when enabled:
 
 ```text
-.omx/ai-research/
+.ai-research-workflow/
   CONFIG.md
   QUESTIONS.md
   LEARNINGS.md
   ISSUES.md
   DECISIONS.md
   SKILL_GROWTH.md
-.omx/ai-research/<slug>/
+.ai-research-workflow/<slug>/
   DESIGN.md
   NOTES.md
   QUESTIONS.md
   REVIEW.md
 ```
 
-`.omx/ai-research/RESEARCH.md` stores the overall research program: central question, north-star hypotheses, success criteria, claim boundaries, current synthesis, active subquestions, and next priorities.
+`.ai-research-workflow/RESEARCH.md` stores the overall research program: central question, north-star hypotheses, success criteria, claim boundaries, current synthesis, active subquestions, and next priorities.
 
-`.omx/ai-research/INDEX.md` stores the workstream registry: each `<slug>`, status, relationship to the overall question, artifact links, latest evidence, and next action.
+`.ai-research-workflow/INDEX.md` stores the workstream registry: each `<slug>`, status, relationship to the overall question, artifact links, latest evidence, and next action.
 
-`.omx/ai-research/<slug>/` is the workstream control plane. It stores research intent, plans, run indexes, evidence summaries, and reproducibility notes for one concrete direction.
+`.ai-research-workflow/<slug>/` is the workstream control plane. It stores research intent, plans, run indexes, evidence summaries, and reproducibility notes for one concrete direction.
 
 Each workstream has `STATE.json` for phase state and `CLAIMS.md` for the authoritative evidence-to-claim ledger.
 
-Project-root files are the implementation plane. Method code, baseline or paper reproduction code, configs, tests, dataset adapters, benchmark entrypoints, and durable docs belong in the target repository's normal locations, not under `.omx/ai-research/`.
+Project-root files are the implementation plane. Method code, baseline or paper reproduction code, configs, tests, dataset adapters, benchmark entrypoints, and durable docs belong in the target repository's normal locations, not under `.ai-research-workflow/`.
 
 Use the Markdown templates in `assets/templates/` when creating new artifacts. They are scaffolds, not evidence; replace TODO placeholders before treating an artifact as complete.
 
@@ -71,7 +71,7 @@ Use `scripts/init_research_workspace.py` to initialize the portfolio `CONFIG.md`
 
 ## Idea scouting artifact
 
-`IDEA_SCOUTING.md` is optional and belongs at the portfolio root. It is used only before a clear research question exists, when the user asks for idea generation, idea triage, broad-direction scouting, `.omx/ai-research/CONFIG.md` sets `idea_scouting: on`, or `idea_scouting: auto` applies under a guided/autonomous preset.
+`IDEA_SCOUTING.md` is optional and belongs at the portfolio root. It is used only before a clear research question exists, when the user asks for idea generation, idea triage, broad-direction scouting, `.ai-research-workflow/CONFIG.md` sets `idea_scouting: on`, or `idea_scouting: auto` applies under a guided/autonomous preset.
 
 Use `assets/templates/IDEA_SCOUTING.md` when creating it.
 
@@ -119,7 +119,7 @@ Use `assets/templates/REPRODUCTION.md` when creating it.
 
 ## Optional feedback memory artifacts
 
-Research Feedback Memory, Question Capture, and Researcher Growth Review are opt-in. They are disabled by default and must not create extra files unless enabled by invocation flags or `.omx/ai-research/CONFIG.md`.
+Research Feedback Memory, Question Capture, and Researcher Growth Review are opt-in. They are disabled by default and must not create extra files unless enabled by invocation flags or `.ai-research-workflow/CONFIG.md`.
 
 Supported invocation flags:
 
@@ -128,7 +128,7 @@ Supported invocation flags:
 - `--growth-review`: enable Researcher Growth Review for the current invocation.
 - `--no-feedback`: force feedback memory, Q&A capture, and growth review off for the current invocation.
 
-Optional `.omx/ai-research/CONFIG.md` fields:
+Optional `.ai-research-workflow/CONFIG.md` fields:
 
 ```yaml
 schema_version: 1
@@ -141,7 +141,7 @@ qa_capture: off | research | all
 growth_review: off | milestone | always
 ```
 
-Precedence is: `--no-feedback`, explicit enable flags, `.omx/ai-research/CONFIG.md`, then default off.
+Precedence is: `--no-feedback`, explicit enable flags, `.ai-research-workflow/CONFIG.md`, then default off.
 
 `LEARNINGS.md` minimum sections:
 
@@ -202,8 +202,8 @@ Question Capture is opt-in. It records user questions and answer summaries when 
 `QUESTIONS.md` can exist at the portfolio root or inside a workstream:
 
 ```text
-.omx/ai-research/QUESTIONS.md
-.omx/ai-research/<slug>/QUESTIONS.md
+.ai-research-workflow/QUESTIONS.md
+.ai-research-workflow/<slug>/QUESTIONS.md
 ```
 
 Use `assets/templates/QUESTIONS.md` when creating either file.
@@ -218,7 +218,7 @@ Do not persist secrets, credentials, private data, transient status checks, comm
 
 ## Portfolio artifacts
 
-Minimum `.omx/ai-research/RESEARCH.md` sections:
+Minimum `.ai-research-workflow/RESEARCH.md` sections:
 
 - Overall research objective
 - Central research question
@@ -231,14 +231,14 @@ Minimum `.omx/ai-research/RESEARCH.md` sections:
 - Open decisions and next priorities
 - Last updated
 
-Minimum `.omx/ai-research/INDEX.md` sections:
+Minimum `.ai-research-workflow/INDEX.md` sections:
 
 - Workstream table: slug, status, subquestion, relationship to overall objective, key artifact links, latest evidence, mandatory workflow gate evidence, next action
 - New-workstream decision log: why a new slug was created instead of reusing an existing one
 - Archived or superseded workstreams
 - Cross-workstream dependencies and conflicts
 
-Before creating a new workstream, inspect portfolio `RESEARCH.md`, portfolio `INDEX.md`, and existing `.omx/ai-research/<slug>/` directories. Reuse an existing workstream unless the new task has a distinct research question, validation target, or artifact boundary.
+Before creating a new workstream, inspect portfolio `RESEARCH.md`, portfolio `INDEX.md`, and existing `.ai-research-workflow/<slug>/` directories. Reuse an existing workstream unless the new task has a distinct research question, validation target, or artifact boundary.
 
 New workstream mandatory workflow gate:
 
@@ -349,7 +349,7 @@ The type is orthogonal to lifecycle phase. Both types may move through `experime
 ## `SCRIPT_REGISTRY.md` minimum sections
 
 - Project-native commands that already satisfy the research contract
-- Project-local wrapper scripts under `.omx/ai-research/<slug>/scripts/`
+- Project-local wrapper scripts under `.ai-research-workflow/<slug>/scripts/`
 - Purpose, owner phase, inputs, outputs, dependencies, and environment variables for each command/script
 - Safe-to-rerun/idempotency notes
 - Validation status and last validated command/log path
@@ -452,7 +452,7 @@ Each terminal run directory remains raw evidence. After completion, extract dura
 - Update `RESULTS.md` with tables, figures, interpretation, and hypothesis verdicts when evidence changes.
 - Update `REPRODUCIBILITY.md` with rerun instructions, blockers, environment notes, or nondeterminism.
 - Promote stable conclusions to project-root `docs/`, `reports/`, benchmark cards, README sections, or MkDocs pages.
-- Promote reusable code/config/test changes to the project root, not to `.omx/ai-research/`.
+- Promote reusable code/config/test changes to the project root, not to `.ai-research-workflow/`.
 - Keep raw logs, checkpoints, private data, and large temporary outputs in run/artifact storage; link or summarize them instead of copying them into project docs.
 
 When the user says the current experiment is done, treat that message as an experiment completion handoff trigger. Inspect available run directories and project-local scripts, then persist valuable or user-requested content into the stable artifacts above before giving the final answer. If a requested artifact cannot be written because evidence is missing, record the missing path and exact recovery step.

@@ -124,15 +124,15 @@ When no subcommand is present, use `resolve_workflow.py --prompt` plus the proje
 
 ## Artifact setup
 
-Maintain two research control-plane layers under `.omx/ai-research/`:
+Maintain two research control-plane layers under `.ai-research-workflow/`:
 
-- Portfolio layer: `.omx/ai-research/RESEARCH.md` and `.omx/ai-research/INDEX.md` capture the user's overall research program, current synthesis, active workstreams, and how small directions relate to the larger goal.
-- Workstream layer: `.omx/ai-research/<slug>/` captures a specific subquestion, method lane, baseline, ablation, experiment family, or paper/report slice.
+- Portfolio layer: `.ai-research-workflow/RESEARCH.md` and `.ai-research-workflow/INDEX.md` capture the user's overall research program, current synthesis, active workstreams, and how small directions relate to the larger goal.
+- Workstream layer: `.ai-research-workflow/<slug>/` captures a specific subquestion, method lane, baseline, ablation, experiment family, or paper/report slice.
 
 Minimum portfolio layout:
 
 ```text
-.omx/ai-research/
+.ai-research-workflow/
   IDEA_SCOUTING.md # optional when idea_scouting is enabled or the question is not yet clear
   PAPERS.md        # optional SOTA/baseline paper registry when paper scouting is requested
   RESEARCH.md
@@ -143,7 +143,7 @@ Minimum portfolio layout:
 Minimum workstream layout:
 
 ```text
-.omx/ai-research/<slug>/
+.ai-research-workflow/<slug>/
   STATE.json
   RESEARCH.md
   LITERATURE.md
@@ -173,7 +173,7 @@ Use `scripts/init_workstream.py --workstream-type paper-reproduction` or the com
 
 ## Workflow presets and overrides
 
-Project config can reduce how often the user must name the workflow explicitly. Use `.omx/ai-research/CONFIG.md` from `assets/templates/CONFIG.md`:
+Project config can reduce how often the user must name the workflow explicitly. Use `.ai-research-workflow/CONFIG.md` from `assets/templates/CONFIG.md`:
 
 ```yaml
 schema_version: 1
@@ -194,9 +194,9 @@ Overrides win over the preset. `idea_scouting: auto` lets broad/vague idea promp
 
 Idea Scouting is optional and is not the default path for already-clear research questions. Use it when the user asks for idea generation, asks whether an idea is worth doing, gives only a broad area, or explicitly passes `--idea-scouting`.
 
-Write `.omx/ai-research/IDEA_SCOUTING.md` from `assets/templates/IDEA_SCOUTING.md`. The agent may choose search sources, generate candidate ideas, rank/filter candidates, and write the scouting artifact. It must not choose the final topic, guarantee absolute novelty, replace full `LITERATURE.md`, implement code, run experiments, or create a new workstream without user confirmation.
+Write `.ai-research-workflow/IDEA_SCOUTING.md` from `assets/templates/IDEA_SCOUTING.md`. The agent may choose search sources, generate candidate ideas, rank/filter candidates, and write the scouting artifact. It must not choose the final topic, guarantee absolute novelty, replace full `LITERATURE.md`, implement code, run experiments, or create a new workstream without user confirmation.
 
-When the user explicitly asks to find SOTA/baseline papers, maintain the portfolio paper registry at `.omx/ai-research/PAPERS.md` using `assets/templates/PAPERS.md`. The registry tracks candidate SOTA papers, baseline papers, benchmark/dataset papers, code/data/checkpoint availability, key claims, reproduction priority, and maintenance history.
+When the user explicitly asks to find SOTA/baseline papers, maintain the portfolio paper registry at `.ai-research-workflow/PAPERS.md` using `assets/templates/PAPERS.md`. The registry tracks candidate SOTA papers, baseline papers, benchmark/dataset papers, code/data/checkpoint availability, key claims, reproduction priority, and maintenance history.
 
 When the user explicitly asks to reproduce a paper to find ideas, treat this as paper-reproduction scouting: update `PAPERS.md`, add the paper-derived idea section in `IDEA_SCOUTING.md`, and if the user confirms one paper, enter the new-workstream gate for a paper-reproduction workstream. The actual reproduction plan and evidence belong in the workstream `REPRODUCTION.md`, `EXPERIMENT.md`, `RUNS.md`, `RESULTS.md`, `CLAIMS.md`, and `REPRODUCIBILITY.md`. Do not launch reproduction runs, download data, or create the workstream without the normal confirmation and gate evidence.
 
@@ -235,7 +235,7 @@ Invocation flags:
 - `--growth-review`: enable Researcher Growth Review for this invocation.
 - `--no-feedback`: force feedback memory, Q&A capture, and growth review off for this invocation.
 
-Optional project config lives at `.omx/ai-research/CONFIG.md`:
+Optional project config lives at `.ai-research-workflow/CONFIG.md`:
 
 ```yaml
 schema_version: 1
@@ -248,11 +248,11 @@ qa_capture: off | research | all
 growth_review: off | milestone | always
 ```
 
-Resolution precedence: `--no-feedback`, explicit enable flags, `.omx/ai-research/CONFIG.md`, then default off. Use `assets/templates/CONFIG.md`, `QUESTIONS.md`, `LEARNINGS.md`, `ISSUES.md`, `DECISIONS.md`, `SKILL_GROWTH.md`, `DESIGN.md`, `NOTES.md`, and `REVIEW.md` only when the resolved mode enables them.
+Resolution precedence: `--no-feedback`, explicit enable flags, `.ai-research-workflow/CONFIG.md`, then default off. Use `assets/templates/CONFIG.md`, `QUESTIONS.md`, `LEARNINGS.md`, `ISSUES.md`, `DECISIONS.md`, `SKILL_GROWTH.md`, `DESIGN.md`, `NOTES.md`, and `REVIEW.md` only when the resolved mode enables them.
 
 Feedback memory records distilled knowledge, not raw logs. Keep raw run outputs under `runs/` and link or summarize them.
 
-When Q&A capture is enabled and the user asks a research, design, architecture, experiment, interpretation, or workflow question rather than issuing a command, answer first, then append the question and answer summary to `.omx/ai-research/QUESTIONS.md` or `.omx/ai-research/<slug>/QUESTIONS.md`. Route durable concepts, decisions, issues, design notes, or growth lessons to the appropriate feedback artifacts.
+When Q&A capture is enabled and the user asks a research, design, architecture, experiment, interpretation, or workflow question rather than issuing a command, answer first, then append the question and answer summary to `.ai-research-workflow/QUESTIONS.md` or `.ai-research-workflow/<slug>/QUESTIONS.md`. Route durable concepts, decisions, issues, design notes, or growth lessons to the appropriate feedback artifacts.
 
 Use `scripts/capture_question.py` for deterministic question capture after the answer has been given. It refuses likely secret/credential text unless explicitly overridden. `scripts/question_capture_hook.py` adds the two-stage hook surface: submit classifies and records pending state, answer appends only after an answer summary exists. `assets/hooks/question-capture.example.json` shows example wiring; hooks may call capture only when `qa_capture` resolves to `research` or `all`.
 
@@ -260,11 +260,11 @@ Use `assets/schemas/` with `scripts/validate_research_schema.py` when CONFIG, ST
 
 ## Research control plane vs project implementation
 
-`.omx/ai-research/` is the research portfolio control plane. `.omx/ai-research/<slug>/` is a workstream control plane.
+`.ai-research-workflow/` is the research portfolio control plane. `.ai-research-workflow/<slug>/` is a workstream control plane.
 
-Actual research work belongs in the target project root using existing project conventions. Implement the user's method, reproduce baselines, add configs, tests, dataset adapters, training/evaluation entrypoints, and reports in project-root locations such as `src/`, `models/`, `baselines/`, `configs/`, `experiments/`, `scripts/`, `tests/`, `docs/`, or established equivalents. Do not put method code, baseline code, or production experiment code under `.omx/ai-research/`; only thin orchestration wrappers and metadata belong there.
+Actual research work belongs in the target project root using existing project conventions. Implement the user's method, reproduce baselines, add configs, tests, dataset adapters, training/evaluation entrypoints, and reports in project-root locations such as `src/`, `models/`, `baselines/`, `configs/`, `experiments/`, `scripts/`, `tests/`, `docs/`, or established equivalents. Do not put method code, baseline code, or production experiment code under `.ai-research-workflow/`; only thin orchestration wrappers and metadata belong there.
 
-For a paper-reproduction workstream, `.omx/ai-research/<slug>/REPRODUCTION.md` is the control-plane ledger for the target paper, claim, reproduction type, available materials, deviations, run evidence links, reproduction-derived ideas, and final distillation. Project-root code/config/data adapters still live in the target repository's normal implementation plane.
+For a paper-reproduction workstream, `.ai-research-workflow/<slug>/REPRODUCTION.md` is the control-plane ledger for the target paper, claim, reproduction type, available materials, deviations, run evidence links, reproduction-derived ideas, and final distillation. Project-root code/config/data adapters still live in the target repository's normal implementation plane.
 
 ## Task worktree rule
 
@@ -285,7 +285,7 @@ The skill repository tracks the framework itself:
 
 When this skill runs, designs, implements, or audits experiments, structured runtime evidence is mandatory by default. Do not wait for the user to ask for logs, metrics, progress, or visualizations.
 
-For every actual experiment run, ensure the project has existing native commands or project-local scripts recorded in `.omx/ai-research/<slug>/SCRIPT_REGISTRY.md`. Put wrappers under `.omx/ai-research/<slug>/scripts/`. Commands/scripts must produce a distinct run directory with command record, complete log, structured metrics, summary, and figures when visualizations are appropriate.
+For every actual experiment run, ensure the project has existing native commands or project-local scripts recorded in `.ai-research-workflow/<slug>/SCRIPT_REGISTRY.md`. Put wrappers under `.ai-research-workflow/<slug>/scripts/`. Commands/scripts must produce a distinct run directory with command record, complete log, structured metrics, summary, and figures when visualizations are appropriate.
 
 Each workstream keeps `STATE.json` as its phase state and `CLAIMS.md` as its evidence-to-claim ledger. Update `STATE.json` at workflow phase transitions. Update `CLAIMS.md` whenever results support, contradict, downgrade, or retire a claim.
 
@@ -298,8 +298,8 @@ When settled results or conclusions are finalized and project policy allows, mir
 When the user says the current experiment is done, finished, ready to wrap up, or otherwise asks to close out the current run, switch into Experiment completion handoff before answering. Do not treat the message as chat-only.
 
 Completion handoff requires:
-- inspect `.omx/ai-research/<slug>/runs/` manifests, logs, metrics, summaries, and figures
-- inspect `.omx/ai-research/<slug>/scripts/` and update `SCRIPT_REGISTRY.md`
+- inspect `.ai-research-workflow/<slug>/runs/` manifests, logs, metrics, summaries, and figures
+- inspect `.ai-research-workflow/<slug>/scripts/` and update `SCRIPT_REGISTRY.md`
 - update `RUNS.md`, `RESULTS.md`, and `REPRODUCIBILITY.md` when evidence changes status, conclusions, rerun requirements, or failures
 - update `CLAIMS.md` and preserve negative or inconclusive results instead of deleting them
 - persist user-requested outputs, notable findings, reusable commands, decisions, and next-step TODOs into stable artifacts or project-root docs
@@ -322,7 +322,7 @@ Use `scripts/generate_report_outline.py` only after stable evidence exists. It c
 
 ## Workflow phases
 
-0. OMX workflow entry: read or create `.omx/ai-research/RESEARCH.md` and `.omx/ai-research/INDEX.md`; run optional idea scouting when there is no clear research question; decide whether to reuse a workstream or enter the new-workstream gate; resolve optional feedback and Q&A capture modes.
+0. OMX workflow entry: read or create `.ai-research-workflow/RESEARCH.md` and `.ai-research-workflow/INDEX.md`; run optional idea scouting when there is no clear research question; decide whether to reuse a workstream or enter the new-workstream gate; resolve optional feedback and Q&A capture modes.
 1. Research intake: produce portfolio and workstream `RESEARCH.md` with research question, falsifiable hypothesis, success/falsification criteria, non-goals, claim boundaries, and decision boundaries.
 2. Literature review: produce `LITERATURE.md` with source-backed evidence from primary sources when facts are current or niche.
 3. Research question spec: tighten hypotheses until each is testable.

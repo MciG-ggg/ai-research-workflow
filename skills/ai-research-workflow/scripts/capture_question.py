@@ -49,7 +49,7 @@ def entry(args: argparse.Namespace) -> str:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Append a distilled Q&A entry to .omx/ai-research QUESTIONS.md.")
+    parser = argparse.ArgumentParser(description="Append a distilled Q&A entry to .ai-research-workflow QUESTIONS.md.")
     parser.add_argument("project_root", type=Path, help="Target project root.")
     parser.add_argument("--question", required=True, help="User question to record.")
     parser.add_argument("--answer-summary", required=True, help="Concise answer summary; answer the user before capture.")
@@ -66,7 +66,7 @@ def main() -> int:
     if SENSITIVE_RE.search(combined) and not args.allow_sensitive:
         raise SystemExit("refusing to capture possible secret/credential text; redact it or pass --allow-sensitive intentionally")
 
-    ai_root = args.project_root.resolve() / ".omx" / "ai-research"
+    ai_root = args.project_root.resolve() / ".ai-research-workflow"
     target = ai_root / args.workstream / "QUESTIONS.md" if args.workstream else ai_root / "QUESTIONS.md"
     text = entry(args)
     if args.dry_run:

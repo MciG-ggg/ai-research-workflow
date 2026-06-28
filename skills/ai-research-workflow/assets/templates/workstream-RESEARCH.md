@@ -59,7 +59,7 @@ TODO
 
 ## Portfolio Link
 
-- `.omx/ai-research/RESEARCH.md`
+- `.ai-research-workflow/RESEARCH.md`
 
 ## New-workstream Gate Evidence
 

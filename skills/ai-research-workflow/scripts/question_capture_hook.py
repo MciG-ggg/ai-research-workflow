@@ -142,7 +142,7 @@ def append_capture(
     if SENSITIVE_RE.search("\n".join([question, answer_summary, "\n".join(evidence), "\n".join(routed_update), follow_up or ""])):
         raise SystemExit("refusing to capture possible secret/credential text; redact it first")
 
-    ai_root = project_root / ".omx" / "ai-research"
+    ai_root = project_root / ".ai-research-workflow"
     target = ai_root / workstream / "QUESTIONS.md" if workstream else ai_root / "QUESTIONS.md"
     capture_args = argparse.Namespace(
         question=question,
@@ -181,12 +181,12 @@ def main() -> int:
     parser.add_argument("--prompt-file", type=Path, help="File containing the user prompt/question.")
     parser.add_argument("--answer-summary", help="Distilled answer summary supplied by the post-answer hook.")
     parser.add_argument("--answer-file", type=Path, help="File containing the distilled answer summary.")
-    parser.add_argument("--workstream", help="Optional workstream slug for .omx/ai-research/<slug>/QUESTIONS.md.")
+    parser.add_argument("--workstream", help="Optional workstream slug for .ai-research-workflow/<slug>/QUESTIONS.md.")
     parser.add_argument("--scope", choices=["research", "workflow", "architecture", "experiment", "interpretation", "all"], help="Override inferred question scope.")
     parser.add_argument("--evidence", action="append", default=[], help="Evidence/link/path to record. Repeatable.")
     parser.add_argument("--routed-update", action="append", default=[], help="Artifact updated because of the answer. Repeatable.")
     parser.add_argument("--follow-up", help="Optional follow-up action.")
-    parser.add_argument("--pending-path", type=Path, help="Override pending marker path. Defaults to .omx/state/ai-research-question-capture-pending.json.")
+    parser.add_argument("--pending-path", type=Path, help="Override pending marker path. Defaults to .ai-research-workflow/state/ai-research-question-capture-pending.json.")
     parser.add_argument("--no-pending-write", action="store_true", help="Submit stage classifies only; do not write the pending marker.")
     parser.add_argument("--keep-pending", action="store_true", help="Answer stage keeps the pending marker after successful capture.")
     parser.add_argument("--dry-run", action="store_true", help="Print planned writes without changing files.")
