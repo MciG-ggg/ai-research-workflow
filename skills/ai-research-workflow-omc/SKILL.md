@@ -49,6 +49,7 @@ Maintenance validation:
 python3 scripts/validate_framework_contract.py .
 python3 scripts/validate_research_workspace.py <project-root>
 python3 scripts/validate_research_schema.py <project-root>
+python3 scripts/validate_run_purposes.py <project-root>
 python3 scripts/check_regression_fixtures.py
 python3 scripts/run_e2e_scenarios.py
 ```
@@ -96,6 +97,8 @@ Prefer explicit subcommands when the user's intent matches one of these lanes. `
 /oh-my-claudecode:ai-research-workflow closeout           # workstream + report-before-merge closeout plan
 /oh-my-claudecode:ai-research-workflow negative-result    # preserve failed/null/inconclusive evidence and downgrade claims
 /oh-my-claudecode:ai-research-workflow draft              # paper/report/blog/rebuttal outline from stable artifacts
+/oh-my-claudecode:ai-research-workflow recall            # "之前那个 X 实验干嘛的来着?" - 召回 workstreams / runs / decisions
+/oh-my-claudecode:ai-research-workflow run-purposes       # validate every runs/<id>/ has a purpose.md
 ```
 
 Bundled CLI facade for deterministic local use:
@@ -105,6 +108,8 @@ python3 scripts/ai_research.py help
 python3 scripts/ai_research.py resolve <project-root> --prompt "这个实验做完了，整理落盘"
 python3 scripts/ai_research.py schema <project-root>
 python3 scripts/ai_research.py graph <project-root> <slug> --json
+python3 scripts/ai_research.py recall <project-root> [--query TEXT] [--slug SLUG] [--limit N] [--json]
+python3 scripts/ai_research.py run-purposes <project-root> [--strict]
 python3 scripts/ai_research.py update-check
 ```
 
@@ -133,6 +138,8 @@ Minimum portfolio layout:
 
 ```text
 .ai-research-workflow/
+  CONTEXT.md       # always-on: ubiquitous language + active questions (DDD-style vocabulary)
+  DECISIONS.md     # always-on: 1-2-line log of "why we did X this way"
   IDEA_SCOUTING.md # optional when idea_scouting is enabled or the question is not yet clear
   PAPERS.md        # optional SOTA/baseline paper registry when paper scouting is requested
   RESEARCH.md
@@ -155,12 +162,54 @@ Minimum workstream layout:
   REPRODUCIBILITY.md
   PAPER_DRAFT.md
   SCRIPT_REGISTRY.md
+  DECISIONS.md     # always-on: per-workstream decision log
   CLOSEOUT.md       # optional workstream completion/report-before-merge plan
   PAPER_OUTLINE.md  # optional generated report outline
   QUESTIONS.md      # optional when qa_capture is enabled
   scripts/
   runs/
+    <run-id>/
+      purpose.md   # required: why this run exists, written before launch
+      transcript.jsonl
+      artifacts/
 ```
+
+## Always-on vocabulary, decisions, and run-purpose artifacts
+
+These three lightweight files exist by default in every fresh workspace and
+every new workstream. They are the cheapest insurance against the three
+failure modes below and should be maintained continuously rather than only
+when a feedback-memory mode is enabled.
+
+- `.ai-research-workflow/CONTEXT.md` — Ubiquitous language. A short table of
+  project-specific terms with one-line definitions and legacy names to avoid,
+  plus a list of active research questions. Borrowed from Eric Evans'
+  Domain-Driven Design: every term here is the single source of truth used in
+  artifacts, conversations, commits, and code. **Failure mode prevented**:
+  the agent reinvents or misremembers project vocabulary between sessions.
+- `.ai-research-workflow/DECISIONS.md` and `.ai-research-workflow/<slug>/DECISIONS.md` —
+  One row per decision: date, scope, the choice made, what was rejected, and
+  why. Two lines per row is enough. **Failure mode prevented**:
+  "why did we do it this way" archaeology at the start of every workstream.
+- `.ai-research-workflow/<slug>/runs/<run-id>/purpose.md` — Written BEFORE
+  the run starts. Captures the hypothesis being tested, what success looks
+  like, expected runtime, and stop conditions. Filled out post-run with what
+  we actually learned. **Failure mode prevented**: a timestamped run folder
+  whose name no longer matches anything the agent remembers about its purpose.
+
+The validator `scripts/validate_run_purposes.py` walks every workstream's
+`runs/` directory and warns (or, with `--strict`, errors) when a run is
+missing `purpose.md` or only has TODO placeholders. Run it on every
+completion handoff.
+
+The recall helper `scripts/recall.py` (or `ai_research.py recall`) walks
+the workspace and prints a compact report answering "what was that experiment
+for?" without archaeology. It accepts `--query TEXT` to filter runs whose
+`purpose.md` contains TEXT, `--slug SLUG` to restrict to one workstream,
+and `--json` for machine-readable output. Use it before resuming a paused
+project, before answering the user "what did we do last week?", or before
+starting a new workstream to confirm whether the question already has a
+running home.
 
 Use `assets/templates/portfolio-RESEARCH.md`, `portfolio-INDEX.md`, `PAPERS.md`, `STATE.json`, `workstream-RESEARCH.md`, `REPRODUCTION.md`, `CLAIMS.md`, and the artifact-specific templates as the starting point when creating these files. Templates define shape only; replace TODO placeholders with project evidence before treating an artifact as complete.
 

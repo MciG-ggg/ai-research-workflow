@@ -33,6 +33,9 @@ WORKSTREAM_TEMPLATES = {
     "REPRODUCIBILITY.md": "REPRODUCIBILITY.md",
     "PAPER_DRAFT.md": "PAPER_DRAFT.md",
     "SCRIPT_REGISTRY.md": "SCRIPT_REGISTRY.md",
+    # DECISIONS.md is always-on per workstream: 1-2 lines per decision,
+    # scoped to this workstream's lifetime and decisions.
+    "DECISIONS.md": "DECISIONS.md",
 }
 PAPER_REPRODUCTION_TEMPLATES = {
     "REPRODUCTION.md": "REPRODUCTION.md",
