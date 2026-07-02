@@ -44,6 +44,8 @@ SCRIPT_COMMANDS = {
     "update-check": "check_skill_update.py",
     "e2e": "run_e2e_scenarios.py",
     "fixtures": "check_regression_fixtures.py",
+    "recall": "recall.py",
+    "run-purposes": "validate_run_purposes.py",
 }
 
 ROUTE_ONLY = {"scout", "papers", "reproduce-paper", "experiment", "route", "commands"}
@@ -62,6 +64,8 @@ If you want X, say Y:
   Preserve a failed result:   ai_research.py negative-result <project-root> <slug> --finding ... --evidence ... --interpretation ... --claim-update ...
   Check schemas:              ai_research.py schema <project-root>
   Build evidence graph:       ai_research.py graph <project-root> <slug> --json
+  Recall experiments/decisions: ai_research.py recall <project-root> [--query TEXT] [--slug SLUG] [--json]
+  Validate per-run purpose.md:  ai_research.py run-purposes <project-root> [--strict]
   Check installed version:    ai_research.py update-check
 """
 
