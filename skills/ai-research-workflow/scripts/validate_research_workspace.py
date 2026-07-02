@@ -15,7 +15,7 @@ import sys
 from dataclasses import dataclass
 from pathlib import Path
 
-PORTFOLIO_FILES = ["RESEARCH.md", "INDEX.md"]
+PORTFOLIO_FILES = ["RESEARCH.md", "INDEX.md", "CONTEXT.md", "DECISIONS.md"]
 IDEA_SCOUTING_FILES = ["IDEA_SCOUTING.md"]
 PAPER_REGISTRY_FILES = ["PAPERS.md"]
 
@@ -28,10 +28,13 @@ WORKSTREAM_FILES = [
     "REPRODUCIBILITY.md",
     "PAPER_DRAFT.md",
     "SCRIPT_REGISTRY.md",
+    # DECISIONS.md is always-on per workstream so 1-2-line decisions are
+    # captured without enabling feedback_memory mode.
+    "DECISIONS.md",
 ]
 LIFECYCLE_WORKSTREAM_FILES = ["STATE.json", "CLAIMS.md"]
 
-FEEDBACK_ROOT_FILES = ["LEARNINGS.md", "ISSUES.md", "DECISIONS.md"]
+FEEDBACK_ROOT_FILES = ["LEARNINGS.md", "ISSUES.md"]
 QA_ROOT_FILES = ["QUESTIONS.md"]
 GROWTH_ROOT_FILES = ["SKILL_GROWTH.md"]
 

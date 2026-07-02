@@ -89,11 +89,17 @@ def main() -> int:
     write_config(ai_root / "CONFIG.md", args, force=args.force, dry_run=args.dry_run, actions=actions)
     copy_template("portfolio-RESEARCH.md", ai_root / "RESEARCH.md", force=args.force, dry_run=args.dry_run, actions=actions)
     copy_template("portfolio-INDEX.md", ai_root / "INDEX.md", force=args.force, dry_run=args.dry_run, actions=actions)
+    # CONTEXT.md is always-on: project-level ubiquitous language so the
+    # agent does not reinvent terminology every session.
+    copy_template("CONTEXT.md", ai_root / "CONTEXT.md", force=args.force, dry_run=args.dry_run, actions=actions)
+    # DECISIONS.md is always-on at portfolio level: 1-2 lines per decision,
+    # low overhead, prevents "why did we do it this way" archaeology later.
+    copy_template("DECISIONS.md", ai_root / "DECISIONS.md", force=args.force, dry_run=args.dry_run, actions=actions)
 
     if args.idea_scouting == "on":
         copy_template("IDEA_SCOUTING.md", ai_root / "IDEA_SCOUTING.md", force=args.force, dry_run=args.dry_run, actions=actions)
     if args.feedback_memory in {"lite", "full"}:
-        for name in ("LEARNINGS.md", "ISSUES.md", "DECISIONS.md"):
+        for name in ("LEARNINGS.md", "ISSUES.md"):
             copy_template(name, ai_root / name, force=args.force, dry_run=args.dry_run, actions=actions)
     if args.qa_capture in {"research", "all"}:
         copy_template("QUESTIONS.md", ai_root / "QUESTIONS.md", force=args.force, dry_run=args.dry_run, actions=actions)
